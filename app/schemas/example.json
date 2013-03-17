@@ -1,0 +1,35 @@
+{
+	"PDO": "sqlite",
+	
+	"columns": [
+		{
+			"name": "id",
+			"type": "INTEGER", 
+			"constraints": ["PRIMARY KEY"]
+		},
+		{
+			"name": "title",
+			"type": "TEXT", 
+			"constraints": ["NOT NULL"],
+			"default": "''"
+		},
+		{
+			"name":	"done",
+			"type": "INTEGER", 
+			"constraints": ["NOT NULL"],	
+			"default": 0
+		},
+		{
+			"name": "date_created",
+			"type": "TEXT",
+			"default": "CURRENT_TIMESTAMP"
+		},
+		{
+			"name": "last_updated",
+			"type": "TEXT", 
+			"default": "CURRENT_TIMESTAMP"
+		}
+	],
+
+	"constraints":[]
+}

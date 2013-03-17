@@ -1,0 +1,15 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    <name> -- <role> -- <twitter>
+    José Vieira Lisboa -- Developer -- #
+
+# THANKS
+
+    O'Reilly
+
+# TECHNOLOGY COLOPHON
+
+    PHP, SQLite

@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Example tasks table schema
+ * @example For a tasks schema 'tasks.php':
+ * change table class name 'Example_Table' to 'Tasks_Table'
+ * change table name 'example' to 'tasks'
+ * change controller name to the PDO used (Sqlite, Mysql, ...)
+ */
+class {Table}_Table extends {Controller} {
+
+    /**
+     * creates the table in the database
+     */
+    public function create(){
+        $this->exec("CREATE TABLE IF NOT EXISTS {table}({schema})");
+    }
+
+    /**
+     * removes the table from the database
+     */
+    public function drop(){
+        $this->exec("DROP TABLE {table}");
+    }
+}

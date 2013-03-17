@@ -1,0 +1,11 @@
+app/controllers/*
+app/schemas/*
+app/uploads/*
+!app/controllers/download.php
+!app/controllers/upload.php
+!app/controllers/schema.php
+!app/controllers/closure_compiler.php
+!app/controllers/example.php
+!app/schemas/example.php
+!app/schemas/example.json
+storage/*.sqlite
