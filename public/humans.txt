@@ -3,8 +3,8 @@
 
 # TEAM
 
-    <name> -- <role> -- <twitter>
-    José Vieira Lisboa -- Developer -- #
+    <name> -- <role> -- <e-mail>
+    José Vieira Lisboa -- Developer -- jose.vieira.lisboa@gmail.com
 
 # THANKS
 

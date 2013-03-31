@@ -1,16 +1,27 @@
 <?php
+/**
+ * Situs - A PHP Framework
+ *
+ * @package  Situs
+ * @version  0.0.0
+ * @author   José Vieira Lisboa <jose.vieira.lisboa@gmail.com>
+ * @link     http://situs.pt
+ */
 
 /**
- * Router
+ * Router class
  */
 class Router extends Util {
     protected $response = "";
-    protected static $routes = null;
+    protected static $routes;
 
     /**
-     *
+     * Route
+     * adds a route callback to the routes array
      */
     public static function route($uri, $callback){
+        if(empty($uri) || empty($callback)) return; 
+        if(!isset(self::$routes)) self::$routes = (object) array();
         self::$routes->$uri = $callback;
     }
 
@@ -177,10 +188,9 @@ class Router extends Util {
             $args = array(); 
             $args[] = $request;
 
-            if(method_exists($Controller, $request->method)) {
-                
+            if(method_exists($Controller, $request->method)) { 
                 Auth::basic($api);
-
+                
                 Database::$table = $api;
 
                 $reflectionMethod = new ReflectionMethod($Controller, $request->method);

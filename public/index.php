@@ -1,12 +1,20 @@
 <?php
+/**
+ * Situs - A PHP Framework
+ *
+ * @package  Situs
+ * @version  0.0.0
+ * @author   José Vieira Lisboa <jose.vieira.lisboa@gmail.com>
+ * @link     http://situs.pt
+ */
 
-error_reporting(0);
+//--------------------------
+// Uncomment for production
+//--------------------------
+#error_reporting(0);
 
 Router::run();
 
-/**
- * Auto loads classes
- */
 function __autoload($className) {
     $className = strtolower($className);
     $base = dirname(dirname(__FILE__));
@@ -17,7 +25,8 @@ function __autoload($className) {
 }
 
 /**
- * loads a required files or quits quietly
+ * Load File
+ * Requires a file or quits silently
  */
 function load($file){
     if(!file_exists($file)) return false;

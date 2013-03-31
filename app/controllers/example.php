@@ -7,7 +7,7 @@
  * The controller has to be created manualy, in the controllers folder,
  * if the Api does not use the database (that is: it does not have a schema).
  *
- * Anonymous functions require PHP >=5.3. 
+ * Anonymous functions require PHP >=5.3.
  *
  * @example For a  tasks controller 'tasks.php':
  * change table class name 'Example_Controller' to 'Tasks_Controller'

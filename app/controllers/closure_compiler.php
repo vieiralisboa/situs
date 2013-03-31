@@ -4,6 +4,10 @@
  */
 class Closure_compiler_Controller {
     
+    public function get($request) {
+        return "The Closure Compiler API does not respond to GET requests.";
+    }
+
     //POST /upload/file 
     public function post($request) {
         #return $_FILES;

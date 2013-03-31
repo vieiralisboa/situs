@@ -1,4 +1,12 @@
 <?php
+/**
+ * Situs - A PHP Framework
+ *
+ * @package  Situs
+ * @version  0.0.0
+ * @author   José Vieira Lisboa <jose.vieira.lisboa@gmail.com>
+ * @link     http://situs.pt
+ */
 
 /**
  * TODO change Model to Record (or Document)

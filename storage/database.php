@@ -1,11 +1,19 @@
 <?php
+/**
+ * Situs - A PHP Framework
+ *
+ * @package  Situs
+ * @version  0.0.0
+ * @author   José Vieira Lisboa <jose.vieira.lisboa@gmail.com>
+ * @link     http://situs.pt
+ */
 
 /**
  * Link to the database
  */
 class Database extends Sqlite {
     
-    public static $table = nulll;
+    public static $table = null;
 
     /**
      * Static Database...
@@ -234,13 +242,15 @@ class Database extends Sqlite {
     }
 
    
-    function __construct($input){
-        
+    function __construct($input = null){
+        if($input === null) return;
+
         self::create_table(self::$table);
         
         $schema = $this->schema(self::$table);
         
         $this->input = $input;
+        
         $this->fields = (object) array();
         foreach($input as $field => $value){
             if(isset($schema[$field])){
