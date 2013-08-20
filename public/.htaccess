@@ -9,8 +9,11 @@
 # features. "+FollowSymLinks" must be enabled for this to work symbolically.
 
 DirectoryIndex index.html index.php
-Header set Access-Control-Allow-Origin *
+
+Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
 Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+
 <IfModule mod_rewrite.c>
 	Options +FollowSymLinks
 	RewriteEngine On

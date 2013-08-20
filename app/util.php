@@ -97,7 +97,7 @@ class Util {
         $regex = "/^";
         foreach($uri_array as $u) {
             $regex .= "\\/";
-            $regex .= substr($u, 0, 1) == ":" ? '(?P<' . substr($u, 1) .'>.+)' : $u;//[A-Za-z0-9_]
+            $regex .= substr($u, 0, 1) == ":" ? '(?P<' . substr($u, 1) .'>[A-Za-z0-9_\-\.]+)' : $u;//
         }
         $regex .= "$/";
 
@@ -118,7 +118,7 @@ class Util {
         if(preg_match($regex, $_SERVER['REQUEST_URI'])){
             preg_match($regex, $_SERVER['REQUEST_URI'], $matches);
 
-            return $this->ctype_array($matches);
+            return self::ctype_array($matches);
         }        
         else return false;
     }
@@ -127,10 +127,17 @@ class Util {
         return self::preg_match_uri($uri);
     }
 
+    public function dummie(){
+        return 'dummie';
+    }
+
     /**
      * Quit
      */
     public static function quit($code){
+        // prevent the null trail (json empty string)
+        Router::$json = false;
+
         $status = self::$codes[$code];
         
         header($_SERVER["SERVER_PROTOCOL"]." $code $status");
@@ -149,6 +156,9 @@ class Util {
      * Reads (downloads) local files
      */
     public static function download($file){
+        // prevent the null trail (json empty string)
+        Router::$json = false;
+
         //!preg_match('/\.js$/', $file)
         if(!file_exists($file) || is_dir($file)) {
             self::quit(404);

@@ -27,15 +27,15 @@ class Example_Controller {
         Router::route('/example/:id', function($request) {
             return Database::find($request->data['id']);
         });
-
+/*
         Router::route('/example/done', function() {
             return Database::query("SELECT * FROM todos WHERE done = 1;");
         });
-
+*/
         Router::route('/example/delete/:id', function($request) {    
             return Database::delete($request->data['id']);
         });
-
+/*
         Router::route('/example/seed', function() {
             $todos = array(
                 array('id'=>1, 'title'=>"Go to the supermarket.", 'done'=>1),//, 'time'=>'2013-01-25 12:23:55'
@@ -43,6 +43,7 @@ class Example_Controller {
                 array('id'=>3, 'title' => "Wash the dishes.", 'done'=>0));
             return Database::seed($todos);
         });
+*/    
     }
 
     /**
@@ -78,3 +79,4 @@ class Example_Controller {
         return "";
     }
 }
+

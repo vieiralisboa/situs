@@ -14,6 +14,8 @@
 class Router extends Util {
     protected $response = "";
     protected static $routes;
+    #protected static $json;
+    public static $json = true;
 
     /**
      * Route
@@ -163,7 +165,13 @@ class Router extends Util {
      * Start the (Router) Controller
      */
     public function start ($request) {
-        $api = $request->uri[0];
+        $api = $request->uri[0];// situs.pt/$api/:some
+
+        // Controller name
+        // class name 'Name_Controller' for PHP 5.3+
+        // class name 'Name52_Controller' for PHP 5.2-
+        // PHP version 5.2 doesn't support annonymous functions 
+        if(floatval(phpversion()) == 5.2) $api .= '52';
     
         $base = dirname(dirname(__FILE__));
         $controller = "$base/app/controllers/$api.php";
@@ -181,19 +189,22 @@ class Router extends Util {
             if(!load($controller)) self::quit(404);
         #$this->quit(404);
         }
-
+         
+        // Controller class name
         $Controller = ucwords($api) . "_Controller";
-
+        
         if(class_exists($Controller)) {
             $args = array(); 
             $args[] = $request;
 
             if(method_exists($Controller, $request->method)) { 
+                
                 Auth::basic($api);
                 
                 Database::$table = $api;
 
                 $reflectionMethod = new ReflectionMethod($Controller, $request->method);
+                
                 $this->response = $reflectionMethod->invokeArgs(new $Controller(), $args);
 
                 if(count(self::$routes) > 0){
@@ -203,6 +214,7 @@ class Router extends Util {
                         }
                     }
                 }
+
                 #if(is_string($this->response)) $this->json = false;
                 return;
             }
@@ -249,7 +261,6 @@ class Router extends Util {
         // or neither for a "404 Not Found" status at "/"
         #if($_SERVER['REQUEST_URI'] == "/") $this->redirect("/index.html");
         
-        $this->json = true;
         $request = $this->request();
 
         //DEVELOPMENT ONLY
@@ -261,9 +272,14 @@ class Router extends Util {
     function __destruct(){       
         header('X-Powered-By: PHP/5.4 SitusServer');
 
-        $this->json = $this->response !== '' ? $this->json : false;  
+        #if($this->response === null)
+        #{
+        #    $this->response = '';
+        #}
+        
+        #$this->json = $this->response !== '' ? $this->json : false;
 
-        if( $this->json ){
+        if( self::$json ){
             header('Cache-Control: no-cache, must-revalidate');
             header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             header('Content-type: application/json; charset=utf-8');
@@ -271,5 +287,7 @@ class Router extends Util {
             echo json_encode($this->response);
         }
         else echo $this->response;
+        
+        self::$json = true;
     }
 }

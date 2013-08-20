@@ -20,6 +20,7 @@ class Closure_compiler_Controller {
             $postdata = file_get_contents("php://input");
             $path = dirname(dirname(__FILE__))."\\uploads";
 
+
             $in = "$path\\in.js";
             $out = "$path\\min-out.js";
             file_put_contents("$path\\in.js", $postdata);
@@ -32,11 +33,11 @@ class Closure_compiler_Controller {
 
             return array (
                 'file' => 'out.js',
-                'filename' => $filename,
+                //'filename' => $filename,
                 'input' => file_get_contents($in),
                 'output' => file_get_contents($out),
-                'command' => $command,
-                'out' =>$out,
+                //'command' => $command,
+                //'out' =>$out,
                 'result'=>$output
             );
         }
@@ -80,11 +81,11 @@ class Closure_compiler_Controller {
 
             return array (
                 'file' => $name,
-                'filename' => $filename,
+                //'filename' => $filename,
                 'input' => file_get_contents("$path\\$name"),
                 'output' => file_get_contents($out),
-                'command' => $command,
-                'out' =>$out,
+                //'command' => $command,
+                //'out' =>$out,
                 'result'=>$output
             );
         }        
