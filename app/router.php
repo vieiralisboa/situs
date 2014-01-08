@@ -249,6 +249,8 @@ class Router extends Util {
     }
 
     function __construct(){
+        header('X-Powered-By: PHP/'.phpversion().' Situs');
+
         // ignore OPTIONS method
         if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
 
@@ -270,7 +272,7 @@ class Router extends Util {
     }
 
     function __destruct(){       
-        header('X-Powered-By: PHP/5.4 SitusServer');
+        #header('X-Powered-By: PHP/'.phpversion().' Situs');
 
         #if($this->response === null)
         #{

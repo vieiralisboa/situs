@@ -15,13 +15,19 @@
 
 Router::run();
 
+/**
+ * Auto Load Class
+ * Auto loads the required class if the class exists
+ * in the directory paths listed in the $paths array.
+ * @param (string) $className the class name
+ */
 function __autoload($className) {
     $className = strtolower($className);
     $base = dirname(dirname(__FILE__));
     $paths = array("/app/", "/storage/");
     foreach($paths as $path){
     	if(load("$base$path$className.php")) break;
-    } 
+    }
 }
 
 /**
