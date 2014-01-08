@@ -1,32 +1,12 @@
-# [SITUS](http://situs.pt)
+# [SITUS](https://xn--stio-vpa.pt)
 
-About.
+Situs PHP Framework
 
-Description.
+Situs is a restfull API Server.
 
-* Homepage: [http://situs.pt](http://situs.pt)
+* Homepage: [http://sítio.pt](http://xn--stio-vpa.pt)
 * Twitter: [@xxxx](http://twitter.com/xxxx)
-
-
-## Quick start
-
-Choose one of the following options:
-
-1. Step one.
-2. Step two.
-
-
-## Features
-
-* Feature one.
-* Feature two.
-
 
 ## Documentation
 
-Documentation.
-
-
-## Contributing
-
-Anyone and everyone is welcome to contribute.
+see README.txt
