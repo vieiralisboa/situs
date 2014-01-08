@@ -14,6 +14,8 @@ class Situs52_Controller {
 			//
 			case $request = Util::preg_match_uri("/situs"):
 				//return $request;
+				#return "'/situs'";
+
 				Util::quit(404);
 			
 			//
@@ -29,6 +31,8 @@ class Situs52_Controller {
 	        //
 			case $request = Util::preg_match_uri('/situs/js/:script'): 
 				//return $request;
+				#return "'/situs/js/:script'";
+
 				$script = $request['script'];
 				$base = $LIBS . "frontgate/";
 				switch($script)
@@ -65,8 +69,13 @@ class Situs52_Controller {
 					// situs/bar?<$query>
 					//
 					case "bar":
+						//return $request;
+						#return "'/situs/js/bar?:query'";
+
 						foreach($query as $name => $value) {
-							$file = $LIBS . "jquery.bar/js/min-bar.$name.js";
+							#$file = $LIBS . "jquery.bar/js/min-bar.$name.js";
+							$file = $LIBS . "jquery.bar/js/bar.$name.js";
+
 							if(file_exists($file)) return Util::download($file);
 						}
 						break;
@@ -75,15 +84,18 @@ class Situs52_Controller {
 					// situs/frontgate?<$query>
 					//
 					case "frontgate":
-						$temp_file = $LIBS . "TEMP/min-frontgate"; 
+						#$temp_file = $LIBS . "TEMP/min-frontgate";
+						$temp_file = $LIBS . "TEMP/frontgate";
+
 						$files = frontgate($matches, $LIBS, $temp_file);
+
 						$temp_file .= ".js";//".". intval(time()/86400) . 		
 						break;
 
 					default:
 
 				}
-				
+
 				if(count($files)) {	
 					$script = "";
 					
@@ -115,6 +127,8 @@ function query($matches)
 		for ($i=0; $i < count($sets); $i++) 
 		{
 			$param = explode("=", $sets[$i]);
+
+			if(!isset($param[1])) $param[1] = null;
 			$params[$param[0]] = $param[1];
 		}
 	}
@@ -128,19 +142,25 @@ function frontgate($matches, $LIBS, &$temp_file){
 			"underscore/1.4.2/underscore-min.js",
 			"jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.min.js",
 			"topzindex/1.2/jquery.topzindex.min.js",
-			"jquery.panel/min-jquery.panel.js",
-			"jquery.bar/js/min-bar.js"
+			#"jquery.panel/min-jquery.panel.js",
+			"jquery.panel/jquery.panel.js",
+			#"jquery.bar/js/min-bar.js",
+			"jquery.bar/js/bar.js"
 		),
+
 		"router" => array(
 			"underscore/1.4.2/underscore-min.js"
 		)
 	);
-	$files[] = $LIBS . "frontgate/js/min-frontgate.js";
+	#$files[] = $LIBS . "frontgate/js/min-frontgate.js";
+	$files[] = $LIBS . "frontgate/js/frontgate.js";
 
 	if(count($matches) > 2)	{
 		$names = explode("&", $matches[3]);
 		foreach($names as $name) {
-			$file = $LIBS . "frontgate/js/min-frontgate.$name.js";
+			#$file = $LIBS . "frontgate/js/min-frontgate.$name.js";
+			$file = $LIBS . "frontgate/js/frontgate.$name.js";
+
 			if(file_exists($file)){
 				$temp_file .= "&" . $name;
 				if(isset($requires[$name])) {
