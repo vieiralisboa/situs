@@ -25,7 +25,9 @@ class Closure_compiler_Controller {
             $out = "$path\\min-out.js";
             file_put_contents("$path\\in.js", $postdata);
 
-            $command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+            //$command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+            $command = "java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+
             if(file_exists($in)){
                 $output = '';
                 exec($command, $output);
@@ -71,7 +73,9 @@ class Closure_compiler_Controller {
             $in = "$path\\$name";
             $out = "$path\\min-$name";
 
-            $command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+            //$command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+            $command = "java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
+
             if(file_exists($in)){
                 #echo "\n$in exists\n";
                 #echo "\nexeting: $command\n";
