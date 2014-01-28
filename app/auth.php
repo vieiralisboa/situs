@@ -12,61 +12,16 @@
  * Authorization
  */
 class Auth extends Util{
-	
-	// Dummy Users
-	static $users = array(
-		'toolbar' => array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'myip', 'pw' => 'piym'),
-			array('user' => 'root', 'pw' => 'dem0n'),
-			array('user' => 'daniel', 'pw' => 'dem0nio'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-		),
-		'toolbar52' => array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'myip', 'pw' => 'piym'),
-			array('user' => 'root', 'pw' => 'dem0n'),
-			array('user' => 'daniel', 'pw' => 'dem0nio'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-		),
-		'myTV' => array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'paula', 'pw' => 'pserafim')
-		),
-		'myTV52' => array(
-			array('user' => 'guest', 'pw' => 'guest')
-		),
-		'closure_compiler' => array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-		),
-		'closure_compiler52' => array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-
-		),
-		'myip' =>array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-
-		),
-		'myip52' =>array(
-			array('user' => 'guest', 'pw' => 'guest'),
-			array('user' => 'anonymous', 'pw' => 'anonymous')
-
-		)
-	);
 
 	// dummy db
 	public static function db($user, $realm){
-		if(!isset(self::$users[$realm])) return false;
-
-		$db = self::$users[$realm];
-
+		$users = (array) json_decode(file_get_contents(dirname(__FILE__).'\auth.json'));
+		if(!isset($users[$realm])) return false;
+		$db = $users[$realm];
 		foreach($db as $record)
-			if($record['user'] == $_SERVER['PHP_AUTH_USER'])
-				return $record['pw'];
-			
+			if($record->user == $_SERVER['PHP_AUTH_USER'])
+				return $record->pw;
+
 		return false;
 	}
 
