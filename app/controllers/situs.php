@@ -66,7 +66,34 @@ class Situs_Controller {
 					case "bar":
 						#return $query;
 						foreach($query as $name => $value) {
+							$filename = "bar.$name.js";
+							$script = "jquery.bar/js/bar.$name.js";
 							$file = utf8_decode($LIBS . "jquery.bar/js/bar.$name.js");
+
+//DEVELOPMENT attach the filename
+//---------------------------------------
+$temp_file = $LIBS . "TEMP/" . $filename;
+if(file_exists($file)) $body = file_get_contents($file);
+else return $file;
+
+$SCRIPT = <<<SCRIPT
+//Situs_Controller>>>
+(function(BAR_JSON, BAR_NAME){
+window.BAR_JSON = BAR_JSON;
+window.BAR_NAME = BAR_NAME;
+
+//!JavaScript $file
+$body
+//Situs_Controller>>>
+ })("{$script}on", "$name");
+
+SCRIPT;
+
+file_put_contents($temp_file, $SCRIPT);
+if(file_exists($temp_file)) return Util::download($temp_file);
+else return $temp_file;
+//---------------------
+
 							if(file_exists($file)) return Util::download($file);
 						}
 						break;
