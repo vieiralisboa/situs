@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schema</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="text/javascript" src="https://xn--stio-vpa.pt/jquery/2.0.3/jquery-2.0.3.js"></script>
+    <script type="text/javascript" src="https://xn--stio-vpa.pt/ze/js/ze.js"></script>
+</head>
+<body>
+    <a title="Fork me on GitHub!" id="github" href="https://github.com/vieiralisboa/Schema">GitHub</a>
+    <div class="example" id="requires"></div>
+    <div class="example" id="usage1"></div>
+    <div class="example" id="usage2"></div>
+    <div class="example" id="usage3"></div>
+    <div class="example" id="schema"></div>
+    <div class="example" id="tasks-api"></div>
+    <div class="example" id="controller"></div>
+    <script type="text/javascript">
+        var ruler = "<span style=\"color: rgba(255,255,255,.65); font-family: monospace; padding: 0 5px\">\n12345678901234567890123456789012345678901234567890123456789012345678901234567890</span>";
+
+        var examples = [{
+            file: "templates/usage1.js",
+            id: "#usage1",
+            header: "<span><strong>Usage</strong> 1</span>"
+        },{
+            file: "templates/usage2.js",
+            id: "#usage2",
+            header: "<span><strong>Usage</strong> 2</span>"
+        },{
+            file: "templates/usage3.js",
+            id: "#usage3",
+            header: "<span><strong><em>straightforward</em> Usage</strong>\nCreates the <em>tasks.json</em> schema file on the server. <em>Can only be undone on the server side!</em></span>"
+        },{
+            file: "templates/schema.json",
+            id: "#schema",
+            header: "<span><strong><em>tasks</em> Schema</strong>\nThe file <em>tasks.json</em> stored on the server is required to enable the <em>tasks</em> controller*.</span>"
+        },{
+            file: "templates/controller.txt",
+            id: "#controller",
+            header: "<span><strong>Schema Controller</strong>\nThe controller that writes the schema file <em>tasks.json</em> on the server side.</span>"
+        },{
+            file: "templates/tasks.html",
+            id: "#tasks-api",
+            header: "<span><strong><em>tasks</em> Controller</strong>\nOnce the <em>tasks</em> schema is saved on the server, the <em>tasks</em> controller* is ready to use.</span>"
+        },{
+            file: "templates/requires.html",
+            id: "#requires",
+            header: "<span><strong>Setup</strong>\nHTML requirements</span>"
+        }];
+
+        for(var i in examples) (function(example){
+            Ze.code(example.file, function(code){
+                var header = example.header;
+                $(example.id).html(code);
+                $(example.id + " ol").prepend(header).append(ruler);
+            });
+        })(examples[i]);
+
+        //<!--The columns <em>id</em>, <em>date_created</em> and <em>last_updated</em> are created by default.-->
+    </script>
+</body>
+</html>

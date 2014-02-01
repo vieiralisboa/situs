@@ -1,0 +1,113 @@
+body{
+    background-color: rgb(231,237,234);
+}
+ol.code,
+#my-tasks{
+    /*padding: 5px;
+    padding-left: 60px;
+    border-radius: 10px;
+    */
+    background-color: rgb(220,220,220);
+    display: inline-block;
+    margin: 10px 20px;
+    vertical-align: top;
+    border: solid rgb(230,230,230) 1px;
+    box-shadow: 0 0 17px rgb(100,100,100);
+    font-family: monospace;
+    text-align: left;
+}
+#add-task{
+	text-align: right;
+	margin: 10px;
+	padding: 0;
+}
+#tasks ul{
+	padding: 10px;
+	margin: 0;
+	padding-top: 0;
+	width: 400px;
+}
+#tasks li{
+	line-height: 26px;
+	vertical-align: middle;
+	background-color: rgba(255,255,255,.35);
+	list-style: none;
+	padding-left: 10px;
+	margin: 1px;
+}
+button.delete,
+button.edit{
+	float: right;
+	vertical-align: middle;
+}
+div.example{
+    text-align: center;
+    /*white-space: pre-line;*/
+	margin: 10px 0;
+}
+ol.code{
+    margin: 5px;
+    display: inline-block;
+    color:  rgba(255,255,255,.8); clear: both;
+}
+ol.code li{
+    background-color: rgba(255,255,255,.25);
+   white-space: pre;
+   padding: 0 5px;
+}
+li span.code,
+li span.js,
+li span.html,
+li span.php{
+    color: rgba(0,0,0,.9);
+}
+li span.json{
+    color: green;
+}
+li span.comment-block{
+    color: green;
+}
+li span.comment{
+    color: rgb(160,160,160);
+}
+ol.code li:hover{
+    color: gray;
+    background-color: rgba(255,255,255,.5);
+    cursor:default;
+}
+ol.code > span:first-child{
+    vertical-align: top;
+    font-family: sans-serif;
+    color: rgba(0,0,0,.5);
+    font-size: 85%;
+    /*line-height: 32px;*/
+    padding: 10px 5px;
+    display:inline-block;
+    white-space: pre;
+}
+#github{
+    position: fixed;
+    background-color: rgb(241,247,244);
+    display:inline-block;
+    padding: 6px 10px 2px 10px;
+    font-size: 12px;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,.05);
+    color: rgb(191,197,194);
+    right: 20px;
+    top: -4px;
+    border: solid rgb(201,207,204) 1px;
+    border-radius: 0 0 8px 8px;
+    transition: all 1.5s;
+    text-align: center;
+    text-decoration: none;
+    line-height: 22px;
+}
+#github:hover{
+    box-shadow: 0 0 10px 0 rgba(0,0,0,.5);
+    border: solid rgb(255,255,255) 1px;
+    background-color: rgb(239,245,242);
+    color: rgb(131,137,134);
+}
+#schema ol li span{
+    color: purple
+}

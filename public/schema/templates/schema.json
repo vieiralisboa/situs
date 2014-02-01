@@ -1,0 +1,37 @@
+{
+    "PDO": "Sqlite",
+    "name": "tasks",
+    "constraints": [],
+    "columns": [
+    {
+        "name": "id",
+        "type": "INTEGER",
+        "constraints": ["PRIMARY KEY"]
+        },
+    {
+      "name": "date_created",
+      "type": "TEXT",
+      "default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "last_updated",
+      "type": "TEXT",
+      "default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "title",
+      "type": "TEXT",
+      "constraints": ["NOT NULL"]
+    },
+    {
+      "name": "done",
+      "type": "INTEGER",
+      "default": 0
+    },
+    {
+      "name": "priority",
+      "type": "INTEGER",
+      "default": 5
+    }
+  ]
+}
