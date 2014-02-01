@@ -76,16 +76,26 @@ $temp_file = $LIBS . "TEMP/" . $filename;
 if(file_exists($file)) $body = file_get_contents($file);
 else return $file;
 
+$protocol = $_SERVER['HTTPS']? "https" : "http";
+$file2 = explode("/", $file);
+$file0 = $file2[count($file2)-1];
+
 $SCRIPT = <<<SCRIPT
 //Situs_Controller>>>
-(function(BAR_JSON, BAR_NAME){
-window.BAR_JSON = BAR_JSON;
-window.BAR_NAME = BAR_NAME;
+window.BAR_JSON = "{$script}on";
+window.BAR_NAME = "$name";
+(function(FILE){
 
-//!JavaScript $file
+//JavaScript $file
 $body
 //Situs_Controller>>>
- })("{$script}on", "$name");
+})({
+    name: "$name",
+    filename: "$file0",
+    script: "$script",
+    path: "$file",
+    url: "$protocol://{$_SERVER['SERVER_NAME']}/$script"
+});
 
 SCRIPT;
 
