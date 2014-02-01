@@ -6,13 +6,17 @@
 
 DirectoryIndex index.html index.php
 
-## Headers
-<IfModule mod_headers>
-	Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
+### Headers
+#<IfModule mod_headers>
+##	Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
 #	Header set Access-Control-Allow-Origin *
-	Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-	Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-</IfModule>
+#	Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+#	Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+#</IfModule>
+
+Header set Access-Control-Allow-Origin *
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 
 ## Turning on the rewrite engine is necessary for the following rules and
 ## features. "+FollowSymLinks" must be enabled for this to work symbolically.
