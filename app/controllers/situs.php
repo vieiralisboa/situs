@@ -94,7 +94,7 @@ $body
     filename: "$file0",
     script: "$script",
     path: "$file",
-    url: "$protocol://{$_SERVER['SERVER_NAME']}/$script"
+    url: "$protocol://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}"
 });
 
 SCRIPT;
