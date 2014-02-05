@@ -1,14 +1,17 @@
 //JavaScript
 // Situs Schema
-// requires Situs controler, Backbone
+// requires Situs controller and Backbone
 
 window.Apps = window.Apps || {};
 
 (function(App){
+	var SCHEMA = "schema",
+		SERVER = "https://xn--stio-vpa.pt/",
+		URL_ROOT = SERVER+SCHEMA
+		user = "schema",
+		pw = "amehcs";
 
-	$.ajaxSetup({
-		beforeSend: Frontgate.xhrAuth('schema', 'schema')
-	});
+	//$.ajaxSetup({ beforeSend: Frontgate.xhrAuth(user, pw) });
 
 	App.Models.Column = Backbone.Model.extend({
 		defaults: {
@@ -116,7 +119,7 @@ window.Apps = window.Apps || {};
 			constraints: []
 		},
 
-		urlRoot: "//localhost/schema",//"//situs.dev/schema"
+		urlRoot: URL_ROOT,
 
 		initialize: function(attrs){
 			attrs = attrs || {};
@@ -156,7 +159,9 @@ window.Apps = window.Apps || {};
 		console.info(App.name, App.version.join("."));
 	window.Apps.Schema = App;
 	Apps.Schema.create = function(schema, callback){
-		(new Apps.Schema.Models.Table(schema)).save().success(callback);
+		(new Apps.Schema.Models.Table(schema)).save({
+			beforeSend: Frontgate.xhrAuth(user, pw)
+		}).success(callback);
 	};
 })({
 	name: "Schema",
