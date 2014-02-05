@@ -173,12 +173,13 @@ function frontgate($matches, $LIBS, &$temp_file){
 			"underscore/1.4.2/underscore-min.js"
 		)
 	);
-	$files[] = $LIBS . "frontgate/js/frontgate.js";
+	$LIB = "/htdocs/sites/frontgate/public/";
+	$files[] = $LIB . "frontgate/js/frontgate.js";
 
 	if(count($matches) > 2)	{
 		$names = explode("&", $matches[3]);
 		foreach($names as $name) {
-			$file = $LIBS . "frontgate/js/frontgate.$name.js";
+			$file = $LIB . "frontgate/js/frontgate.$name.js";
 			if(file_exists($file)){
 				$temp_file .= "&" . $name;
 				if(isset($requires[$name])) {
@@ -187,7 +188,7 @@ function frontgate($matches, $LIBS, &$temp_file){
 							$files[] = $LIBS . $require;
 						}
 					}	
-				} 
+				}
 				$files[] = $file;
 			} 
 		}
