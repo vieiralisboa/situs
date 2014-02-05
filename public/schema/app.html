@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="/jquery/jquery-1.8.3.min.js"></script>
+    <script src="/frontgate/js/frontgate.js"></script>
+</head>
+<body>
+    <div id="header">
+        <h1 style="opacity: .5; padding: 10px 15px; margin: 0"><em>tasks</em></h1>
+        <a style="padding-left: 15px" href="index.html"><em>Schema</em> model</a>
+    </div>
+    <div class="example">
+        <div id="my-tasks">
+            <form id="add-task" action="#">
+                <input style="display: none;" type="text" placeholder="Your new task" />
+                <input type="submit"  value="Add Task"/>
+            </form>
+            <div id="tasks"></div>
+        </div>
+    </div>
+    <script>
+        Frontgate.auth({user:"guest"});
+        // App Location
+        Frontgate.scripts("underscore/1.4.2/underscore-min.js",
+            "backbone/lib/0.9.2/backbone-min.js",
+            'situs.schema/js/backbone.schema.js',
+            'situs.schema/js/backbone.tasks.js',
+            function(){
+                Apps.Tasks.app("#tasks", "#add-task", '#taskTemplate');
+        });
+    </script>
+    <script id="taskTemplate" type="text/template">
+        <span><%= title %></span> (<%= priority %>)
+        <button class="edit">Edit</button>
+        <button class="delete">Delete</button>
+    </script>
+</body>
+</html>
