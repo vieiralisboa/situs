@@ -11,7 +11,7 @@ class Situs_Controller {
 		switch( true )
 		{
 			//
-			// 
+			//
 			//
 			case $request = Util::preg_match_uri("/situs"):
 				//return $request;
@@ -26,8 +26,8 @@ class Situs_Controller {
 				if(file_exists($file)) return Util::download($file);
 
 			//
-	        // Toolbar :script
-	        //
+			// Toolbar :script
+			//
 			case $request = Util::preg_match_uri('/situs/js/:script'): 
 				//return $request;
 				$script = $request['script'];
@@ -166,7 +166,7 @@ function frontgate($matches, $LIBS, &$temp_file){
 			"underscore/1.4.2/underscore-min.js",
 			"jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
 			"topzindex/1.2/jquery.topzindex.js",
-			"jquery.panel/jquery.panel.js",
+			"jquery.panel/panel.js",
 			"jquery.bar/js/bar.js"
 		),
 		"router" => array(
