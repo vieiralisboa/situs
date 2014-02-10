@@ -15,12 +15,13 @@ class Auth extends Util{
 
 	// dummy db
 	public static function db($user, $realm){
-		$users = (array) json_decode(file_get_contents(dirname(__FILE__).'\auth.json'));
-		if(!isset($users[$realm])) return false;
-		$db = $users[$realm];
-		foreach($db as $record)
-			if($record->user == $_SERVER['PHP_AUTH_USER'])
-				return $record->pw;
+		$file = dirname(__FILE__)."\auth\\$realm.json";
+		if(file_exists($file)){
+			$db = json_decode(file_get_contents($file));
+			foreach($db as $record)
+				if($record->user == $user) return $record->pw;
+		}
+		//else die($file);
 
 		return false;
 	}
@@ -40,13 +41,11 @@ class Auth extends Util{
 	public static function basic($realm = false){
 		switch($realm)
 		{
-			// Basic Authorization not required
+			// Auth not required for these controllers
 			case 'toolbar':
-			case 'toolbar52':
 			case 'download':
-			case 'download52':
 			case 'situs':
-			case 'situs52': 
+			case 'myip':
 				return;
 
 			// default realm
@@ -60,7 +59,7 @@ class Auth extends Util{
 
 		// get user password from the database
 		//"SELECT pw FROM $realm WHERE user='{$_SERVER['PHP_AUTH_USER']}'";
-		$pw = self::db($_SERVER['PHP_AUTH_USER'], $realm);
+		$pw = self::db(strtolower($_SERVER['PHP_AUTH_USER']), $realm);
 
 		// password verification
 		if($_SERVER['PHP_AUTH_PW'] != $pw) self::unauthorize($realm);
