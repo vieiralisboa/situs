@@ -2,7 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="css/styles.css">
-    <script src="/jquery/jquery-1.8.3.min.js"></script>
+    <script src="/jquery/2.0.3/jquery-2.0.3.min.js"></script>
     <script src="/frontgate/js/frontgate.js"></script>
 </head>
 <body>
@@ -27,7 +27,7 @@
             'situs.schema/js/backbone.schema.js',
             'situs.schema/js/backbone.tasks.js',
             function(){
-                Apps.Tasks.app("#tasks", "#add-task", '#taskTemplate');
+                Apps.Tasks.start("#tasks", "#add-task", '#taskTemplate');
         });
     </script>
     <script id="taskTemplate" type="text/template">
