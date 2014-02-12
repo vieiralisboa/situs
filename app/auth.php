@@ -38,30 +38,30 @@ class Auth extends Util{
 	 * Basic Authorization
 	 * Realm is Api name http://host/<Api>/:some/:more
 	 */
-	public static function basic($realm = false){
-		switch($realm)
-		{
-			// Auth not required for these controllers
-			case 'toolbar':
-			case 'download':
-			case 'situs':
-			case 'myip':
-				return;
-
-			// default realm
-			default:
-				if($realm === false) $realm = 'situs';
+	public static function basic($realm){
+		// list of controllers that do not require authorization
+		$ignore = dirname(__FILE__)."\auth\.ignore.json";
+		if(file_exists($ignore)){
+			$controllers = json_decode(file_get_contents($ignore));
+			foreach($controllers as $controller) {
+				if($controller == $realm) {
+					return;
+				}
+			}
 		}
 
 		// no username or password
-		if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) 
+		if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
 			self::unauthorize($realm);
+		}
 
 		// get user password from the database
 		//"SELECT pw FROM $realm WHERE user='{$_SERVER['PHP_AUTH_USER']}'";
 		$pw = self::db(strtolower($_SERVER['PHP_AUTH_USER']), $realm);
 
 		// password verification
-		if($_SERVER['PHP_AUTH_PW'] != $pw) self::unauthorize($realm);
+		if ($_SERVER['PHP_AUTH_PW'] != $pw) {
+			self::unauthorize($realm);
+		}
 	}
 }
