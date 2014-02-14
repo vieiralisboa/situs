@@ -165,29 +165,23 @@ class Router extends Util {
      * Start the (Router) Controller
      */
     public function start ($request) {
+        // Controller name
         $api = $request->uri[0];// situs.pt/$api/:some
 
-        // Controller name
-        // class name 'Name_Controller' for PHP 5.3+
-        // class name 'Name52_Controller' for PHP 5.2-
-        // PHP version 5.2 doesn't support annonymous functions 
-        if(floatval(phpversion()) == 5.2) $api .= '52';
-    
+        // requires PHP version 5.3+
+        if(floatval(phpversion()) < 5.3) self::quit(501);
+
+        // class filename
         $base = dirname(dirname(__FILE__));
         $controller = "$base/app/controllers/$api.php";
 
         // load Controller script
-        if(!load($controller)){
-            // create and lod controller script 
-            #if(self::create_controller($api)) load($controller);
-
+        if(!load($controller)) {
             // create controller script if schema exists
             if(!self::create_controller($api)) self::quit(404);
-        #$this->quit(404);
             
             // retry loading the controller script
             if(!load($controller)) self::quit(404);
-        #$this->quit(404);
         }
          
         // Controller class name
@@ -221,7 +215,6 @@ class Router extends Util {
         }
         
         self::quit(404);
-        #$this->quit(404);
     }
     
     /**
