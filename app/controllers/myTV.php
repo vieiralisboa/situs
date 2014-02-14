@@ -10,6 +10,7 @@ class MyTV_Controller {
 
         // folder containing the videos
         $path = "\\\\MYBOOKLIVE\\Public\\Shared Videos\\tv-shows";
+        #$path = "/shares/Public/Shared Videos/tv-shows";// MBL
 
         // valid requests contain 
         if(count($request->uri) < 3) return; 
@@ -46,61 +47,13 @@ class MyTV_Controller {
 
                     // Subtitles (vtt)
                     //---------------------------------------------------------
-                    $vtt = $path."/".$info['filename'].".vtt";
-                    $header = 'Content-type: application/x-www-form-urlencoded';
                     // vtt file exists
-                    if(file_exists($vtt))
+                    if(file_exists($path."/".$info['filename'].".vtt"))
                     {
-                        /*/ALTERNATIVE1 post vtt file to the server                   
-                        $sent = $vtt.'.SENT';
-                        if(!file_exists($sent))//*/
-                        $sent = $path."/".'SENT.frontgate.txt';
-                        if(!in_array($vtt, file($sent)))
-                        {
-                            $url = 'http://frontgate.dev/vtt/post.php';
-                            $postdata = http_build_query(array(
-                                'name' => $info['filename'].".vtt",
-                                'text' => file_get_contents($vtt)
-                            ));
-                            
-                            $opts = array('http' => array(
-                                'method'  => 'POST',
-                                'header'  => $header,
-                                'content' => $postdata
-                            ));
-    
-                            //file_put_contents("C:\\TEMP\\req.json", json_encode($opts));
-                            
-                            /*/ALTERNATIVE1 update sent list
-                            file_put_contents($sent, "uploaded to " . $url);//*/
-                            file_put_contents($sent, "\n" . $vtt, FILE_APPEND);
-
-                            $context  = stream_context_create($opts);
-                            $result = file_get_contents($url, false, $context);   
-                        }
-
-                        /*ALTERNATIVE to post vtt (untested)
-                        $params = array('http' => array(
-                            'method' => 'POST',
-                            'content' => 'toto=1&tata=2'
-                        ));
-                        $ctx = stream_context_create($params);
-                        $fp = @fopen($sUrl, 'rb', false, $ctx);
-                        if (!$fp)
-                        {
-                            throw new Exception("Problem with $sUrl, $php_errormsg");
-                        }
-                        $response = @stream_get_contents($fp);
-                        if ($response === false) 
-                        {
-                            throw new Exception("Problem reading data from $sUrl, $php_errormsg");
-                        }
-                        */
-                        
                         // include vtt file (where the vtt file was uploaded)
-                        $show['vtt'] = "vtt/".$info['filename'].".vtt";
+                        $show['vtt'] = vtt($info['filename'].".vtt", $path);
                     }
-                    
+
                     // add video to the list
                     $videos[] = $show;
                 }
@@ -236,4 +189,65 @@ function rangeDownload($file) {
  
     fclose($fp);
  
+}
+
+function vtt($vtt, $path) {
+    $header = 'Content-type: application/x-www-form-urlencoded';
+    $json =  $path."/".'SENT.situs.json';
+    $sent_subs = file_exists($json)? json_decode(file_get_contents($json)): array();
+    
+    /*/ALTERNATIVE1 post vtt file to the server                   
+    $sent = $vtt.'.SENT';
+    if(!file_exists($sent))//*/
+    #$sent = $path."/".'SENT.situs.txt';
+    
+    #if(!in_array($vtt, file($sent)))
+    if(!in_array($vtt, $sent_subs))
+    {
+        $sent_subs[] = $vtt;
+        file_put_contents($json, json_encode($sent_subs));
+
+        $url = 'http://situs.pt/vtt/post.php';
+        $postdata = http_build_query(array(
+            'name' => $vtt,
+            'text' => file_get_contents($path.'/'.$vtt)
+        ));
+        
+        $opts = array('http' => array(
+            'method'  => 'POST',
+            'header'  => $header,
+            'content' => $postdata
+        ));
+
+        //file_put_contents("C:\\TEMP\\req.json", json_encode($opts));
+        
+        /*/ALTERNATIVE1 update sent list
+        file_put_contents($sent, "uploaded to " . $url);//*/
+        #file_put_contents($sent, $vtt."\n", FILE_APPEND);
+
+        $context  = stream_context_create($opts);
+        $result = file_get_contents($url, false, $context);   
+    }
+
+
+    /*ALTERNATIVE to post vtt (untested)
+    $params = array('http' => array(
+        'method' => 'POST',
+        'content' => 'toto=1&tata=2'
+    ));
+    $ctx = stream_context_create($params);
+    $fp = @fopen($sUrl, 'rb', false, $ctx);
+    if (!$fp)
+    {
+        throw new Exception("Problem with $sUrl, $php_errormsg");
+    }
+    $response = @stream_get_contents($fp);
+    if ($response === false) 
+    {
+        throw new Exception("Problem reading data from $sUrl, $php_errormsg");
+    }
+    */
+    
+    // include vtt file (where the vtt file was uploaded)
+    return "vtt/" . $vtt;
 }
