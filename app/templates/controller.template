@@ -1,24 +1,25 @@
 <?php
+
 /**
  * Situs - A PHP Framework
  *
  * @package  Situs
  * @version  0.0.0
  * @author   José Vieira Lisboa <jose.vieira.lisboa@gmail.com>
- * @link     http://situs.pt
+ * @link     http://situs.xn--stio-vpa.pt
  */
 
 /**
  * RESTful Controller
  */
 class {Name}_Controller {
-    
+
     /**
      * GET
      */
-    public function get(){     
-        
-        Router::route('/{name}', function(){ 
+    public function get(){
+
+        Router::route('/{name}', function(){
             // gets all records from the database
             return Database::all();
         });
@@ -28,7 +29,7 @@ class {Name}_Controller {
             return Database::find($request->data['id']);
         });    
 
-        Router::route('/{name}/seed', function($records) {
+        Router::route('/{name}/seed', function($records){
             /* Example $records
             $records = array(
                 array('id'=>1, 'title'=>"Go to the supermarket.", 'done'=>1),
@@ -39,18 +40,18 @@ class {Name}_Controller {
             return Database::seed($records);
         });
 
-        Router::route('/{name}/json/:json', function($request) {    
+        Router::route('/{name}/json/:json', function($request){
             $request->input = (array) json_decode(urldecode($request->data['json']));
             $todo = new Record($request->input);
             return $todo->save();
         });
 
-        Router::route('/{name}/delete/:id', function($request) {    
+        Router::route('/{name}/delete/:id', function($request){
             // delets a record by its id in the database
             return Database::delete($request->data['id']);
         });
 
-        Router::route('/{name}/update/:json', function($request) {    
+        Router::route('/{name}/update/:json', function($request){
             $request->input = (array) json_decode(urldecode($request->data['json']));
             $request->data['id'] = $request->input['id'];
             // updates a record by its id in the database
@@ -63,10 +64,10 @@ class {Name}_Controller {
      * POST
      */
     public function post() {
-       
-       Router::route('/{name}', function($request) {    
+
+       Router::route('/{name}', function($request){
             // inserts a record in the database 
-       		$record = new Record($request->input);
+            $record = new Record($request->input);
             return $record->save();
         });
     }
@@ -75,10 +76,10 @@ class {Name}_Controller {
      * UPDATE
      */
     public function put(){
-        
-        Router::route('/{name}/:id', function($request) {    
-        	// updates a record by its id in the database
-        	$record = new Record($request->input);
+
+        Router::route('/{name}/:id', function($request){
+            // updates a record by its id in the database
+            $record = new Record($request->input);
             return $record->save($request->data['id']);
         });
     }
@@ -87,8 +88,8 @@ class {Name}_Controller {
      * DELETE
      */
     public function delete($request){
-        
-        Router::route('/{name}/:id', function($request) {    
+
+        Router::route('/{name}/:id', function($request){
             // delets a record by its id in the database
             return Database::delete($request->data['id']);
         });
