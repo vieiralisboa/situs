@@ -174,12 +174,12 @@ function frontgate($matches, $LIBS, &$temp_file){
 		)
 	);
 	$LIB = "/htdocs/sites/frontgate/public/";
-	$files[] = $LIB . "frontgate/js/frontgate.js";
+	$files[] = $LIB . "js/frontgate.js";
 
 	if(count($matches) > 2)	{
 		$names = explode("&", $matches[3]);
 		foreach($names as $name) {
-			$file = $LIB . "frontgate/js/frontgate.$name.js";
+			$file = $LIB . "js/frontgate.$name.js";
 			if(file_exists($file)){
 				$temp_file .= "&" . $name;
 				if(isset($requires[$name])) {
