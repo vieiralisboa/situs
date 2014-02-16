@@ -1,8 +1,12 @@
 //JavaScript
 
 // sends the table schema to server
-(new Schema.Table({
+(new Schema({
     name:'tasks',
+    auth: {
+        user: 'tasks',
+        pw: 'sksat'
+    },
     columns: [
         {
             name: 'title',
@@ -20,4 +24,4 @@
             default: 5
         }
     ]
-}).save().success(callback);
+}).save();

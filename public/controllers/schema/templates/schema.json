@@ -1,5 +1,9 @@
 {
     "PDO": "Sqlite",
+    "auth": {
+        "user":"tasks",
+        "pw": "sksat"
+    },
     "name": "tasks",
     "constraints": [],
     "columns": [

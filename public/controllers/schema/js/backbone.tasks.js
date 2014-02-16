@@ -1,69 +1,66 @@
 //JavaScript
-// requires situs.Schema, Backbone 0.9.2
+// requires situs.Schema, Backbone 1.1.0
 
-window.Apps = Apps || {};
+window.Apps = window.Apps || {};
 
-(function(App){
+(function(app){
+
     // Tasks controller's location
-    App.API = Frontgate.location(App.location);
-    App.API.auth(App.schema.auth || Frontgate.location());
+    app.API = Frontgate.location(app.location);
+    app.API.auth(app.schema.auth || Frontgate.location());
 
     // create the Tasks controler on Situs server ( tasks schema )
-    Apps.Schema.create(App.schema, function(data, message, XMLHR){
-        if (data === 1) {
-            console.log("CREATED SITUS CONTROLER tasks");
+    Schema.create(app.schema, function(model, response, options){
+
+        if(response === true || response === 1){
+            if(console && console.info) {
+                if(response === 1){
+                    console.info("NEW API FROM SCHEMA");
+                }
+                console.info(app.schema.name, "API OK");
+            }
+            app.ready.status = 1;
         }
 
-        if (message == "success") {
-            console.info("TASKS API OK");
-        }
-        else {
-            console.log("TASKS API NOK");
-        }
-
-        if (message == "success") {
-            App.ready.status = data;
-            while(App.ready.stack.length) {
-                //console.log("Tasks from stack");
-                (App.ready.stack.shift())();
+        if(app.ready.status){
+            while(app.ready.stack.length){
+                (app.ready.stack.shift())();
             }
         }
-        else {
-            throw "Error! RESTfull API for Tasks is not ready.";
-        }
+        else throw "TASKS API NOK";
+
     });
 
     // task model
-    App.Models.Task = Backbone.Model.extend({
+    app.Models.Task = Backbone.Model.extend({
         validate: function(attrs){
             if ( !$.trim(attrs.title) ) {
                 return "a task requires a valid title.";
             }
         },
-        urlRoot: App.API.url(),
+        urlRoot: app.API.url(app.schema.name),
         defaults: {
             priority: 0
         }
     });
 
     // tasks collection
-    App.Collections.Tasks = Backbone.Collection.extend({
-        model: App.Models.Task,
-        url: App.API.url(),
+    app.Collections.Tasks = Backbone.Collection.extend({
+        model: app.Models.Task,
+        url: app.API.url(app.schema.name),
         initialize: function(){
             //console.log('initializing a Tasks collection');
-            $.ajaxSetup({
-                beforeSend: App.API.xhrAuth()
+            this.fetch({
+                beforeSend: app.API.xhrAuth()
             });
-            this.fetch();
         }
     });
 
     // task view
-    App.Views.Task = Backbone.View.extend({
+    app.Views.Task = Backbone.View.extend({
         tagName: 'li',
         template: function(data){
-            return App.template(data);
+            return app.template(data);
         },
         initialize: function(){
             //console.log(this.model.toJSON());
@@ -78,20 +75,17 @@ window.Apps = Apps || {};
             var taskTitle = prompt('Edit Task', this.model.get('title'));
             if(taskTitle) {
                 this.model.set('title', taskTitle);
-                $.ajaxSetup({
-                    beforeSend: App.API.xhrAuth()
+                this.model.save(null, {
+                    beforeSend: app.API.xhrAuth()
                 });
-                this.model.save();
                 //console.log('editing title: '+taskTitle);
             }
             //this.render();
         },
         deleteTask: function(e){
-            $.ajaxSetup({
-                beforeSend: App.API.xhrAuth()
+            this.model.destroy({
+                beforeSend: app.API.xhrAuth()
             });
-            this.model.destroy();
-            //console.log(tasks);
         },
         remove: function(){
             this.$el.remove();
@@ -104,7 +98,7 @@ window.Apps = Apps || {};
     });
 
     // tasks view
-    App.Views.Tasks = Backbone.View.extend({
+    app.Views.Tasks = Backbone.View.extend({
         tagName: 'ul',
         initialize: function(){
             this.collection.on('add', this.addOne, this);
@@ -114,13 +108,13 @@ window.Apps = Apps || {};
             return this;
         },
         addOne: function(task){
-            var taskView = new App.Views.Task({model: task});
+            var taskView = new app.Views.Task({model: task});
             this.$el.append( taskView.render().el );
         }
     });
 
     //
-    App.Views.AddTask = Backbone.View.extend({
+    app.Views.AddTask = Backbone.View.extend({
         //el: '#add-task',
         events: {
             'submit': 'submit'
@@ -139,14 +133,13 @@ window.Apps = Apps || {};
                 return false;
             }
 
-            var task = new App.Models.Task({
+            var task = new app.Models.Task({
                 title: taskTitle
             });
 
-            $.ajaxSetup({
-                beforeSend: App.API.xhrAuth()
+            task.save(null, {
+                beforeSend: app.API.xhrAuth()
             });
-            task.save();
 
             this.collection.add(task);
 
@@ -156,7 +149,7 @@ window.Apps = Apps || {};
     });
 
     // starts the tasks app
-    App.start = function(tasksViewSelector, addTasksSelector, templateSelector){
+    app.start = function(tasksViewSelector, addTasksSelector, templateSelector){
         this.template = (function(id){
             return _.template( $(id).html() );
         })(templateSelector);
@@ -168,32 +161,31 @@ window.Apps = Apps || {};
             //TODO render tasks view without REfetching tasks
             //console.log("FETCH TASKS FROM SERVER");
 
-            $.ajaxSetup({
-                beforeSend: Apps.Tasks.API.xhrAuth()
-            });
-
             // fetch tasks from server
-            tasksCollection.fetch().success(function(){
-                //console.log("FETCH TASKS FROM SERVER RESULT: ", arguments[1]);
+            tasksCollection.fetch({
+                beforeSend: Apps.Tasks.API.xhrAuth(),
+                success: function(){
+                    //console.log("FETCH TASKS FROM SERVER RESULT: ", arguments[1]);
 
-                // create the 'tasks' view
-                var tasksView = new Apps.Tasks.Views.Tasks({
-                    collection: tasksCollection
-                });
+                    // create the 'tasks' view
+                    var tasksView = new Apps.Tasks.Views.Tasks({
+                        collection: tasksCollection
+                    });
 
-                tasksView.render().$el.appendTo(tasksViewSelector);
+                    tasksView.render().$el.appendTo(tasksViewSelector);
 
-                // create the 'add task' view
-                var addTaskView = new Apps.Tasks.Views.AddTask({
-                    el: addTasksSelector,
-                    collection: tasksCollection
-                });
+                    // create the 'add task' view
+                    var addTaskView = new Apps.Tasks.Views.AddTask({
+                        el: addTasksSelector,
+                        collection: tasksCollection
+                    });
+                }
             });
         });
     };
 
     // adds to the 'when ready' stack
-    App.ready = function(f){
+    app.ready = function(f){
         if (this.ready.status) {
             f();
         }
@@ -201,25 +193,25 @@ window.Apps = Apps || {};
             this.ready.stack.push(f);
         }
     };
-    App.ready.status = 0;
-    App.ready.stack = [];
+    app.ready.status = 0;
+    app.ready.stack = [];
 
-    window.Apps.Tasks = App;
+    window.Apps.Tasks = app;
 
     if (window.console && console.info) {
-        console.info(App.name, App.version.join("."));
+        console.info(app.name, app.version.join("."));
     }
 })
 ({
     "name": "Tasks",
-    "version": [0, 1, 0],
+    "version": [0, 2, 0],
     "Models": {},
     "Collections": {},
     "Views": {},
     "location": {
         "hostname": "situs.xn--stio-vpa.pt",
         "protocol": "https",
-        "pathname": "/tasks"
+        //"pathname": "/tasks"
     },
     "schema": {
         "name": "tasks",

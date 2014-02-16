@@ -1,24 +1,21 @@
 //JavaScript
 // Schema
-// requires Situs controller, Backbone 0.9.2
+// requires Situs controller, Backbone 1.1.0
 
-window.Apps = window.Apps || {};
+(function(app){
+    var API = Frontgate.location(app.schema.location),
 
-(function(App){
-    App.API = Frontgate.location(App.schema.location);
-    App.API.auth(App.schema.auth);
-
-    // column
-    App.Models.Column = Backbone.Model.extend({
-        defaults: App.schema.defaults.column,
+    // column model constructor
+    Column = Backbone.Model.extend({
+        defaults: app.schema.defaults_column,
 
         initialize: function(attrs){
-            //console.log("Column '"+attrs.name+"' initialized.");
 
             this.on('error', function(model, error){
                 console.log(error);
             });
 
+            // validates a constraint
             this.validateConstraint = function(constraint){
                 var constraints = ['PRIMARY KEY', 'UNIQUE', 'NOT NULL'];
                 for(var i in constraints){
@@ -29,6 +26,7 @@ window.Apps = window.Apps || {};
                 return false;
             };
 
+            // adds a constraint to the constraints array
             this.addConstraint = function(constraint){
                 var constraints = this.get('constraints');
 
@@ -50,14 +48,15 @@ window.Apps = window.Apps || {};
             };
         },
 
+        // validates column attributes
         validate: function(attrs){
             // Name
-            if( ! $.trim(attrs.name) ){
+            if( !$.trim(attrs.name) ){
                 return "a column requires a valid name.";
             }
 
             // Type
-            if( ! $.trim(attrs.type) ){
+            if( !$.trim(attrs.type) ){
                 return "a column requires a valid type.";
             }
             var types = ['Text', 'Numeric', 'Integer', 'Float', 'None'];
@@ -68,7 +67,10 @@ window.Apps = window.Apps || {};
                     break;
                 }
             }
-            if(!valid) return "invalid column type.";
+
+            if(!valid) {
+                return "invalid column type.";
+            }
 
             // Constraints
             if(typeof attrs.constraints != 'undefined') {
@@ -81,73 +83,83 @@ window.Apps = window.Apps || {};
                     }
                 }
             }
-
-            // default
-            if(typeof attrs.default != 'undefined') {
-                // reserved
-            }
         }
-    });
+    }),
 
-    // columns
-    App.Collections.Columns = Backbone.Collection.extend({
-        model: App.Models.Column
-    });
+    // table (column collection) constructor
+    Table = Backbone.Collection.extend({
+        model: Column
+    }),
 
-    // table
-    App.Models.Table = Backbone.Model.extend({
-        defaults: App.schema.defaults.table,
-        urlRoot: App.API.href(),
+    // schema
+    Schema = Backbone.Model.extend({
+        defaults: app.schema.defaults,
+        urlRoot: API.url(),
 
         initialize: function(attrs){
             attrs = attrs || {};
 
+            // create table (column collection)
+            var table = this.set('table', new Table).get('table');
+
+            // adds a column to the column collection
             this.addColumn = function(attrs){
-                attrs = attrs || {};
-                var columns = this.get('columns');
-                if(!columns.find(function(item){
-                        return item.get('name') === attrs.name;})) {
-                    columns.add(attrs);//new App.Models.Column(attrs));
+                var column = table.find(function(col){
+                    return col.get('name') === attrs.name;
+                });
+
+                if(!column){
+                    table.add(attrs);
                 }
-                //else console.error("Column '"+attrs.name+"' already exists!");
+                else {
+                    var error = "column name '{name}' already exists";
+                    throw error.replace('{name}', attrs.name);
+                }
             }
 
-            this.set('columns', new App.Collections.Columns);
-
+            // validates schema attributes
             this.validate = function(attrs){
-                // Columns
-                if(typeof attrs.columns._byCid == 'undefined'){
-                    return "Use the addColumn method to add a column.";
-                }
+                //TODO validate columns
             };
 
-            if (App.schema && App.schema.columns) {
-                _.forEach(App.schema.columns, this.addColumn, this);
+            // create default columns
+            if(app.schema && app.schema.columns){
+                _.forEach(app.schema.columns, this.addColumn, this);
             }
 
+            // create custom columns
             if(typeof attrs.columns != 'undefined'){
                 _.forEach(attrs.columns, this.addColumn, this);
             }
         }
     });
 
-    App.create = function(schema, callback){
-        $.ajaxSetup({ beforeSend: App.API.xhrAuth() });
-        (new Apps.Schema.Models.Table(schema)).save().success(callback);//{ beforeSend: App.API.xhrAuth() }
+    // creates a schema (for the Situs controller)*
+    Schema.create = function(schema, callback){
+        (new Schema(schema)).save(null, {
+            beforeSend: API.xhrAuth(),
+            success: callback,
+            error: function(){
+                console.error(arguments);
+            }
+        });
     };
 
-    window.Apps.Schema = App;
+    // put Schema on the global object
+    window.Schema = Schema;
 
-    if (console && console.info) {
-        console.info(App.name, App.version.join("."));
+    // use credentials for Situs Schema controller
+    API.auth(app.schema.auth);
+
+    Schema.VERSION = app.version.join(".");
+
+    if(console && console.info){
+        console.info(app.name, Schema.VERSION);
     }
 })
 ({
     "name": "Schema",
-    "version": [0,1,0],
-    "Models": {},
-    "Views": {},
-    "Collections": {},
+    "version": [0,2,0],
     "Router": {},
     "schema": {
         "name": "schema",
@@ -156,15 +168,13 @@ window.Apps = window.Apps || {};
             "pw": "amehcs"
         },
         "defaults": {
-            "table": {
-                "PDO": "Sqlite",
-                "constraints": []
-            },
-            "column":{
-                "name": 'id',
-                "type": 'INTEGER',
-                //"constraints": ["PRIMARY KEY"]
-            }
+            "PDO": "Sqlite",
+            "constraints": []
+        },
+        "defaults_column":{
+            "name": 'id',
+            "type": 'INTEGER',
+            //"constraints": ["PRIMARY KEY"]
         },
         "columns": [
             {

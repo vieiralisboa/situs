@@ -3,6 +3,10 @@
 // creates the tasks schema on the server
 Schema.create({
     name:'tasks',
+    auth: {
+        user: 'tasks',
+        pw: 'sksat'
+    },
     columns: [
         {
             name: 'title',
