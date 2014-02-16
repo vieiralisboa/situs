@@ -97,7 +97,7 @@ window.Apps = window.Apps || {};
     // table
     App.Models.Table = Backbone.Model.extend({
         defaults: App.schema.defaults.table,
-        urlRoot: App.API.href(App.schema.name),
+        urlRoot: App.API.href(),
 
         initialize: function(attrs){
             attrs = attrs || {};
@@ -185,7 +185,8 @@ window.Apps = window.Apps || {};
         ],
         "location": {
             "hostname": "situs.xn--stio-vpa.pt",
-            "protocol": "https:"
+            "protocol": "https",
+            "pathname": "/schema"
         }
     }
 });

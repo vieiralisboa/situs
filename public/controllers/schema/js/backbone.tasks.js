@@ -40,7 +40,7 @@ window.Apps = Apps || {};
                 return "a task requires a valid title.";
             }
         },
-        urlRoot: App.API.href(App.schema.name),//"//situs.dev/tasks",
+        urlRoot: App.API.url(),
         defaults: {
             priority: 0
         }
@@ -49,7 +49,7 @@ window.Apps = Apps || {};
     // tasks collection
     App.Collections.Tasks = Backbone.Collection.extend({
         model: App.Models.Task,
-        url: App.API.href(App.schema.name),//"//situs.dev/tasks",
+        url: App.API.url(),
         initialize: function(){
             //console.log('initializing a Tasks collection');
             $.ajaxSetup({
@@ -218,7 +218,8 @@ window.Apps = Apps || {};
     "Views": {},
     "location": {
         "hostname": "situs.xn--stio-vpa.pt",
-        "protocol": "https:"
+        "protocol": "https",
+        "pathname": "/tasks"
     },
     "schema": {
         "name": "tasks",
