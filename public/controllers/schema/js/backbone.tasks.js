@@ -1,8 +1,6 @@
 //JavaScript
 // requires situs.Schema, Backbone 1.1.0
 
-window.Apps = window.Apps || {};
-
 (function(app){
 
     // Tasks controller's location
@@ -154,28 +152,28 @@ window.Apps = window.Apps || {};
             return _.template( $(id).html() );
         })(templateSelector);
 
-        Apps.Tasks.ready(function(){
+        Tasks.ready(function(){
             // create a tasks collection
-            var tasksCollection =  new Apps.Tasks.Collections.Tasks;
+            var tasksCollection =  new Tasks.Collections.Tasks;
 
             //TODO render tasks view without REfetching tasks
             //console.log("FETCH TASKS FROM SERVER");
 
             // fetch tasks from server
             tasksCollection.fetch({
-                beforeSend: Apps.Tasks.API.xhrAuth(),
+                beforeSend: Tasks.API.xhrAuth(),
                 success: function(){
                     //console.log("FETCH TASKS FROM SERVER RESULT: ", arguments[1]);
 
                     // create the 'tasks' view
-                    var tasksView = new Apps.Tasks.Views.Tasks({
+                    var tasksView = new Tasks.Views.Tasks({
                         collection: tasksCollection
                     });
 
                     tasksView.render().$el.appendTo(tasksViewSelector);
 
                     // create the 'add task' view
-                    var addTaskView = new Apps.Tasks.Views.AddTask({
+                    var addTaskView = new Tasks.Views.AddTask({
                         el: addTasksSelector,
                         collection: tasksCollection
                     });
@@ -196,7 +194,7 @@ window.Apps = window.Apps || {};
     app.ready.status = 0;
     app.ready.stack = [];
 
-    window.Apps.Tasks = app;
+    window.Tasks = app;
 
     if (window.console && console.info) {
         console.info(app.name, app.version.join("."));
