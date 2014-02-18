@@ -1,3 +1,4 @@
 app/uploads/*
 storage/*.sqlite
 .idea
+storage/activity.json
