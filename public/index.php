@@ -1,7 +1,5 @@
 <?php
 
-include "../activity.php";
-
 /**
  * Situs - A PHP Framework
  *

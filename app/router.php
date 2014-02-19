@@ -221,8 +221,16 @@ class Router extends Util {
      * Run
      * Auto starts a new Router 
      */   
-    public static function run() {
-        return new Router();
+    public static function run($config = null) {
+
+        //TODO get config from json file
+        if($config === null){
+            $config = (object) array();
+            $config->activity = (object) array();
+            $config->activity->filename = "../storage/activity.json";
+        }
+
+        return new Router($config);
     }
 
     /**
@@ -241,7 +249,7 @@ class Router extends Util {
         exit;
     }
 
-    function __construct(){
+    function __construct($config){
         header('X-Powered-By: PHP/'.phpversion().' Situs');
 
         // ignore OPTIONS method
@@ -250,6 +258,10 @@ class Router extends Util {
             // send OPTIONS headers here
             
             exit;
+        }
+
+        if($config->activity) {
+            $this->activity($config->activity);
         }
 
         // use server's rewrite module or uncomment
