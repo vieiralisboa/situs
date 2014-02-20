@@ -16,6 +16,7 @@ class Router extends Util {
     protected static $routes;
     #protected static $json;
     public static $json = true;
+    protected $config;
 
     /**
      * Route
@@ -223,14 +224,31 @@ class Router extends Util {
      */   
     public static function run($config = null) {
 
-        //TODO get config from json file
+        /*/TODO get config from json file
         if($config === null){
             $config = (object) array();
             $config->activity = (object) array();
             $config->activity->filename = "../storage/activity.json";
-        }
+        }//*/
 
         return new Router($config);
+    }
+
+    /**
+     * Read config (json) file
+     * @param string $config config file name
+     */
+    protected function config($config = "config.json"){
+        $file = dirname(__FILE__)."\\".$config;
+
+        #$this->stop(getcwd());// "/public/"
+
+        if(file_exists($file)) {
+            return $this->config = json_decode(file_get_contents($file));
+        }
+        else {
+            return $this->config = (object) array();
+        }
     }
 
     /**
@@ -260,8 +278,10 @@ class Router extends Util {
             exit;
         }
 
-        if($config->activity) {
-            $this->activity($config->activity);
+        $this->config();
+
+        if($this->config->activity) {
+            $this->activity($this->config->activity);
         }
 
         // use server's rewrite module or uncomment
