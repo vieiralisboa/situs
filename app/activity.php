@@ -15,7 +15,7 @@ class Activity
     public static function filename($filename = false)
     {
         if($filename === false)
-            return self::$root . "/logs/" . self::$filename;
+            return self::$root . self::$filename;
         self::$filename = $filename;
         return self::$filename;
     }
@@ -71,9 +71,11 @@ class Activity
     private function _set(){
         if(self::$set) return 0;
         self::$logs = (object) array();
-        self::$root = dirname(dirname(__FILE__));
         if(!self::$filename)
-            self::$filename = "activity_".date("Ym").".json";
+        {
+            self::$root = dirname(dirname(__FILE__));
+            self::$filename = "/logs/activity_".date("Ym").".json";
+        }
         return self::$set = 1;
     }
 
