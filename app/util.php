@@ -214,42 +214,4 @@ class Util {
 
         return $sucess;
     }
-
-    public function activity($config){
-        if(!isset($config->filename)) return 0;
-
-        $filename = $config->filename;
-
-        if(file_exists($filename)) {
-            $activity = json_decode(file_get_contents($filename));
-        }
-        else {
-            $activity = (object) array();
-        }
-
-        $agent = $_SERVER['HTTP_USER_AGENT'];
-        $address = $_SERVER['REMOTE_ADDR'];
-        $request = $_SERVER['REQUEST_URI'];
-        $today = date("Ymd");
-
-        if(!isset($activity->$address)){
-            $activity->$address = (object) array();
-        }
-
-        if(!isset($activity->$address->$agent)){
-            $activity->$address->$agent = (object) array();
-        }
-
-        if(!isset($activity->$address->$agent->$today)){
-            $activity->$address->$agent->$today = (object) array();
-        }
-
-        if(!isset($activity->$address->$agent->$today->$request)){
-            $activity->$address->$agent->$today->$request = 0;
-        }
-
-        $activity->$address->$agent->$today->$request += 1;
-
-        file_put_contents($filename, json_encode($activity));
-    }
 }

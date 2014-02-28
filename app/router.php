@@ -281,7 +281,7 @@ class Router extends Util {
         $this->config();
 
         if($this->config->activity) {
-            $this->activity($this->config->activity);
+            Activity::log();
         }
 
         // use server's rewrite module or uncomment
