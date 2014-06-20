@@ -1,0 +1,23 @@
+body {
+	color: rgba(255, 255, 255, .75);
+	background-color: rgba(35, 60, 10, .75);
+	/*font-family: monospace;*/
+	text-shadow: 0 0 5px rgba(230, 255, 205, .5);
+	padding-bottom: 54px;
+}
+code{
+	display: block;
+	word-wrap:break-word;
+}
+.header{
+	color: rgba(210, 255, 185, .33);
+	text-shadow: 0 0 5px rgba(230, 255, 205, .25);
+	border-bottom: solid rgba(255,255,255,.1) 1px;
+
+	margin: 15px 0 5px;
+
+}
+.json{
+	color: rgba(255, 200, 255,  .75);
+	text-shadow: 0 0 5px rgba(255, 150, 255, .5);
+}

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/jquery/jquery-1.8.3.min.js"></script>
+<script src="/frontgate/js/frontgate.js"></script>
+<script src="/underscore/1.4.2/underscore-min.js"></script>
+<script src="/backbone/lib/0.9.2/backbone-min.js"></script>
+</head>
+<body>
+<div id="header">
+<h1>Frontgate Schema for Situs PHP Framework</h1>
+<i>
+<h3>Step by Step Example</h3>
+</i>
+</div>
+<ul><b>Requirements:</b>
+<li>Situs PHP Framework</li>
+<li><a href="http://backbonejs.org/">Backbone.js</a> (Schema is a Backbone Model)</li>
+<li><a href="http://situs.no-ip.org:8080/dev/frontgate/index.html">FrontGate</a> (required for example 2)</li>
+</ul>
+<ol><b>Examples:</b>
+    <li><a href="index.html">Basic Usage</a></li>
+    <li><a href="working.example.html">Step by Step Example</a></li>
+    <li><a href="app.html">Tasks App</a></li>
+</ol>
+<pre id="schema-doc">
+<!-- WORKING EXAMPLE -->
+
+<span style="color: blue">/* APPLICATION */</span>
+
+<!-- step 1  Create Location  -->
+<button id="create-location">Step 1: create a remote Location</button>
+<span style="color: silver">// create a new Frontgate location</span>
+Situs = new Frontgate.Location({
+    hostname: 'situs.dev',
+    pathname: '/dev/situs.schema/'
+});
+
+<!-- step 2 Load Schema -->
+<span id="load-schema" style="display:none"><button id="load-schema-butt">Step 2: Load Schema script</button>
+<span style="color: silver">// load the SchemaJS with a callback</span>
+Situs.script('js/schema.js', function(){
+    <!-- step 3 -->
+    <span id="create-schema" style="display:none"><button id="create-schema-butt">Step 3: Create tasks schema</button>
+    <span style="color: silver">// create the 'tasks' schema</span>
+    var tasks = new Apps.Schema.Models.Table({
+        name:'tasks',
+        columns: [
+            {
+                name: 'title', 
+                type: 'TEXT', 
+                constraints: ['NOT NULL']
+            },
+            {
+                name: 'done', 
+                type: 'INTEGER', 
+                default: 0
+            }
+    ]});
+
+    <span id="save-schema" style="display:none"><button id="save-schema-butt">Step 4: Save tasks schema</button>
+    <span style="color: silver">// upload the schema with a callback on success</span>
+    tasks.save().success(function(res){
+        
+        <span id="load-tasks" style="display:none"><button id="load-tasks-butt">Load Tasks</button>
+        <span style="color: silver">// load the tasks MVC script with a callback on loaded</span>
+        Situs.script('js/tasks.js', function(){  
+
+            <span id="create-task" style="display:none"><button id="create-task-butt">Create task</button>
+            <span style="color: silver">// create a task</span>
+            var task = new Apps.Tasks.Models.Task({
+                title: 'Buy milk.'
+            });
+
+            task.toJSON();
+            <span style="color: green">{
+                "title":"Buy milk.",
+                "done":0
+            }</span>
+            
+            <span style="color: silver">// POST to server</span> 
+            task.save();
+            
+            task.toJSON();
+            <span style="color: green">{
+                "id":1,
+                "title":"Buy milk.",
+                "done":0,
+                "date_created":"2013-03-15 22:35:12",
+                "last_updated":"2013-03-15 22:35:12"
+            }</span>
+
+            <span id="edit-task" style="display:none"><button id="edit-task-butt">Edit task</button>
+            <span style="color: silver">// change task title</span> 
+            task.set('title', 'Buy milk and cookies.');
+
+            <span style="color: silver">// PUT to server</span>
+            task.save();
+
+            task.toJSON();
+            <span style="color: green">{
+                "id":1,
+                "title":"Buy milk and cookies.",
+                "done":0,
+                "date_created":"2013-03-15 22:35:12",
+                "last_updated":"2013-03-15 22:42:28"
+            }</span></span>
+</span>
+        });</span>
+    });</span></span>
+});</span><!-- load-schema --> 
+
+</pre>
+
+<!--
+<script src="/dev/situs.schema/js/schema.js"></script>
+-->
+<script>
+
+/* APPLICATION */
+
+// Step 1: Create Location
+$("#create-location").click(function(){
+    window.Situs = new Frontgate.Location({
+        hostname: "localhost",
+        pathname: "/"
+    });
+    
+    $.ajaxSetup({ 
+        beforeSend: Frontgate.xhrAuth('guest','guest')
+    });
+    
+    $("#create-location").hide();
+    $("#load-schema").show();
+});
+
+// Step 2
+$("#load-schema-butt").click(function(){
+    Situs.script("situs.schema/js/backbone.schema.js", function(){
+        console.log('loading the Schema...');
+        $("#load-schema-butt").hide();
+        $("#create-schema").show();
+    }); 
+});
+
+// Step 3: Create Schema
+$("#create-schema-butt").click(function(){
+    console.log('Creating the task schema...');
+    $("#create-schema-butt").hide();
+    $("#save-schema").show();
+
+    // create the 'tasks' schema
+    tasks = new Apps.Schema.Models.Table({
+        name:'tasks',
+        columns: [
+            {
+                name: 'title', 
+                type: 'TEXT', 
+                constraints: ['NOT NULL']
+            },
+            {
+                name: 'done', 
+                type: 'INTEGER', 
+                default: 0
+            },
+            {
+                name: 'priority', 
+                type: 'INTEGER', 
+                default: 5
+            }
+        ]
+    });
+
+    // log console
+    console.log(JSON.stringify(tasks));
+
+});
+
+// Step 4: Save Task Schema
+$("#save-schema-butt").click(function(){
+    console.log('Saving the task schema...');
+    $("#save-schema-butt").hide();
+    $("#load-tasks").show();
+    // upload the schema with a callback on success
+    tasks.save().success(function(res){
+        var log = res ? 'Successfuly uploaded schema to server.' : 'A schema with the same may already exist. Try a different name for your schema.';
+        console.log(log);
+    });
+});
+
+// Step 5: Load Tasks
+$("#load-tasks-butt").click(function(){
+    console.log('Loading Tasks...');
+    $("#load-tasks-butt").hide();
+    $("#create-task").show();
+
+    // load the tasks MVC script with a callback on loaded
+    Situs.script('/situs.schema/js/backbone.tasks.js', function(){
+       if(!Apps.Tasks) console.log('Tasks NOT loaded.');
+       else console.log('Tasks loaded.');
+    });
+});
+
+// Step 6: Create Task
+$("#create-task-butt").click(function(){
+    console.log('Creating task');
+    //*1           
+    // create a task
+    task = new Apps.Tasks.Models.Task({
+        title: 'Buy milk.'
+    });
+    //
+    console.log(task.toJSON());
+    
+    // POST to server 
+    task.save().success(function(){
+        console.log(task.toJSON());
+    });
+    
+    $("#create-task-butt").hide();
+    $("#edit-task").show();
+});
+
+// Step 7: Edit Task
+$("#edit-task-butt").click(function(){
+    console.log('Editing task');
+    $("#edit-task-butt").hide();
+    $("#my-tasks-butt").show();
+    // change task title 
+    task.set('title', 'Buy milk and cookies.');
+    // PUT to server
+    task.save().success(function(res){
+        console.log(res);
+        //console.log(task.toJSON());
+    });
+});
+
+</script>
+<script id="taskTemplate" type="text/template">
+    <span><%= title %></span> (<%= priority %>)
+    <button class="edit">Edit</button>
+    <button class="delete">Delete</button>
+</script>
+</body>
+</html>

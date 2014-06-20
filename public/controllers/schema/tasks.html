@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt" data-remote_hostname="xn--stio-vpa.pt" data-remote_protocol="https:" data-host="xn--stio-vpa.pt">
+<head>
+    <meta charset="utf-8">
+    <script src="https://xn--stio-vpa.pt/frontgate/js/frontgate.js"></script>
+    <link rel="stylesheet" type="text/css" href="myconsole.css">
+</head>
+<body>
+<script src="myconsole.js"></script>
+<script>
+Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
+    "underscore/1.4.2/underscore.js",
+    "backbone/1.1.0/backbone.js", function(){
+
+/*/
+    var API = Frontgate.location({
+        hostname: "situs.xn--stio-vpa.pt",
+        pathname: "/tasks",
+        protocol: "https"
+    });
+
+    API.auth({
+        user: "tasks",
+        pw: "sksat"
+    });
+
+    var Task = Backbone.Model.extend({ 
+        defaults: { 
+            title: "",
+            priority: 0,
+            done: 0
+        },
+        urlRoot: API.url()
+    });
+
+    var Tasks = Backbone.Collection.extend({ 
+        model: Task,
+        url: API.url()
+    });
+
+    var tasks = new Tasks;
+
+    function fetchTasks(){
+        tasks.fetch({
+            beforeSend: API.xhrAuth(),
+            success: function(collection, response, options){
+                myConsole("tasks.fetch()", response);
+            }
+        });
+    }
+
+    fetchTasks();
+
+    // create a task
+    var task = new Task({ 
+        title: "study for the calculus test" 
+    });
+
+    task.save(null, {
+        beforeSend: API.xhrAuth(),
+        success: function(model, response, options){
+            //console.log(model, response, options);
+            myConsole("task.save()", response);
+        }
+    });
+
+    fetchTasks();
+    
+    task.set("title", "study for the physics test");
+    myConsole('task.set("title", "study for the physics test")', task.attributes);
+
+    task.fetch({
+        beforeSend: API.xhrAuth(),
+        success: function(model, response, options){
+            //console.log(model, response, options);
+            myConsole("task.fetch()", task.attributes);
+        }
+    });
+
+
+setTimeout(function(){
+    task.destroy({ 
+        beforeSend: API.xhrAuth() 
+    });
+}, 10000);
+//*/
+
+/*
+    myConsole("set an attribute", 'task.set("title", "buy milk")',
+        task.set("title", "buy milk"));
+    myConsole("set an attribute", 'task.set("where", "grocery store")',
+        task.set("where", "grocery store"));
+    myConsole("unset an attribute", 'task.unset("where")', task.unset("where"));
+    myConsole("clone a model", 'task2 = task.clone()', task2 = task.clone());
+    myConsole("clear a model", 'task.clear()', task.clear());
+    myConsole(null, "task.toJSON()", task.toJSON());
+    myConsole(null,"task2.toJSON()", task2.toJSON());
+*/
+
+ze = Object.create(Object.prototype);
+
+ze.version = "1.1.1";
+
+ze = Object.defineProperties(ze,
+{
+    USER: {
+        value: "daniel",
+        writeable: false
+    },
+    PW: {
+        value: "*****",
+        writeable: false
+    }
+});
+
+ze2 = { user: "daniel", pw :"*****" };
+
+
+});
+
+function changeZe(o){
+    for(var name in o)
+    o[name] = "XXXXX";
+    return o;
+}
+
+
+
+</script>
+</body>
+</html>
+
