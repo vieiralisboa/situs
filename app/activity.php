@@ -73,7 +73,7 @@ class Activity
         self::$logs = (object) array();
         if(!self::$filename)
         {
-            self::$root = dirname(dirname(__FILE__));
+            self::$root = "/shares/www";//dirname(dirname(__FILE__));
             self::$filename = "/logs/activity_".date("Ym").".json";
         }
         return self::$set = 1;

@@ -5,7 +5,9 @@
 class Toolbar_Controller {
 	
 	public function get() {
-		
+		//$base = "/htdocs/libs/";
+		$base = "/shares/jlisboa/WD SmartWare.swstor/ULTRABOOK/Volume.7d313caf.1c93.4c09.838c.44ab9c4ba2a0/htdocs/libs/";
+
 		switch( true )
 		{
 			
@@ -14,7 +16,7 @@ class Toolbar_Controller {
 	        //
 			case $request = Util::preg_match_uri('/toolbar/addon/:script'): 
 				// requested script
-				$script = "/htdocs/libs/" + $request['script'];
+				$script = $base.$request['script'];
 				
 				// upload script
 				if(file_exists($script)) return Util::download($script);
@@ -30,8 +32,7 @@ class Toolbar_Controller {
 				//return $request;
 				$script = $request['script'];
 				//$name = str_replace('.js', '', $script);
-				$base = "/htdocs/libs/";
-				
+								
 				switch($script){
 					case "toolbar.js":
 						$filename = $base."jquery.toolbar/js/toolbar.js";

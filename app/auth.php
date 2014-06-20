@@ -15,7 +15,8 @@ class Auth extends Util{
 
 	// dummy db
 	public static function db($user, $realm){
-		$file = dirname(__FILE__)."\auth\\$realm.json";
+		#$file = dirname(__FILE__)."\auth\\$realm.json";
+		$file = dirname(__FILE__)."/auth/$realm.json";
 		if(file_exists($file)){
 			$db = json_decode(file_get_contents($file));
 			foreach($db as $record)
@@ -40,7 +41,8 @@ class Auth extends Util{
 	 */
 	public static function basic($realm){
 		// list of controllers that do not require authorization
-		$ignore = dirname(__FILE__)."\auth\.ignore.json";
+		#$ignore = dirname(__FILE__)."\auth\.ignore.json";
+		$ignore = dirname(__FILE__)."/auth/.ignore.json";
 		if(file_exists($ignore)){
 			$controllers = json_decode(file_get_contents($ignore));
 			foreach($controllers as $controller) {

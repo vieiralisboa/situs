@@ -1,30 +1,41 @@
 <?php
 /**
  * Download
+ * TODO seperate controllers for folder contents and download_video
  */
 class MyTV_Controller {
     
-    public function get($request) {   
+    public function get($request) {
         
         if($request->uri[1] == 'auth') return "Authorized";
 
+        //DEBUG
+        //return $request;
+
         // folder containing the videos
-        $path = "\\\\MYBOOKLIVE\\Public\\Shared Videos\\tv-shows";
-        #$path = "/shares/Public/Shared Videos/tv-shows";// MBL
+        #$path = "\\\\MYBOOKLIVE\\Public\\Shared Videos";//\\tv-shows";
+        $path = "/shares/Public/Shared Videos";//tv-shows";// MBL
+        $sep = "/";//"\\";
 
         // valid requests contain 
-        if(count($request->uri) < 3) return; 
+        if(count($request->uri) < 3) return;
 
-        // Route 1. /myTV/dir
+        // Route 1. /myTV/dir/:dir
         //---------------------------------------------------------------------
-        if($request->uri[1] == 'dir')
-        {
-            $dir = $request->uri[2];
-            $path .= "\\".$dir;
-            $url = "http://situs.no-ip.org:8080/myTV/show/";
+        $k = 1;
+        if($request->uri[$k] == 'dir' && isset($request->uri[$k+1])){
+            $dir = $request->uri[++$k];
+            
+            while(isset($request->uri[++$k])){
+                $dir .=  $sep.$request->uri[$k];
+            }
+
+            $path .= $sep.$dir;
+            //return $path;
+
+            //$url = "http://situs.no-ip.org:8080/myTV/show/";
             $videos = array();
-            foreach(scandir($path) as $video)
-            {
+            foreach(scandir($path) as $video){
                 $info = pathinfo($video);
                 if(preg_match('/\.mp4$/', $video)) 
                 {
@@ -35,20 +46,20 @@ class MyTV_Controller {
                     $name = str_replace('.', " ", $name);
                     $show = array(
                         'name' => $name,// $info['basename'],
-                        'mp4' => 'show/' . $dir. "/" . $info['filename']
+                        'mp4' => 'show' . $sep . $dir. $sep . $info['filename']
                         //'mp4' => "http://guest:guest@situs.no-ip.org:8080/myTV/show/" . $dir."/".$info['filename']
                     );
 
                     // HD (m4v)
                     //---------------------------------------------------------
-                    $m4v = $path . "/" . $info['filename'] . ".m4v";
+                    $m4v = $path . $sep . $info['filename'] . ".m4v";
                     if(file_exists($m4v)) $show['m4v'] = true;
                     //else $show['m4v'] = false;
 
                     // Subtitles (vtt)
                     //---------------------------------------------------------
                     // vtt file exists
-                    if(file_exists($path."/".$info['filename'].".vtt"))
+                    if(file_exists($path.$sep.$info['filename'].".vtt"))
                     {
                         // include vtt file (where the vtt file was uploaded)
                         $show['vtt'] = vtt($info['filename'].".vtt", $path);
@@ -59,37 +70,66 @@ class MyTV_Controller {
                 }
             }
             return $videos;
-        } 
+        }
 
-        
         // Route 2. /myTV/show/:folder/:file
         //---------------------------------------------------------------------
-        if($request->uri[1] == 'show')
-        {
+        $i = 1;
+        if($request->uri[$i] == 'show'){
+            //DEBUG
+            //return $request;
+
+            $file = $path;
+
             // path to the file's folder
-            $path .= "\\".$request->uri[2];
+            while(isset($request->uri[++$i])){
+                $file .= $sep.$request->uri[$i];
+            }
+
+            $filename = $request->uri[$i];// . ".mp4";
 
             // requested video
-            $file = $request->uri[3];// . ".mp4";
-            if(!file_exists("$path\\$file")) return false;
+            if(!file_exists($file)) return false;
             
             // only stream partial video (range)
-            if(empty($_SERVER['HTTP_RANGE'])) return false;
+            if(0) if(empty($_SERVER['HTTP_RANGE'])) {
+                //file_put_contents("myTV_0_SERVER.json", json_encode($_SERVER));
+                return false;
+            }
+            
+            //file_put_contents("myTV_1_SERVER.json", json_encode($_SERVER));
 
-            // set mp4 mime-type header
-            header("Content-Type: video/mp4");
-            
+            //mp4Upload($file);
+
             // stream the video
-            rangeDownload("$path\\$file");
-            
+            rangeDownload($file);
+
             exit;
-        } 
-        
+        }
+
         // Invalid route
         //---------------------------------------------------------------------
         return false;
     }  
 }
+
+function mp4Upload($mp4){
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $mp4);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    $out = curl_exec($ch);
+    curl_close($ch);
+
+    header('Content-type: video/mp4');
+    header('Content-type: video/mpeg');
+    header('Content-disposition: inline');
+    header("Content-Transfer-Encoding:­ binary");
+    header("Content-Length: ".filesize($out));
+    echo $out;
+    exit();
+}
+
 
 /**
  *
@@ -102,7 +142,12 @@ function rangeDownload($file) {
     $length = $size;           // Content length
     $start  = 0;               // Start byte
     $end    = $size - 1;       // End byte
+    
     // Now that we've gotten so far without errors we send the accept range header
+    
+    // set mp4 mime-type header
+    header("Content-Type: video/mp4");
+
     /* At the moment we only support single ranges.
      * Multiple ranges requires some more work to ensure it works correctly
      * and comply with the spesifications: http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
@@ -122,8 +167,10 @@ function rangeDownload($file) {
  
         $c_start = $start;
         $c_end   = $end;
+        
         // Extract the range string
         list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+        
         // Make sure the client hasn't sent us a multibyte range
         if (strpos($range, ',') !== false) {
  
@@ -133,12 +180,16 @@ function rangeDownload($file) {
             header('HTTP/1.1 416 Requested Range Not Satisfiable');
             header("Content-Range: bytes $start-$end/$size");
             // (?) Echo some info to the client?
+
+            //file_put_contents("myTV_416_headers.json", json_encode(getallheaders()));
+
             exit;
         }
+
         // If the range starts with an '-' we start from the beginning
         // If not, we forward the file pointer
         // And make sure to get the end byte if spesified
-        if ($range0 == '-') {
+        if ($range[0] == '-') {
  
             // The n-number of the last bytes is requested
             $c_start = $size - substr($range, 1);
@@ -149,11 +200,14 @@ function rangeDownload($file) {
             $c_start = $range[0];
             $c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
         }
+        
         /* Check the range and make sure it's treated according to the specs.
          * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
          */
+        
         // End bytes can not be larger than $end.
         $c_end = ($c_end > $end) ? $end : $c_end;
+        
         // Validate the requested range and return an error if it's not correct.
         if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
  
@@ -168,6 +222,7 @@ function rangeDownload($file) {
         fseek($fp, $start);
         header('HTTP/1.1 206 Partial Content');
     }
+    
     // Notify the client the byte range we'll be outputting
     header("Content-Range: bytes $start-$end/$size");
     header("Content-Length: $length");
@@ -207,7 +262,8 @@ function vtt($vtt, $path) {
         $sent_subs[] = $vtt;
         file_put_contents($json, json_encode($sent_subs));
 
-        $url = 'http://situs.pt/vtt/post.php';
+        //$url = 'http://situs.pt/vtt/post.php';
+        $url = 'http://xn--stio-vpa.pt/VideoPlayer/post.php';
         $postdata = http_build_query(array(
             'name' => $vtt,
             'text' => file_get_contents($path.'/'.$vtt)
@@ -249,5 +305,5 @@ function vtt($vtt, $path) {
     */
     
     // include vtt file (where the vtt file was uploaded)
-    return "vtt/" . $vtt;
+    return "/VideoPlayer/" . $vtt;
 }

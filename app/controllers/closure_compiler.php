@@ -1,6 +1,6 @@
 <?php
 /**
- * Download
+ * PHP 5.2
  */
 class Closure_compiler_Controller {
     
@@ -10,87 +10,90 @@ class Closure_compiler_Controller {
 
     //POST /upload/file 
     public function post($request) {
-        #return $_FILES;
-        #return $request;
+
+        #$jshrink = '/shares/www/libs/JShrink/src/JShrink/Minifier.php';
+        $jshrink = "/shares/jlisboa/WD SmartWare.swstor/ULTRABOOK/Volume.7d313caf.1c93.4c09.838c.44ab9c4ba2a0/htdocs/libs/JShrink/src/JShrink/Minifier.php";
+
+        if(file_exists($jshrink)) require $jshrink;
+        else return null;//$request;
+
+        // path to the upload folder
+        #$path = dirname(dirname(__FILE__))."/uploads";
+        $path = "/shares/www/uploads";
 
         /*
-         * Compile input
+         * Compile posted input
+         * Saves minified code to file
          */
         if( $request->uri[1] == 'compile') {
-            $postdata = file_get_contents("php://input");
-            $path = dirname(dirname(__FILE__))."\\uploads";
+            
+            // posted code
+            $js = file_get_contents("php://input");
+            
+            // path to output file
+            $out = "$path/min-out.js";
 
-
-            $in = "$path\\in.js";
-            $out = "$path\\min-out.js";
-            file_put_contents("$path\\in.js", $postdata);
-
-            //$command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
-            $command = "java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
-
-            if(file_exists($in)){
-                $output = '';
-                exec($command, $output);
-            }
+            // JShrink posted data
+            #$minifiedCode = JShrink\Minifier::minify($postdata);
+            // Disable YUI style comment preservation.
+            $minifiedCode = Minifier::minify($js, array('flaggedComments' => false));
+            
+            // save minified code
+            file_put_contents($out, $minifiedCode);
 
             return array (
                 'file' => 'out.js',
-                //'filename' => $filename,
-                'input' => file_get_contents($in),
+                'filename' => $filename,
+                'input' => $js,
                 'output' => file_get_contents($out),
-                //'command' => $command,
-                //'out' =>$out,
-                'result'=>$output
+                'command' => $command,
+                'out' =>$out,
+                'result'=>$minifiedCode
             );
         }
-
+        
         /*
          * Compile from file
          */
-
-        // folder to upload file
-        $path = dirname(dirname(__FILE__))."\\uploads";
-     
+        // 
         $name = isset( $request->uri[1] ) ? $request->uri[1] : $_FILES['file']['name'];
 
         // uploaded file is not a .js file
         if(!preg_match('/\.js$/', $name)) return $_FILES;
         
         // complete path to upload file
-        $filename = "$path\\$name";
+        $filename = "$path/$name";
 
-        // remove any existing file with same name
-        // to avoid false upload success
+        // remove existing file with same name to avoid false upload success
         if(file_exists($filename)) unlink($filename);
 
-        #return $filename;
-
-        // upload file
+        // save uploaded file
         $success = Util::upload($filename);
+        if(!$success) return "File Upload Failed";
+        #else return "File Upload Successful";
 
         // verify if file was uploaded successfuly
-        if(file_exists("$path\\$name")) {
-            $in = "$path\\$name";
-            $out = "$path\\min-$name";
+        if(file_exists($filename)) {
+            
+            $js = file_get_contents($filename);
+            
+            $out = "$path/min-$name";
+            
+            // JShrink posted data
+            #$minifiedCode = Minifier::minify($js);
+            $minifiedCode = Minifier::minify($js, array('flaggedComments' => false));
 
-            //$command = "C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
-            $command = "java.exe -jar C:\\htdocs\\libs\\closure-compiler\\compiler-latest\\compiler.jar --js=$in --js_output_file=$out";
-
-            if(file_exists($in)){
-                #echo "\n$in exists\n";
-                #echo "\nexeting: $command\n";
-                $output = '';
-                exec($command, $output);
-            }
+            // save minified code
+            file_put_contents($out, $minifiedCode);
 
             return array (
                 'file' => $name,
-                //'filename' => $filename,
-                'input' => file_get_contents("$path\\$name"),
+                'filename' => $filename,
+                'input' => $js,
                 'output' => file_get_contents($out),
-                //'command' => $command,
-                //'out' =>$out,
-                'result'=>$output
+                'command' => $command,
+                'out' => $out,
+                'result' => $minifiedCode
             );
         }        
         

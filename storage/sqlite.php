@@ -17,7 +17,8 @@ class Sqlite {
      */
     protected function connect() {
         if(isset($this->db)) return $this->db;
-        $base = dirname(dirname(__FILE__));
+        #$base = dirname(dirname(__FILE__));
+        $base = "/shares/www";
         $database = "sqlite:$base/storage/situs.sqlite";
         $this->db = new PDO($database);
         return $this->db;

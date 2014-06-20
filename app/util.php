@@ -150,7 +150,6 @@ class Util {
         die($response);
     }
 
-
     /**
      * Download
      * Reads (downloads) local files
@@ -170,10 +169,51 @@ class Util {
         header("Cache-Control: public");
         header("Content-Description: File Transfer");
         header("Content-Disposition: attachment; filename=$filename");
-        header("Content-Type: application/x-javascript");
-        header("Content-Transfer-Encoding: binary");
-        
-         //Read the file from disk
+
+        switch(pathinfo($filename, PATHINFO_EXTENSION)){
+            case "html":
+            case "htm":
+                header('Content-Type: text/html; charset=utf-8');
+                break;
+
+            case "css":
+                header("Content-type: text/css; charset: UTF-8");
+                break;
+
+            case "json":
+                header('Content-Type: application/json');
+                break;
+
+            case "js":
+                header("Content-Type: application/x-javascript");
+                break;
+
+            default:
+                header('Content-Type: application/octet-stream');
+                header("Content-Transfer-Encoding: binary");
+                header('Content-Length: ' . filesize($file));
+        }
+
+/*/
+$file = 'monkey.gif';
+if (file_exists($file)) {
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename='.basename($file));
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($file));
+    ob_clean();
+    flush();
+    readfile($file);
+    exit;
+}
+//*/
+        ob_clean();
+        flush();
+
+        //Read the file from disk
         readfile($file);
     }
 
