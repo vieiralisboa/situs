@@ -151,8 +151,51 @@ class Util {
     }
 
     /**
+     * Serve static
+     * Reads local files
+     */
+    public static function serve($file){
+        // prevent the null trail (json empty string)
+        Router::$json = false;
+
+        if(!file_exists($file) || is_dir($file)) {
+            self::quit(404);
+        }
+
+        $filename = basename($file);
+
+        switch(pathinfo($filename, PATHINFO_EXTENSION)){
+            case "html":
+            case "htm":
+                header('Content-Type: text/html; charset=utf-8');
+                break;
+
+            case "css":
+                header("Content-type: text/css; charset: UTF-8");
+                break;
+
+            case "json":
+                header('Content-Type: application/json');
+                break;
+
+            case "js":
+                header("Content-Type: application/x-javascript");
+                break;
+
+            default:
+                self::quit(404);
+        }
+
+        ob_clean();
+        flush();
+
+        //Read the file from disk
+        readfile($file);
+    }
+
+    /**
      * Download
-     * Reads (downloads) local files
+     * Uploads local files
      */
     public static function download($file){
         // prevent the null trail (json empty string)

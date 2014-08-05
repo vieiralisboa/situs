@@ -15,7 +15,7 @@ class Docs_Controller {
             $HTDOCS = "/shares/jlisboa/WD SmartWare.swstor/ULTRABOOK/Volume.7d313caf.1c93.4c09.838c.44ab9c4ba2a0/htdocs";
             $file = $HTDOCS."/sites/ze/js/bar/templates/".$request->data['template'];
             if(!file_exists($file)) Util::quit(404);
-            return Util::download($file);
+            return Util::serve($file);
         });
 
         Router::route('/docs/bar/css/:sheet', function($request) {
