@@ -17,9 +17,13 @@ class Sqlite {
      */
     protected function connect() {
         if(isset($this->db)) return $this->db;
-        #$base = dirname(dirname(__FILE__));
-        $base = "/shares/www";
-        $database = "sqlite:$base/storage/situs.sqlite";
+        $base = dirname(__FILE__);
+        if(file_exists("$base/sqlite.json")){
+            $config = json_decode(file_get_contents("$base/sqlite.json"));
+            if(!empty($config->base)) $base = $config->base;
+        }
+
+        $database = "sqlite:$base/situs.sqlite";
         $this->db = new PDO($database);
         return $this->db;
     }
