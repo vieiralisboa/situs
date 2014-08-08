@@ -3,23 +3,27 @@
  * Toolbar
  */
 class Situs_Controller {
-	
+
 	public function get() {//return "disabled";
-		$HTDOCS = "/shares/jlisboa/WD SmartWare.swstor/ULTRABOOK/Volume.7d313caf.1c93.4c09.838c.44ab9c4ba2a0/htdocs/";
+
+		$json = file_get_contents(dirname(__FILE__)."/situs.conf.json");
+		$config = json_decode($json);
 
 		switch( true ){
-			//
+			// BASE
 			case $request = Util::preg_match_uri("/situs")://return $request;
 				Util::quit(404);
 
+			// BAR
 			case $request = Util::preg_match_uri('/situs/bar/:script'):
 				$script = $request['script'];
-				$file = $HTDOCS . "sites/ze/js/bar/js/bar.$script.js";
+				$file = $config->htdocs . $config->bar . "js/bar.$script.js";
 				if(file_exists($file)) return Util::download($file);
 
+			// SCRIPT
 			case $request = Util::preg_match_uri('/situs/js/:script')://return $request;
 				$script = $request['script'];
-				$base = $HTDOCS . "sites/frontgate/public/";
+				$base = $config->htdocs . $config->frontgate;
 				switch($script){
 					case "frontgate":
 					case "frontgate.js":
@@ -49,13 +53,16 @@ class Situs_Controller {
 					case "bar":#return $query;
 						foreach($query as $name => $value) {
 							$filename = "bar.$name.js";
-							$script = "bar/bar.$name.js";
-							$file = utf8_decode($HTDOCS."sites/ze/js/bar/js/bar.$name.js");
+							$script = "jquery.bar/js/bar.$name.js";
+							$file = utf8_decode($config->htdocs.$config->bar . "js/bar.$name.js");
 
 							//DEVELOPMENT attach the filename
-							$temp_file = "/shares/www/tmp/" . $filename;
+							$temp_file = $config->temp.$filename;
 							if(file_exists($file)) {
 								$body = file_get_contents($file);
+								$json = file_get_contents($file."on");
+								if($json) $json = json_encode(json_decode($json));
+								else $json = json_encode(null);
 							}
 							//else return $file;
 
@@ -65,8 +72,6 @@ class Situs_Controller {
 
 $SCRIPT = <<<SCRIPT
 //Situs_Controller>>>
-window.BAR_JSON = "{$script}on";
-window.BAR_NAME = "$name";
 (function(FILE){
 
 //JavaScript $file
@@ -77,9 +82,9 @@ $body
     filename: "$file0",
     script: "$script",
     path: "$file",
-    url: "$protocol://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}"
+    url: "$protocol://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}",
+    json: '$json'
 });
-
 SCRIPT;
 
 						file_put_contents($temp_file, $SCRIPT);
@@ -93,8 +98,8 @@ SCRIPT;
 
 				// situs/frontgate?<$query>
 				case "frontgate":
-					$temp_file = "/shares/www/tmp/frontgate"; 
-					$files = frontgate($matches, $HTDOCS, $temp_file);
+					$temp_file =  $config->temp . "frontgate"; 
+					$files = frontgate($matches, $config, $temp_file);
 					$temp_file .= ".js";//".". intval(time()/86400)
 					break;
 
@@ -135,7 +140,7 @@ function query($matches){
 	return $params;
 }
 
-function frontgate($matches, $HTDOCS, &$temp_file){
+function frontgate($matches, $config, &$temp_file){
 	$files = array();	
 	$requires = array(
 		"situs" => array(
@@ -150,7 +155,7 @@ function frontgate($matches, $HTDOCS, &$temp_file){
 		)
 	);
 
-	$LIB = $HTDOCS  ."sites/frontgate/public/";
+	$LIB = $config->htdocs . $config->frontgate;
 	$files[] = $LIB . "js/frontgate.js";
 
 	if(count($matches) > 2)	{
@@ -162,7 +167,7 @@ function frontgate($matches, $HTDOCS, &$temp_file){
 				if(isset($requires[$name])) {
 					foreach($requires[$name] as $required) {
 						if(!in_array($required, $files)) {
-							$files[] = $HTDOCS . $required;
+							$files[] = $config->htdocs . $required;
 						}
 					}	
 				}
