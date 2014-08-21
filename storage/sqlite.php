@@ -9,7 +9,7 @@
  */
 
 /**
- *
+ * SQL controller for Sqlite PDO
  */
 class Sqlite {
     /**
@@ -28,14 +28,13 @@ class Sqlite {
         return $this->db;
     }
 
-   
     /**
      * executes SQL queries
      */
     protected function exec($sql) {
-        
+
         //parse sql here
-        
+
         return $this->connect()->exec($sql);
     }
 
