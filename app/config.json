@@ -1,5 +1,6 @@
 {
-	"activity": {
+	"_activity": {
 		"filename": "../storage/activity.json"
-	}
+	},
+	"activity": false
 }

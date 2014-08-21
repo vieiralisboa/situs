@@ -14,7 +14,7 @@
 class Router extends Util {
     protected $response = "";
     protected static $routes;
-    #protected static $json;
+    public static $controller_config;
     public static $json = true;
     protected $config;
 
@@ -85,9 +85,9 @@ class Router extends Util {
         }
         
         file_put_contents($controller, $data);
-        
+
         if(file_exists($controller)) return true;
-        
+
         // failed to create the controller
         return false;
     }
@@ -118,7 +118,7 @@ class Router extends Util {
         $file = explode(".", basename($json));
         $api = $file[0];
         $schema = json_decode(file_get_contents($json));
-        
+
         #print_r($schema);
 
         $columns = array();
@@ -132,13 +132,13 @@ class Router extends Util {
             if(isset($column->default)){
                 $default = $column->default;
                 $string .= " DEFAULT $default";
-            } 
-                
+            }
+
             $columns[] = $string;
         }
-        
+
         $template = dirname(dirname($json))."/templates/schema.template";
-        
+
         $names = array(
             'Table'=>ucfirst($api),
             'table'=>$api, 
@@ -146,7 +146,7 @@ class Router extends Util {
             'Controller' => ucfirst(strtolower($schema->PDO)), 
         );
         $data = file_get_contents($template);
-        
+
         foreach($names as $name => $value){
             $data = str_replace("{".$name."}", $value, $data);
         }
@@ -154,7 +154,7 @@ class Router extends Util {
         $filename = dirname($json)."/$api.php";
 
         file_put_contents($filename, $data);
-        
+
         #die("DONE");
 
         if(file_exists($filename)) return true;
@@ -179,44 +179,52 @@ class Router extends Util {
         if(!load($controller)) {
             // create controller script if schema exists
             if(!self::create_controller($api)) self::quit(404);
-            
+
             // retry loading the controller script
             if(!load($controller)) self::quit(404);
         }
-         
+
         // Controller class name
         $Controller = ucwords($api) . "_Controller";
-        
+
         if(class_exists($Controller)) {
-            $args = array(); 
+            $args = array();
             $args[] = $request;
 
             if(method_exists($Controller, $request->method)) { 
-                
+
                 Auth::basic($api);
-                
+
                 Database::$table = $api;
 
+                // load controller config
+                $jsonfile = "$base/app/controllers/$api.json";
+                if(file_exists($jsonfile)){
+                    $json = file_get_contents($jsonfile);
+                    self::$controller_config = json_decode($json);
+                }
+
                 $reflectionMethod = new ReflectionMethod($Controller, $request->method);
-                
+
                 $this->response = $reflectionMethod->invokeArgs(new $Controller(), $args);
 
+                // Controllers has set Routes
                 if(count(self::$routes) > 0){
                     foreach(self::$routes as $route => $callback) {
                         if($request->data = $this->preg_match_uri($route)) {
                             $this->response = $callback($request);
+                            break;
                         }
                     }
                 }
-
                 #if(is_string($this->response)) $this->json = false;
                 return;
             }
         }
-        
+
         self::quit(404);
     }
-    
+
     /**
      * Run
      * Auto starts a new Router 
@@ -238,7 +246,7 @@ class Router extends Util {
      * @param string $config config file name
      */
     protected function config($config = "config.json"){
-        $file = dirname(__FILE__)."\\".$config;
+        $file = dirname(__FILE__)."/".$config;
 
         #$this->stop(getcwd());// "/public/"
 
@@ -273,7 +281,7 @@ class Router extends Util {
         if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
 
             // send OPTIONS headers here
-            
+
             exit;
         }
 
