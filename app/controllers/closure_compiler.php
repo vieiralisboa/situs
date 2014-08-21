@@ -3,23 +3,18 @@
  * PHP 5.2
  */
 class Closure_compiler_Controller {
-    
     public function get($request) {
         return "The Closure Compiler API does not respond to GET requests.";
     }
 
-    //POST /upload/file 
+    //POST /upload/file
     public function post($request) {
-
-        #$jshrink = '/shares/www/libs/JShrink/src/JShrink/Minifier.php';
-        $jshrink = "/shares/jlisboa/WD SmartWare.swstor/ULTRABOOK/Volume.7d313caf.1c93.4c09.838c.44ab9c4ba2a0/htdocs/libs/JShrink/src/JShrink/Minifier.php";
-
-        if(file_exists($jshrink)) require $jshrink;
+        if(file_exists(Router::$controller_config->jshrink))
+            require Router::$controller_config->jshrink;
         else return null;//$request;
 
         // path to the upload folder
-        #$path = dirname(dirname(__FILE__))."/uploads";
-        $path = "/shares/www/uploads";
+        $path = Router::$controller_config->uploads;
 
         /*
          * Compile posted input
@@ -43,10 +38,11 @@ class Closure_compiler_Controller {
 
             return array (
                 'file' => 'out.js',
-                'filename' => $filename,
+                //'request' => $request,
+                //'filename' => $filename,
                 'input' => $js,
                 'output' => file_get_contents($out),
-                'command' => $command,
+                //'command' => $command,
                 'out' =>$out,
                 'result'=>$minifiedCode
             );
@@ -103,4 +99,9 @@ class Closure_compiler_Controller {
     public function options($request){
         return null;
     }
+/*
+    function __construct(){
+        $json = file_get_contents(dirname(__FILE__)."/closure_compiler.json");
+        $this->config = json_decode($json);
+    }//*/
 }
