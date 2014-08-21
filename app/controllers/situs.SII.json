@@ -1,0 +1,10 @@
+{	
+	"htdocs": "/mnt/extSdCard/www/htdocs/",
+	"libs": "/mnt/extSdCard/www/htdocs/libs/",
+	"frontgate": "/mnt/extSdCard/www/htdocs/sites/frontgate/public/js/",
+	"temp": "/mnt/extSdCard/www/TEMP/",
+	"bar": "sites/ze/js/bar/",
+	"bars": "sites/ze/js/bars/",
+
+	"!": "use urls with penalty"
+}

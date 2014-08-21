@@ -1,0 +1,14 @@
+{
+	"htdocs": "C:\\htdocs\\",
+	"libs": "C:\\htdocs\\libs\\",
+	"temp": "C:\\htdocs\\libs\\TEMP\\",
+	"frontgate": "C:\\htdocs\\sites\\frontgate\\public\\js\\",
+	"bar": "sites/ze/js/bar/",
+	"bars": null,
+
+	"_frontgate": "http://hosts.medorc.org/frontgate/js/",
+	"_libs": "http://docs.medorc.org/",
+	"_bar": "http://docs.medorc.org/jquery.bar/",
+
+	"!": "use urls with time penalty"
+}

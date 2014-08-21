@@ -1,4 +1,6 @@
 <?php
+error_reporting(0);
+
 /**
  * Toolbar
  */
@@ -6,8 +8,7 @@ class Situs_Controller {
 
 	public function get() {//return "disabled";
 
-		$json = file_get_contents(dirname(__FILE__)."/situs.conf.json");
-		$config = json_decode($json);
+		$config = Router::$controller_config;
 
 		switch( true ){
 			// BASE
@@ -101,18 +102,20 @@ SCRIPT;
 					$temp_file =  $config->temp . "frontgate"; 
 					$files = frontgate($matches, $config, $temp_file);
 					$temp_file .= ".js";//".". intval(time()/86400)
+
 					break;
 
 				// situs/<$name>?<$query>
 				default:
-
 			}
+
+//return $config;
+//return $files;
 
 			if(count($files)) {
 				$script = "";
 
-				if(file_exists($temp_file))
-					unlink($temp_file);
+				if(file_exists($temp_file)) unlink($temp_file);
 
 				foreach($files as $file)
 					$script .= "\n" . file_get_contents($file);
@@ -120,7 +123,7 @@ SCRIPT;
 				file_put_contents($temp_file, $script);
 
 				if(file_exists($temp_file))
-					return Util::download($temp_file);
+					return Util::serve($temp_file);
 			}
 
 			Util::quit(404);//return floatval(phpversion());
@@ -141,38 +144,45 @@ function query($matches){
 }
 
 function frontgate($matches, $config, &$temp_file){
+
 	$files = array();	
 	$requires = array(
 		"situs" => array(
-			"libs/underscore/1.4.2/underscore-min.js",
-			"libs/jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
-			"libs/topzindex/1.2/jquery.topzindex.js",
-			"sites/ze/js/panel/panel.js",
-			"sites/ze/js/bar/js/bar.js"
-		),
-		"router" => array(
-			"libs/underscore/1.4.2/underscore-min.js"
-		)
+			// http://docs.medorc.org/
+			"underscore/1.4.2/underscore-min.js",
+			"jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
+			"topzindex/1.2/jquery.topzindex.js",
+			"jquery.panel/panel.js",
+			"jquery.bar/js/bar.js"
+		)//,
+		//"router" => array(
+		//	"underscore/1.4.2/underscore-min.js"
+		//)
 	);
 
-	$LIB = $config->htdocs . $config->frontgate;
-	$files[] = $LIB . "js/frontgate.js";
+	// 
+	$files[] = $config->frontgate . "frontgate.js";
 
 	if(count($matches) > 2)	{
 		$names = explode("&", $matches[3]);
-		foreach($names as $name) {
-			$file = $LIB . "js/frontgate.$name.js";
+
+//return $names;
+
+		for($i=0; $i<count($names); $i++){
+			$name = $names[$i];
+		//foreach($names as $name) {
+			$file = $config->frontgate . "frontgate.$name.js";
 			if(file_exists($file)){
 				$temp_file .= "&" . $name;
 				if(isset($requires[$name])) {
 					foreach($requires[$name] as $required) {
 						if(!in_array($required, $files)) {
-							$files[] = $config->htdocs . $required;
+							$files[] = $config->libs . $required;
 						}
 					}	
 				}
 				$files[] = $file;
-			} 
+			}
 		}
 	}
 
