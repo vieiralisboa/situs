@@ -12,8 +12,8 @@ class Bar_Controller {
     public function get() {
         Router::route('/bar', function() {
             // full path to file
-            $conf = Router::$controller_config;
-            $file = utf8_decode($conf->htdocs.$conf->bar."js/bar.js");
+            $path = Router::$controller_config->bar;
+            $file = utf8_decode($path."js/bar.js");
 
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -21,16 +21,15 @@ class Bar_Controller {
 
         Router::route('/bar/css', function($request) {
             // full path to file
-            $conf = Router::$controller_config;
-            $file = utf8_decode($conf->htdocs.$conf->bar."css/bar.css");
+            $path = Router::$controller_config->bar;
+            $file = utf8_decode($path."css/bar.css");
 
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
 
         Router::route('/bar/templates/:template', function($request) {
-            $conf = Router::$controller_config;
-            $path = $conf->htdocs.$conf->bar."templates/";
+            $path = Router::$controller_config->bar."templates/";
             $file = utf8_decode($path.$request->data['template']);
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -43,10 +42,8 @@ class Bar_Controller {
         Router::route('/bar/css/:bar', function($request) {
             // file name
             $filename = "bar.{$request->data['bar']}.css";
-
-            // full path to file
-            $conf = Router::$controller_config;
-            $file = utf8_decode($conf->htdocs.$conf->bar."css/$filename");
+            $path = Router::$controller_config->bar;
+            $file = utf8_decode($path."css/$filename");
 
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -60,11 +57,11 @@ class Bar_Controller {
             $script = "jquery.bar/js/$filename";
 
             // full path to file
-            $conf = Router::$controller_config;
-            $file = utf8_decode($conf->htdocs.$conf->bar."js/$filename");
+            $path = Router::$controller_config->bar;
+            $file = utf8_decode($path."js/$filename");
 
             // attach the filename
-            $temp_file = $conf->temp . $filename;
+            $temp_file = Router::$controller_config->temp . $filename;
             if(file_exists($file)) {
                 $body = file_get_contents($file);
                 $json = file_get_contents($file."on");
