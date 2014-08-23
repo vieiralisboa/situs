@@ -10,9 +10,8 @@
 		
 			a) Turning on the rewrite engine is necessary for the following rules and features. 
 			   "+FollowSymLinks" must be enabled for this to work symbolically. 
-			   For all files not found in the file system, reroute the request to the "index.php" front controller, 
-			   keeping the query string intact
-			
+			   For all files not found in the file system, reroute the request to the "index.php" front controller, keeping the query string intact.
+
 				<IfModule mod_rewrite.c>
 					Options +FollowSymLinks
 					RewriteEngine On
@@ -27,8 +26,7 @@
 				#	RewriteRule ^ index.php [L]
 					RewriteRule . index.php [L]
 				</IfModule>
-			
-	
+
 2. SSL (See Annex B for the SSL certificates notes)
 	2.1. Prepare the SSL certicates
 		a) decrypt the private key you received:
@@ -75,14 +73,14 @@
 			</VirtualHost>
 
 3. HTACCESS (Apache)
-	3.1 the .htaccess file:
-	
+	3.1 the .htaccess file - THE AllowOverRide DIRECTIVE SET TO All:
+
 		a) Directory index order
-		
+
 			DirectoryIndex index.html index.php
-		
-		b) Allow Headers THE HEADERS MODULE MUST BE ENABLED
-		
+
+		b) Allow Headers - THE HEADERS MODULE MUST BE ENABLED!
+
 			<IfModule mod_headers>
 				Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org 
 				##to allow any origin: 
@@ -91,8 +89,8 @@
 				Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 			</IfModule>
 
-		c) Rewrite rules THE REWRITE MODULE MUST BE ENABLED
-		
+		c) Rewrite rules - THE REWRITE MODULE MUST BE ENABLED!
+
 			<IfModule mod_rewrite.c>
 				Options +FollowSymLinks
 				RewriteEngine On
