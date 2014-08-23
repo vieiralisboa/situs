@@ -18,20 +18,19 @@ class Situs_Controller {
 			// BAR
 			case $request = Util::preg_match_uri('/situs/bar/:script'):
 				$script = $request['script'];
-				$file = $config->htdocs . $config->bar . "js/bar.$script.js";
+				$file = $config->bar . "js/bar.$script.js";
 				if(file_exists($file)) return Util::download($file);
 
 			// SCRIPT
 			case $request = Util::preg_match_uri('/situs/js/:script')://return $request;
 				$script = $request['script'];
-				$base = $config->htdocs . $config->frontgate;
 				switch($script){
 					case "frontgate":
 					case "frontgate.js":
-						$filename = $base."js/frontgate.js";
+						$filename = $config->frontgate."js/frontgate.js";
 						break;
 					default:
-						$filename = $base."js/$script";
+						$filename = $config->frontgate."js/$script";
 				}
 
 				if(file_exists($filename)) {
@@ -55,7 +54,7 @@ class Situs_Controller {
 						foreach($query as $name => $value) {
 							$filename = "bar.$name.js";
 							$script = "jquery.bar/js/bar.$name.js";
-							$file = utf8_decode($config->htdocs.$config->bar . "js/bar.$name.js");
+							$file = utf8_decode($config->bar . "js/bar.$name.js");
 
 							//DEVELOPMENT attach the filename
 							$temp_file = $config->temp.$filename;
@@ -144,7 +143,6 @@ function query($matches){
 }
 
 function frontgate($matches, $config, &$temp_file){
-
 	$files = array();	
 	$requires = array(
 		"situs" => array(

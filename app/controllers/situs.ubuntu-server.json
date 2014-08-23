@@ -1,0 +1,10 @@
+{
+	"htdocs": "/var/www/",
+	"libs": "http://docs.medorc.org/",
+	"temp": "/tmp/",
+	"frontgate": "/var/www/sites/situs.pt/public/js/",
+	"bar": "/var/www/sites/ze/js/bar/",
+	"bars": "/var/www/sites/ze/js/bars/",
+
+	"!": "use urls with time penalty"
+}
