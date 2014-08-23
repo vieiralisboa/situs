@@ -1,10 +1,11 @@
 <?php
+
 /**
- * Download
+ * Upload/Stream Video
  * TODO seperate controllers for folder contents and download_video
  */
 class MyTV_Controller {
-    
+
     public function get($request) {
         
         if($request->uri[1] == 'auth') return "Authorized";
@@ -12,9 +13,11 @@ class MyTV_Controller {
         //DEBUG
         //return $request;
 
+        $config = Router::$controller_config;
+
+
         // folder containing the videos
-        #$path = "\\\\MYBOOKLIVE\\Public\\Shared Videos";//\\tv-shows";
-        $path = "/shares/Public/Shared Videos";//tv-shows";// MBL
+        $path = $config->path;
         $sep = "/";//"\\";
 
         // valid requests contain 
@@ -76,7 +79,7 @@ class MyTV_Controller {
         //---------------------------------------------------------------------
         $i = 1;
         if($request->uri[$i] == 'show'){
-            //DEBUG
+            // DEBUG
             //return $request;
 
             $file = $path;
@@ -90,16 +93,16 @@ class MyTV_Controller {
 
             // requested video
             if(!file_exists($file)) return false;
-            
+
             // only stream partial video (range)
-            if(0) if(empty($_SERVER['HTTP_RANGE'])) {
+            if(empty($_SERVER['HTTP_RANGE'])) {
+                // upload video
+                #mp4Upload($file);
                 //file_put_contents("myTV_0_SERVER.json", json_encode($_SERVER));
                 return false;
             }
-            
-            //file_put_contents("myTV_1_SERVER.json", json_encode($_SERVER));
 
-            //mp4Upload($file);
+            //file_put_contents("myTV_1_SERVER.json", json_encode($_SERVER));
 
             // stream the video
             rangeDownload($file);
@@ -130,21 +133,19 @@ function mp4Upload($mp4){
     exit();
 }
 
-
 /**
- *
+ * Download file range
  */
 function rangeDownload($file) {
- 
     $fp = @fopen($file, 'rb');
- 
+
     $size   = filesize($file); // File size
     $length = $size;           // Content length
     $start  = 0;               // Start byte
     $end    = $size - 1;       // End byte
-    
+
     // Now that we've gotten so far without errors we send the accept range header
-    
+
     // set mp4 mime-type header
     header("Content-Type: video/mp4");
 
@@ -164,16 +165,14 @@ function rangeDownload($file) {
     // multipart/byteranges
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
     if (isset($_SERVER['HTTP_RANGE'])) {
- 
         $c_start = $start;
         $c_end   = $end;
-        
+
         // Extract the range string
         list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
         
         // Make sure the client hasn't sent us a multibyte range
         if (strpos($range, ',') !== false) {
- 
             // (?) Shoud this be issued here, or should the first
             // range be used? Or should the header be ignored and
             // we output the whole content?
@@ -181,6 +180,7 @@ function rangeDownload($file) {
             header("Content-Range: bytes $start-$end/$size");
             // (?) Echo some info to the client?
 
+            // DEBUG
             //file_put_contents("myTV_416_headers.json", json_encode(getallheaders()));
 
             exit;
@@ -195,22 +195,20 @@ function rangeDownload($file) {
             $c_start = $size - substr($range, 1);
         }
         else {
- 
             $range  = explode('-', $range);
             $c_start = $range[0];
             $c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
         }
-        
+
         /* Check the range and make sure it's treated according to the specs.
          * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
          */
-        
+
         // End bytes can not be larger than $end.
         $c_end = ($c_end > $end) ? $end : $c_end;
         
         // Validate the requested range and return an error if it's not correct.
         if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
- 
             header('HTTP/1.1 416 Requested Range Not Satisfiable');
             header("Content-Range: bytes $start-$end/$size");
             // (?) Echo some info to the client?
@@ -222,28 +220,24 @@ function rangeDownload($file) {
         fseek($fp, $start);
         header('HTTP/1.1 206 Partial Content');
     }
-    
+
     // Notify the client the byte range we'll be outputting
     header("Content-Range: bytes $start-$end/$size");
     header("Content-Length: $length");
- 
+
     // Start buffered download
     $buffer = 1024 * 8;
     while(!feof($fp) && ($p = ftell($fp)) <= $end) {
- 
         if ($p + $buffer > $end) {
- 
-            // In case we're only outputtin a chunk, make sure we don't
-            // read past the length
+            // In case we're only outputtin a chunk, make sure we don't read past the length
             $buffer = $end - $p + 1;
         }
         set_time_limit(0); // Reset time limit for big files
         echo fread($fp, $buffer);
         flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
     }
- 
+
     fclose($fp);
- 
 }
 
 function vtt($vtt, $path) {
@@ -255,10 +249,8 @@ function vtt($vtt, $path) {
     $sent = $vtt.'.SENT';
     if(!file_exists($sent))//*/
     #$sent = $path."/".'SENT.situs.txt';
-    
-    #if(!in_array($vtt, file($sent)))
-    if(!in_array($vtt, $sent_subs))
-    {
+
+    if(!in_array($vtt, $sent_subs)){
         $sent_subs[] = $vtt;
         file_put_contents($json, json_encode($sent_subs));
 
@@ -268,7 +260,7 @@ function vtt($vtt, $path) {
             'name' => $vtt,
             'text' => file_get_contents($path.'/'.$vtt)
         ));
-        
+
         $opts = array('http' => array(
             'method'  => 'POST',
             'header'  => $header,
@@ -276,7 +268,7 @@ function vtt($vtt, $path) {
         ));
 
         //file_put_contents("C:\\TEMP\\req.json", json_encode($opts));
-        
+
         /*/ALTERNATIVE1 update sent list
         file_put_contents($sent, "uploaded to " . $url);//*/
         #file_put_contents($sent, $vtt."\n", FILE_APPEND);
