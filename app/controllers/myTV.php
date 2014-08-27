@@ -7,113 +7,75 @@
 class MyTV_Controller {
 
     public function get($request) {
-        
         if($request->uri[1] == 'auth') return "Authorized";
 
-        //DEBUG
-        //return $request;
-
         $config = Router::$controller_config;
-
-
-        // folder containing the videos
-        $path = $config->path;
         $sep = "/";//"\\";
-
-        // valid requests contain 
-        if(count($request->uri) < 3) return;
-
-        // Route 1. /myTV/dir/:dir
-        //---------------------------------------------------------------------
         $k = 1;
-        if($request->uri[$k] == 'dir' && isset($request->uri[$k+1])){
-            $dir = $request->uri[++$k];
-            
-            while(isset($request->uri[++$k])){
-                $dir .=  $sep.$request->uri[$k];
-            }
 
-            $path .= $sep.$dir;
-            //return $path;
+        // Routes
+        switch($request->uri[1]){
 
-            //$url = "http://situs.no-ip.org:8080/myTV/show/";
-            $videos = array();
-            foreach(scandir($path) as $video){
-                $info = pathinfo($video);
-                if(preg_match('/\.mp4$/', $video)) 
-                {
-                    $name = $info['filename'];
-                    $name = preg_replace("/\.hdtv.*/i", "", $name);
-                    $name = preg_replace("/\.webrip.*/i", "", $name);
-                    $name = preg_replace("/\.web\-dl.*/i", "", $name);
-                    $name = str_replace('.', " ", $name);
-                    $show = array(
-                        'name' => $name,// $info['basename'],
-                        'mp4' => 'show' . $sep . $dir. $sep . $info['filename']
-                        //'mp4' => "http://guest:guest@situs.no-ip.org:8080/myTV/show/" . $dir."/".$info['filename']
-                    );
+            // Route /myTV/config
+            case 'config':
+                return $config;
 
-                    // HD (m4v)
-                    //---------------------------------------------------------
-                    $m4v = $path . $sep . $info['filename'] . ".m4v";
-                    if(file_exists($m4v)) $show['m4v'] = true;
-                    //else $show['m4v'] = false;
+            // Route /myTV/dir/:dir
+            case 'dir':
+                if(!isset($request->uri[$k+1])) return false;
+                
+                $path = $config->path;
+                $dir = $request->uri[++$k];
+                while(isset($request->uri[++$k]))
+                    $dir .=  $sep.$request->uri[$k];
+                $path .= $sep.$dir;
 
-                    // Subtitles (vtt)
-                    //---------------------------------------------------------
-                    // vtt file exists
-                    if(file_exists($path.$sep.$info['filename'].".vtt"))
-                    {
-                        // include vtt file (where the vtt file was uploaded)
-                        $show['vtt'] = vtt($info['filename'].".vtt", $path);
+                $videos = array();
+                foreach(scandir($path) as $video){
+                    $info = pathinfo($video);
+                    if(preg_match('/\.mp4$/', $video)) {
+                        $name = $info['filename'];
+                        $name = preg_replace("/\.hdtv.*/i", "", $name);
+                        $name = preg_replace("/\.webrip.*/i", "", $name);
+                        $name = preg_replace("/\.web\-dl.*/i", "", $name);
+                        $name = str_replace('.', " ", $name);
+                        $show = array(
+                            'name' => $name,// $info['basename'],
+                            'mp4' => 'show'.$sep.$dir.$sep.$info['filename']
+                            //'mp4' => "http://guest:guest@situs.no-ip.org:8080/myTV/show/" . $dir."/".$info['filename']
+                        );
+
+                        // Subtitles (vtt)
+                        if(file_exists($path.$sep.$info['filename'].".vtt"))
+                            $show['vtt'] = vtt($info['filename'].".vtt", $path);
+
+                        // add video to the list
+                        $videos[] = $show;
                     }
-
-                    // add video to the list
-                    $videos[] = $show;
                 }
-            }
-            return $videos;
-        }
+                return $videos;
 
-        // Route 2. /myTV/show/:folder/:file
-        //---------------------------------------------------------------------
-        $i = 1;
-        if($request->uri[$i] == 'show'){
-            // DEBUG
-            //return $request;
+            // Route /myTV/show/:folder/:file
+            case 'show':
+                // path to the file's folder
+                $file = $config->path;
+                while(isset($request->uri[++$k]))
+                    $file .= $sep.$request->uri[$k];
 
-            $file = $path;
+                // requires curl
+                #if(file_exists($file)) mp4Upload($file);
 
-            // path to the file's folder
-            while(isset($request->uri[++$i])){
-                $file .= $sep.$request->uri[$i];
-            }
+                // requested video // only stream partial video (range)
+                if(!file_exists($file) || empty($_SERVER['HTTP_RANGE']))
+                    return false;
 
-            $filename = $request->uri[$i];// . ".mp4";
+                rangeDownload($file);// stream the video
+                exit;
 
-            // requested video
-            if(!file_exists($file)) return false;
-
-            // only stream partial video (range)
-            if(empty($_SERVER['HTTP_RANGE'])) {
-                // upload video
-                #mp4Upload($file);
-                //file_put_contents("myTV_0_SERVER.json", json_encode($_SERVER));
+            default:
                 return false;
-            }
-
-            //file_put_contents("myTV_1_SERVER.json", json_encode($_SERVER));
-
-            // stream the video
-            rangeDownload($file);
-
-            exit;
         }
-
-        // Invalid route
-        //---------------------------------------------------------------------
-        return false;
-    }  
+    }
 }
 
 function mp4Upload($mp4){
@@ -130,7 +92,7 @@ function mp4Upload($mp4){
     header("Content-Transfer-Encoding:­ binary");
     header("Content-Length: ".filesize($out));
     echo $out;
-    exit();
+    exit;
 }
 
 /**
