@@ -10,6 +10,7 @@ class Bar_Controller {
      * GET
      */
     public function get() {
+
         Router::route('/bar', function() {
             // full path to file
             $path = Router::$controller_config->bar;
@@ -28,18 +29,16 @@ class Bar_Controller {
             return Util::serve($file);
         });
 
-        Router::route('/bar/templates/:template', function($request) {
+        Router::route('/bar/:bar/template/:name', function($request) {
             $path = Router::$controller_config->bar."templates/";
-            $file = utf8_decode($path.$request->data['template']);
+            $template = "{$request->data['bar']}.{$request->data['name']}.html";
+
+            $file = utf8_decode($path.$template);
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
 
-        Router::route('/bar/config', function($request) {
-            return Router::$controller_config;
-        });
-
-        Router::route('/bar/css/:bar', function($request) {
+        Router::route('/bar/:bar/css', function($request) {
             // file name
             $filename = "bar.{$request->data['bar']}.css";
             $path = Router::$controller_config->bar;
@@ -47,6 +46,20 @@ class Bar_Controller {
 
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
+        });
+
+        Router::route('/bar/:bar/json', function($request) {
+            // file name
+            $filename = "bar.{$request->data['bar']}.json";
+            $path = Router::$controller_config->bar;
+            $file = utf8_decode($path."js/$filename");
+
+            if(!file_exists($file)) Util::quit(404);
+            return Util::serve($file);
+        });
+
+        Router::route('/bar/config', function($request) {
+            return Router::$controller_config;
         });
 
         Router::route('/bar/:bar', function($request) {
