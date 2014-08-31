@@ -64,6 +64,9 @@ class MyTV_Controller {
                 $vtt = $config->path;
                 while(isset($request->uri[++$k]))
                     $vtt .= $sep.$request->uri[$k];
+                    
+                return $vtt;
+                
                 if(!file_exists($vtt)) return false;
 
                 Util::serve($vtt);
