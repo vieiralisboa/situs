@@ -55,22 +55,16 @@ class MyTV_Controller {
                 }
                 return $videos;
             
-            case 'popup':
-                return "popup disabled";
-            
             // Route API/myTV/vtt/$vtt
             case 'vtt':
                 // requested subtitle
                 $vtt = $config->path;
                 while(isset($request->uri[++$k]))
                     $vtt .= $sep.$request->uri[$k];
-                    
-                return $vtt;
                 
                 if(!file_exists($vtt)) return false;
 
                 Util::serve($vtt);
-                exit;
 
             // Route /myTV/show/$file
             case 'show':
