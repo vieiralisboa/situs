@@ -230,6 +230,10 @@ class Util {
             case "js":
                 header("Content-Type: application/x-javascript");
                 break;
+                
+            case "vtt":
+                header('Content-Type: text/vtt; charset=utf-8');
+                break;
 
             default:
                 header('Content-Type: application/octet-stream');
