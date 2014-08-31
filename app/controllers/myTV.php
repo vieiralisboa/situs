@@ -64,8 +64,8 @@ class MyTV_Controller {
                 
                 if(!file_exists($vtt)) return false;
 
-                //Util::serve($vtt);
-                return Util::download($vtt);
+                Util::serve($vtt);
+                //return Util::download($vtt);
 
             // Route /myTV/show/$file
             case 'show':
