@@ -47,7 +47,7 @@ class MyTV_Controller {
 
                         // Subtitles (vtt)
                         if(file_exists($path.$sep.$info['filename'].".vtt"))
-                            $show['vtt'] = "https://situs.pt/myTV/vtt/".$dir.$sep.$info['filename'].".vtt"; //vtt($info['filename'].".vtt", $path);
+                            $show['vtt'] = "/VideoPlayer/vtt.php?sub=".$dir.$sep.$info['filename'].".vtt"; //vtt($info['filename'].".vtt", $path);
 
                         // add video to the list
                         $videos[] = $show;
