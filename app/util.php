@@ -258,6 +258,8 @@ if (file_exists($file)) {
 
         //Read the file from disk
         readfile($file);
+        
+        exit();
     }
 
     /**
