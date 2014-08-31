@@ -20,7 +20,7 @@ class MyTV_Controller {
             case 'config':
                 return $config;
 
-            // Route /myTV/dir/:dir
+            // Route /myTV/dir/$dir
             case 'dir':
                 if(!isset($request->uri[$k+1])) return false;
                 
@@ -54,13 +54,29 @@ class MyTV_Controller {
                     }
                 }
                 return $videos;
+            
+            case 'popup':
+                return "popup disabled";
+            
+            // Route API/myTV/vtt/$vtt
+            case 'vtt':
+                // requested subtitle
+                $vtt = $config->path;
+                while(isset($request->uri[++$k]))
+                    $vtt .= $sep.$request->uri[$k];
+                if(!file_exists($vtt)) return false;
 
-            // Route /myTV/show/:folder/:file
+                Util::serve($vtt);
+                exit;
+
+            // Route /myTV/show/$file
             case 'show':
                 // path to the file's folder
                 $file = $config->path;
                 while(isset($request->uri[++$k]))
                     $file .= $sep.$request->uri[$k];
+                    
+                //$filename = $request->uri[$k];
 
                 // requires curl
                 #if(file_exists($file)) mp4Upload($file);
