@@ -47,7 +47,7 @@ class MyTV_Controller {
 
                         // Subtitles (vtt)
                         if(file_exists($path.$sep.$info['filename'].".vtt"))
-                            $show['vtt'] = "/VideoPlayer/vtt.php?sub=".$dir.$sep.$info['filename'].".vtt"; //vtt($info['filename'].".vtt", $path);
+                            $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".vtt";
 
                         // add video to the list
                         $videos[] = $show;
@@ -64,7 +64,8 @@ class MyTV_Controller {
                 
                 if(!file_exists($vtt)) return false;
 
-                Util::serve($vtt);
+                //Util::serve($vtt);
+                return Util::download($vtt);
 
             // Route /myTV/show/$file
             case 'show':
@@ -213,64 +214,4 @@ function rangeDownload($file) {
     }
 
     fclose($fp);
-}
-
-function vtt($vtt, $path) {
-    $header = 'Content-type: application/x-www-form-urlencoded';
-    $json =  $path."/".'SENT.situs.json';
-    $sent_subs = file_exists($json)? json_decode(file_get_contents($json)): array();
-    
-    /*/ALTERNATIVE1 post vtt file to the server                   
-    $sent = $vtt.'.SENT';
-    if(!file_exists($sent))//*/
-    #$sent = $path."/".'SENT.situs.txt';
-
-    if(!in_array($vtt, $sent_subs)){
-        $sent_subs[] = $vtt;
-        file_put_contents($json, json_encode($sent_subs));
-
-        //$url = 'http://situs.pt/vtt/post.php';
-        $url = 'http://xn--stio-vpa.pt/VideoPlayer/post.php';
-        $postdata = http_build_query(array(
-            'name' => $vtt,
-            'text' => file_get_contents($path.'/'.$vtt)
-        ));
-
-        $opts = array('http' => array(
-            'method'  => 'POST',
-            'header'  => $header,
-            'content' => $postdata
-        ));
-
-        //file_put_contents("C:\\TEMP\\req.json", json_encode($opts));
-
-        /*/ALTERNATIVE1 update sent list
-        file_put_contents($sent, "uploaded to " . $url);//*/
-        #file_put_contents($sent, $vtt."\n", FILE_APPEND);
-
-        $context  = stream_context_create($opts);
-        $result = file_get_contents($url, false, $context);   
-    }
-
-
-    /*ALTERNATIVE to post vtt (untested)
-    $params = array('http' => array(
-        'method' => 'POST',
-        'content' => 'toto=1&tata=2'
-    ));
-    $ctx = stream_context_create($params);
-    $fp = @fopen($sUrl, 'rb', false, $ctx);
-    if (!$fp)
-    {
-        throw new Exception("Problem with $sUrl, $php_errormsg");
-    }
-    $response = @stream_get_contents($fp);
-    if ($response === false) 
-    {
-        throw new Exception("Problem reading data from $sUrl, $php_errormsg");
-    }
-    */
-    
-    // include vtt file (where the vtt file was uploaded)
-    return "/VideoPlayer/" . $vtt;
 }
