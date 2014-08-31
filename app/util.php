@@ -185,6 +185,11 @@ class Util {
             case "vtt":
                 header('Content-Type: text/vtt; charset=utf-8');
                 break;
+            
+            case "txt":
+            case "srt":
+                header('Content-Type: text/plain; charset=utf-8');
+                break;
 
             default:
                 self::quit(404);
