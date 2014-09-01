@@ -1,6 +1,4 @@
 {
-	"temp": "c:\\temp\\",
-	"bar": "c:\\httpd\\sites\\ze\\js\\bar\\",
-	"_temp": "/tmp/",
-	"_bar": "/var/www/sites/ze/js/bar/"
+	"temp": "c:/temp/",
+	"bar": "c:/httpd/sites/ze/public/bar/"
 }
