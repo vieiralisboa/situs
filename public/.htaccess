@@ -7,26 +7,22 @@
 DirectoryIndex index.html index.php
 
 ### Headers
-#<IfModule mod_headers>
-##	Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
-#	Header set Access-Control-Allow-Origin *
-#	Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-#	Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-#</IfModule>
+<IfModule mod_headers>
+	#Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
+	Header set Access-Control-Allow-Origin *
+	Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+	Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+</IfModule>
 
-Header set Access-Control-Allow-Origin *
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-
-## Turning on the rewrite engine is necessary for the following rules and
-## features. "+FollowSymLinks" must be enabled for this to work symbolically.
+## Rewrite
 <IfModule mod_rewrite.c>
+	## "+FollowSymLinks" must be enabled for it to work symbolically
 	Options +FollowSymLinks
+
+	## Turning on the rewrite engine is necessary for the following rules
 	RewriteEngine On
 
-## For all files not found in the file system, reroute the request to the
-## "index.php" front controller, keeping the query string intact
-
+	## For all files not found in the file system, reroute the request to the "index.php" front controller, keeping the query string intact
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 ## select only one RewriteRule
