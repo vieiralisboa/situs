@@ -82,7 +82,7 @@
 
 		b) Headers
 
-			<IfModule mod_headers>
+			<IfModule mod_headers.c>
 				Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
 				##to allow any origin:
 				#Header set Access-Control-Allow-Origin *

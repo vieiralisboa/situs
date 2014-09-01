@@ -7,7 +7,7 @@
 DirectoryIndex index.html index.php
 
 ### Headers
-<IfModule mod_headers>
+<IfModule mod_headers.c>
 	#Header set Access-Control-Allow-Origin *.situs.pt *.medorc.pt *.medorc.org
 	Header set Access-Control-Allow-Origin *
 	Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
