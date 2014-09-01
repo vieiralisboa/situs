@@ -10,14 +10,14 @@ class Frontgate_Controller {
      */
     public function get() {
         Router::route('/frontgate', function() {
-            $path = Router::$controller_config->frontgate;
+            $path = Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."js/frontgate.js");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
 
         Router::route('/frontgate/css', function($request) {
-            $path = Router::$controller_config->frontgate;
+            $path = Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."css/frontgate.css");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -25,7 +25,7 @@ class Frontgate_Controller {
 
         // frontgate/and/:module
         Router::route('/frontgate/and/:module', function($request) {
-            $path = Router::$controller_config->frontgate;
+            $path = Router::$controller_config->docs."frontgate/";
             $file = $path."js/frontgate.js";
             if(!file_exists($file)) Util::quit(404);
             $body = "";
@@ -83,7 +83,7 @@ SCRIPT;
         });
 
         Router::route('/frontgate/:module', function($request) {
-            $path = Router::$controller_config->frontgate;
+            $path = Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."js/frontgate.{$request->data['module']}.js");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);

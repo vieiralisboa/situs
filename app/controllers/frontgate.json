@@ -5,14 +5,11 @@
 			"underscore/1.4.2/underscore-min.js",
 			"jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
 			"topzindex/1.2/jquery.topzindex.js",
-			"jquery.panel/panel.js",
-			"jquery.bar/js/bar.js"
+			"panel/panel.js",
+			"bar/js/bar.js"
 		]},
-	"frontgate": "C:/httpd/sites/frontgate/public/frontgate/",
 	"temp": "C:/temp/",
-	"docs": "http://docs.medorc.org/",
-	"_frontgate": "/var/www/sites/xn--stio-vpa.pt/public/",
-	"_temp": "/tmp/",
-	"_docs": "C:/httpd/docs/",
+	"docs": "C:/httpd/docs/",
+	"_docs": "http://docs.medorc.org/",
 	"__docs": false
 }
