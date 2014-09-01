@@ -1,0 +1,21 @@
+{
+	"path":"c:\\httpd\\docs\\",
+	"_path":"/var/www/docs/",
+	"libs": {
+		"_" : "underscore\\1.4.2\\underscore-min.js",
+		"underscore" : "underscore\\1.4.2\\underscore-min.js",
+		"backbone" : "backbone\\1.1.0\\backbone-min.js",
+		"jquery" : "jquery\\2.0.3\\jquery-2.0.3.min.js",
+		"topzindex" : "topzindex\\1.2\\jquery.topzindex.js",
+		"ace" : "ace-builds\\src-noconflict\\ace.js"
+	},
+	"help": {
+		"lib" : "lists available libs",
+		"lib/help" : "this object",
+		"lib/:lib" : "serves script :lib",
+		"lib/min/:lib" : "serves minified :lib script",
+		"lib/dl/:lib" : "downloads script :lib",
+		"lib/dl/min/:lib" : "downloads minified :lib script",
+		"lib/config" : "displays config json file"
+	}
+}
