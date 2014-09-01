@@ -1,6 +1,4 @@
 {
-	"frontgate": "/var/www/sites/xn--stio-vpa.pt/public/",
-	"_frontgate": "C:/htdocs/sites/frontgate/public/",
 	"require": {
 		"router": [],
 		"situs": [
@@ -10,9 +8,11 @@
 			"jquery.panel/panel.js",
 			"jquery.bar/js/bar.js"
 		]},
-	"temp": "/tmp/",
-	"_temp": "C:/temp/",
+	"frontgate": "C:/httpd/sites/frontgate/public/frontgate/",
+	"temp": "C:/temp/",
 	"docs": "http://docs.medorc.org/",
-	"_docs": "C:/htdocs/docs/",
+	"_frontgate": "/var/www/sites/xn--stio-vpa.pt/public/",
+	"_temp": "/tmp/",
+	"_docs": "C:/httpd/docs/",
 	"__docs": false
 }
