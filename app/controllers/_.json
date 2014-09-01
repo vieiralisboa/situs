@@ -1,4 +1,6 @@
 {
+	"_temp": "/tmp/",
 	"temp": "C:\\temp\\",
-	"_temp": "/tmp/"
+	"_underscore": "/var/www/libs/underscore/1.4.2/underscore-min.js",
+	"underscore": "C:\\httpd\\www\\libs\\underscore\\1.4.2\\underscore-min.js"
 }
