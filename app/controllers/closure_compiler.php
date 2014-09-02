@@ -25,9 +25,9 @@ class Closure_compiler_Controller {
         //---------------------------------------------------------------------
         if( $request->uri[1] == 'compile') {
             $postdata = file_get_contents("php://input");
-            $path = dirname(dirname(__FILE__))."\\uploads";
-            $in = "$path\\in.js";
-            $out = "$path\\min-out.js";
+            $path = dirname(dirname(__FILE__))."/uploads";
+            $in = "$path/in.js";
+            $out = "$path/min-out.js";
             $command = "$java -jar $compiler --js=$in --js_output_file=$out";
 
             file_put_contents($in, $postdata);
@@ -53,14 +53,14 @@ class Closure_compiler_Controller {
         //---------------------------------------------------------------------
 
         // folder to upload file
-        $path = dirname(dirname(__FILE__))."\\uploads";
+        $path = dirname(dirname(__FILE__))."/uploads";
         $name = isset( $request->uri[1] ) ? $request->uri[1] : $_FILES['file']['name'];
 
         // uploaded file is not a .js file
         if(!preg_match('/\.js$/', $name)) return $_FILES;
 
         // complete path to upload file
-        $filename = "$path\\$name";
+        $filename = "$path/$name";
         #return $filename;
 
         // remove any existing file with same name to avoid false upload success
@@ -70,9 +70,9 @@ class Closure_compiler_Controller {
         $success = Util::upload($filename);
 
         // upload successful
-        if(file_exists("$path\\$name")) {
-            $in = "$path\\$name";
-            $out = "$path\\min-$name";
+        if(file_exists("$path/$name")) {
+            $in = "$path/$name";
+            $out = "$path/min-$name";
             $command = "$java -jar $compiler --js=$in --js_output_file=$out";
 
             if(file_exists($in)){
@@ -83,7 +83,7 @@ class Closure_compiler_Controller {
             return array (
                 'file' => $name,
                 'filename' => $filename,
-                'input' => file_get_contents("$path\\$name"),
+                'input' => file_get_contents("$path/$name"),
                 'output' => file_get_contents($out),
                 'command' => $command,
                 'out' =>$out,
