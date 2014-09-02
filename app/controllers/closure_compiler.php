@@ -25,7 +25,7 @@ class Closure_compiler_Controller {
         //---------------------------------------------------------------------
         if( $request->uri[1] == 'compile') {
             $postdata = file_get_contents("php://input");
-            $path = dirname(dirname(__FILE__))."/uploads";
+            $path = Router::$controller_config->uploads;
             $in = "$path/in.js";
             $out = "$path/min-out.js";
             $command = "$java -jar $compiler --js=$in --js_output_file=$out";
@@ -46,6 +46,9 @@ class Closure_compiler_Controller {
                 //'out' =>$out,
                 'result'=>$output
             );
+
+            // upload failed
+            return "file upload failed";
         }
 
         //---------------------------------------------------------------------
@@ -53,7 +56,7 @@ class Closure_compiler_Controller {
         //---------------------------------------------------------------------
 
         // folder to upload file
-        $path = dirname(dirname(__FILE__))."/uploads";
+        $path = Router::$controller_config->uploads;
         $name = isset( $request->uri[1] ) ? $request->uri[1] : $_FILES['file']['name'];
 
         // uploaded file is not a .js file
