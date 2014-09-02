@@ -1,12 +1,23 @@
 <?php
 
 /**
- * Closer-Compiler/JShrink
+ * Closer-Compiler controller
  */
 class Closure_compiler_Controller {
 
     public function get($request) {
-        return "The Closure Compiler API does not respond to GET requests.";
+        Router::route('/closure_compiler', function($request) {
+            header('Location: http://xn--stio-vpa.pt/#Minify');
+            exit;
+        });
+
+        Router::route('/closure_compiler/download/:file', function($request) {
+            $path = Router::$controller_config->uploads;
+            $file = utf8_decode($path."/".$request->data['file']);
+
+            if(!file_exists($file)) Util::quit(404);
+            return Util::download($file);
+        });
     }
 
     //POST /upload/file
