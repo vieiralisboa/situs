@@ -4,12 +4,20 @@
  * PHP
  */
 class PHP_Controller {
-    
-    // GET 
+
+    // GET
     public function get($request) {
-        return array(
+
+        Router::route('/PHP', function() {
+            return array(
         	'version' => phpversion(),
         	//'credits' => phpcredits()
-        );
+        	);
+        });
+
+        Router::route('/PHP/info', function() {
+        	Router::$json = false;
+            phpinfo();
+        });
     }
 }
