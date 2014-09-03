@@ -16,6 +16,11 @@ class MyTV_Controller {
         // Routes
         switch($request->uri[1]){
 
+            case 'popup':
+                $file = Router::$controller_config->popup;
+                if(!file_exists($file)) Util::quit(404);
+                return Util::serve($file);
+
             // Route /myTV/config
             case 'config':
                 return $config;
@@ -23,7 +28,7 @@ class MyTV_Controller {
             // Route /myTV/dir/$dir
             case 'dir':
                 if(!isset($request->uri[$k+1])) return false;
-                
+
                 $path = $config->path;
                 $dir = $request->uri[++$k];
                 while(isset($request->uri[++$k]))
@@ -54,14 +59,14 @@ class MyTV_Controller {
                     }
                 }
                 return $videos;
-            
+
             // Route API/myTV/vtt/$vtt
             case 'vtt':
                 // requested subtitle
                 $vtt = $config->path;
                 while(isset($request->uri[++$k]))
                     $vtt .= $sep.$request->uri[$k];
-                
+
                 if(!file_exists($vtt)) return false;
 
                 Util::serve($vtt);
@@ -73,7 +78,7 @@ class MyTV_Controller {
                 $file = $config->path;
                 while(isset($request->uri[++$k]))
                     $file .= $sep.$request->uri[$k];
-                    
+
                 //$filename = $request->uri[$k];
 
                 // requires curl
@@ -95,7 +100,7 @@ class MyTV_Controller {
 function mp4Upload($mp4){
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $mp4);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_HEADER, 0);
     $out = curl_exec($ch);
     curl_close($ch);
@@ -146,7 +151,7 @@ function rangeDownload($file) {
 
         // Extract the range string
         list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
-        
+
         // Make sure the client hasn't sent us a multibyte range
         if (strpos($range, ',') !== false) {
             // (?) Shoud this be issued here, or should the first
@@ -166,7 +171,7 @@ function rangeDownload($file) {
         // If not, we forward the file pointer
         // And make sure to get the end byte if spesified
         if ($range[0] == '-') {
- 
+
             // The n-number of the last bytes is requested
             $c_start = $size - substr($range, 1);
         }
@@ -182,7 +187,7 @@ function rangeDownload($file) {
 
         // End bytes can not be larger than $end.
         $c_end = ($c_end > $end) ? $end : $c_end;
-        
+
         // Validate the requested range and return an error if it's not correct.
         if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
             header('HTTP/1.1 416 Requested Range Not Satisfiable');
