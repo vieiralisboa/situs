@@ -2,8 +2,8 @@
 <html>
 <head>
     <link rel="stylesheet" href="css/styles.css">
-    <script src="/jquery/2.0.3/jquery-2.0.3.min.js"></script>
-    <script src="/frontgate/js/frontgate.js"></script>
+    <script src="/lib/jquery"></script>
+    <script src="/frontgate"></script>
 </head>
 <body>
     <div id="header">
@@ -21,13 +21,10 @@
     </div>
     <script>
         // App Location
-        Frontgate.remote({
-            hostname: "xn--stio-vpa.pt",
-            protocol: "https"
-        }).scripts('underscore/1.4.2/underscore-min.js',
-            'backbone/1.1.0/backbone.js',
-            'situs.schema/js/backbone.schema.js',
-            'situs.schema/js/backbone.tasks.js',
+        Frontgate.remote({ hostname: "situs.pt", protocol: "https"})
+        .scripts('lib/underscore', 'lib/backbone',
+            'controllers/schema/js/backbone.schema.js',
+            'controllers/schema/js/backbone.tasks.js',
             function(){
                 Tasks.start("#tasks", "#add-task", '#taskTemplate');
         });

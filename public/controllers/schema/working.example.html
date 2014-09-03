@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="/jquery/jquery-1.8.3.min.js"></script>
-<script src="/frontgate/js/frontgate.js"></script>
-<script src="/underscore/1.4.2/underscore-min.js"></script>
-<script src="/backbone/lib/0.9.2/backbone-min.js"></script>
+<script src="/lib/jquery"></script>
+<script src="/lib/frontgate"></script>
+<script src="/lib/underscore"></script>
+<script src="/lib/backbone"></script>
 </head>
 <body>
 <div id="header">
@@ -47,13 +47,13 @@ Situs.script('js/schema.js', function(){
         name:'tasks',
         columns: [
             {
-                name: 'title', 
-                type: 'TEXT', 
+                name: 'title',
+                type: 'TEXT',
                 constraints: ['NOT NULL']
             },
             {
-                name: 'done', 
-                type: 'INTEGER', 
+                name: 'done',
+                type: 'INTEGER',
                 default: 0
             }
     ]});
@@ -61,10 +61,10 @@ Situs.script('js/schema.js', function(){
     <span id="save-schema" style="display:none"><button id="save-schema-butt">Step 4: Save tasks schema</button>
     <span style="color: silver">// upload the schema with a callback on success</span>
     tasks.save().success(function(res){
-        
+
         <span id="load-tasks" style="display:none"><button id="load-tasks-butt">Load Tasks</button>
         <span style="color: silver">// load the tasks MVC script with a callback on loaded</span>
-        Situs.script('js/tasks.js', function(){  
+        Situs.script('js/tasks.js', function(){
 
             <span id="create-task" style="display:none"><button id="create-task-butt">Create task</button>
             <span style="color: silver">// create a task</span>
@@ -77,10 +77,10 @@ Situs.script('js/schema.js', function(){
                 "title":"Buy milk.",
                 "done":0
             }</span>
-            
-            <span style="color: silver">// POST to server</span> 
+
+            <span style="color: silver">// POST to server</span>
             task.save();
-            
+
             task.toJSON();
             <span style="color: green">{
                 "id":1,
@@ -91,7 +91,7 @@ Situs.script('js/schema.js', function(){
             }</span>
 
             <span id="edit-task" style="display:none"><button id="edit-task-butt">Edit task</button>
-            <span style="color: silver">// change task title</span> 
+            <span style="color: silver">// change task title</span>
             task.set('title', 'Buy milk and cookies.');
 
             <span style="color: silver">// PUT to server</span>
@@ -108,7 +108,7 @@ Situs.script('js/schema.js', function(){
 </span>
         });</span>
     });</span></span>
-});</span><!-- load-schema --> 
+});</span><!-- load-schema -->
 
 </pre>
 
@@ -125,11 +125,11 @@ $("#create-location").click(function(){
         hostname: "localhost",
         pathname: "/"
     });
-    
-    $.ajaxSetup({ 
+
+    $.ajaxSetup({
         beforeSend: Frontgate.xhrAuth('guest','guest')
     });
-    
+
     $("#create-location").hide();
     $("#load-schema").show();
 });
@@ -140,7 +140,7 @@ $("#load-schema-butt").click(function(){
         console.log('loading the Schema...');
         $("#load-schema-butt").hide();
         $("#create-schema").show();
-    }); 
+    });
 });
 
 // Step 3: Create Schema
@@ -154,18 +154,18 @@ $("#create-schema-butt").click(function(){
         name:'tasks',
         columns: [
             {
-                name: 'title', 
-                type: 'TEXT', 
+                name: 'title',
+                type: 'TEXT',
                 constraints: ['NOT NULL']
             },
             {
-                name: 'done', 
-                type: 'INTEGER', 
+                name: 'done',
+                type: 'INTEGER',
                 default: 0
             },
             {
-                name: 'priority', 
-                type: 'INTEGER', 
+                name: 'priority',
+                type: 'INTEGER',
                 default: 5
             }
         ]
@@ -204,19 +204,19 @@ $("#load-tasks-butt").click(function(){
 // Step 6: Create Task
 $("#create-task-butt").click(function(){
     console.log('Creating task');
-    //*1           
+    //*1
     // create a task
     task = new Apps.Tasks.Models.Task({
         title: 'Buy milk.'
     });
     //
     console.log(task.toJSON());
-    
-    // POST to server 
+
+    // POST to server
     task.save().success(function(){
         console.log(task.toJSON());
     });
-    
+
     $("#create-task-butt").hide();
     $("#edit-task").show();
 });
@@ -226,7 +226,7 @@ $("#edit-task-butt").click(function(){
     console.log('Editing task');
     $("#edit-task-butt").hide();
     $("#my-tasks-butt").show();
-    // change task title 
+    // change task title
     task.set('title', 'Buy milk and cookies.');
     // PUT to server
     task.save().success(function(res){

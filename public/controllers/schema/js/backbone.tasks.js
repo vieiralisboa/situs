@@ -207,7 +207,7 @@
     "Collections": {},
     "Views": {},
     "location": {
-        "hostname": "situs.xn--stio-vpa.pt",
+        "hostname": "situs.pt",
         "protocol": "https",
         //"pathname": "/tasks"
     },

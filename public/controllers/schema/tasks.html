@@ -1,16 +1,14 @@
 <!doctype html>
-<html lang="pt" data-remote_hostname="xn--stio-vpa.pt" data-remote_protocol="https:" data-host="xn--stio-vpa.pt">
+<html lang="pt" data-remote_hostname="xn--stio-vpa.pt" data-remote_protocol="https:" data-host="situs.pt">
 <head>
     <meta charset="utf-8">
-    <script src="https://xn--stio-vpa.pt/frontgate/js/frontgate.js"></script>
+    <script src="/frontgate"></script>
     <link rel="stylesheet" type="text/css" href="myconsole.css">
 </head>
 <body>
 <script src="myconsole.js"></script>
 <script>
-Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
-    "underscore/1.4.2/underscore.js",
-    "backbone/1.1.0/backbone.js", function(){
+Frontgate.remote().sync("lib/jquery", "lib/_", "lib/backbone", function(){
 
 /*/
     var API = Frontgate.location({
@@ -24,8 +22,8 @@ Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
         pw: "sksat"
     });
 
-    var Task = Backbone.Model.extend({ 
-        defaults: { 
+    var Task = Backbone.Model.extend({
+        defaults: {
             title: "",
             priority: 0,
             done: 0
@@ -33,7 +31,7 @@ Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
         urlRoot: API.url()
     });
 
-    var Tasks = Backbone.Collection.extend({ 
+    var Tasks = Backbone.Collection.extend({
         model: Task,
         url: API.url()
     });
@@ -52,8 +50,8 @@ Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
     fetchTasks();
 
     // create a task
-    var task = new Task({ 
-        title: "study for the calculus test" 
+    var task = new Task({
+        title: "study for the calculus test"
     });
 
     task.save(null, {
@@ -65,7 +63,7 @@ Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
     });
 
     fetchTasks();
-    
+
     task.set("title", "study for the physics test");
     myConsole('task.set("title", "study for the physics test")', task.attributes);
 
@@ -79,8 +77,8 @@ Frontgate.remote().scripts("jquery/2.0.3/jquery-2.0.3.js",
 
 
 setTimeout(function(){
-    task.destroy({ 
-        beforeSend: API.xhrAuth() 
+    task.destroy({
+        beforeSend: API.xhrAuth()
     });
 }, 10000);
 //*/
