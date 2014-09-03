@@ -12,25 +12,26 @@ class Docs_Controller {
         });
 
         Router::route('/docs/bar/templates/:template', function($request) {
-            $file = Router::$controller_config->htdocs."/sites/ze/bar/templates/".$request->data['template'];
+            $file = Router::$controller_config->htdocs."/sites/ze/public/bar/templates/".$request->data['template'];
+
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
 
         Router::route('/docs/bar/css/:sheet', function($request) {
-            $file = Router::$controller_config->htdocs."/sites/ze/bar/css/".$request->data['sheet'];
+            $file = Router::$controller_config->htdocs."/sites/ze/public/bar/css/".$request->data['sheet'];
             if(!file_exists($file)) Util::quit(404);
             return Util::download($file);
         });
 
         Router::route('/docs/bar/:file', function($request) {
-            $file = Router::$controller_config->htdocs."/sites/ze/bar/js/".$request->data['file'];
+            $file = Router::$controller_config->htdocs."/sites/ze/public/bar/js/".$request->data['file'];
             if(!file_exists($file)) Util::quit(404);
             return Util::download($file);
         });
 
         Router::route('/docs/uploader/:file', function($request) {
-            $file = Router::$controller_config->htdocs."/sites/ze/public/upload/".$request->data['file'];
+            $file = Router::$controller_config->htdocs."/sites/ze/public/public/upload/".$request->data['file'];
             if(!file_exists($file)) Util::quit(404);
             return Util::download($file);
         });
