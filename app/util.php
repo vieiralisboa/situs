@@ -69,8 +69,8 @@ class Util {
     /**
      * ctype Array Values
      * Converts ctype strings in array to numeric values
-     */  
-    public static function ctype_array($array){   
+     */
+    public static function ctype_array($array){
         foreach($array as $key => $value){
             $array[$key] = ctype_digit($value) ? (int) $value : $value;
         }
@@ -84,7 +84,7 @@ class Util {
         $string = str_replace('\/', '/', $uri);
         $string = str_replace('//', '/',  $string);
         $array = explode('/', substr($string, 1));
-        
+
         return $array;
     }
 
@@ -93,7 +93,7 @@ class Util {
      */
     public static function regex_uri($uri) {
         $uri_array = self::break_uri($uri);
-        
+
         $regex = "/^";
         foreach($uri_array as $u) {
             $regex .= "\\/";
@@ -106,7 +106,7 @@ class Util {
 
     /**
      * Preg Match Requested Uri
-     * @example 
+     * @example
      * $_SERVER[REQUEST_URI];// "/todos/5"
      * match_uri('/todos/:id'); // array(0 => "todos", 'id' => 5)
      * match_uri('/tasks'); // false
@@ -114,12 +114,12 @@ class Util {
      */
     public function preg_match_uri($match) {
         $regex = self::regex_uri($match);
-        
+
         if(preg_match($regex, $_SERVER['REQUEST_URI'])){
             preg_match($regex, $_SERVER['REQUEST_URI'], $matches);
 
             return self::ctype_array($matches);
-        }        
+        }
         else return false;
     }
 
@@ -139,14 +139,14 @@ class Util {
         Router::$json = false;
 
         $status = self::$codes[$code];
-        
+
         header($_SERVER["SERVER_PROTOCOL"]." $code $status");
-       
+
         $response = file_get_contents(dirname(__FILE__)."/status.html");
-        
+
         foreach(array('code'=>$code, 'status'=>$status, 'server' => $_SERVER['HTTP_HOST']) as $name => $value)
-            $response = str_replace( "<%= $name %>", $value, $response);   
-        
+            $response = str_replace( "<%= $name %>", $value, $response);
+
         die($response);
     }
 
@@ -175,17 +175,17 @@ class Util {
                 break;
 
             case "json":
-                header('Content-Type: application/json');
+                header('Content-Type: application/json; charset=utf-8');
                 break;
 
             case "js":
-                header("Content-Type: application/x-javascript");
+                header("Content-Type: application/x-javascript; charset=utf-8");
                 break;
-                                
+
             case "vtt":
                 header('Content-Type: text/vtt; charset=utf-8');
                 break;
-            
+
             case "txt":
             case "srt":
                 header('Content-Type: text/plain; charset=utf-8');
@@ -239,7 +239,7 @@ class Util {
             case "js":
                 header("Content-Type: application/x-javascript");
                 break;
-                
+
             case "vtt":
                 header('Content-Type: text/vtt; charset=utf-8');
                 break;
@@ -271,7 +271,7 @@ if (file_exists($file)) {
 
         //Read the file from disk
         readfile($file);
-        
+
         exit();
     }
 
@@ -281,12 +281,12 @@ if (file_exists($file)) {
      */
     public static function upload($file) {
         $sucess = false;
-        
+
         // Ajax file post
         if(isset($GLOBALS['HTTP_RAW_POST_DATA'])) {
             file_put_contents($file, $GLOBALS['HTTP_RAW_POST_DATA']);
             if(file_exists($file)) $sucess = true;
-            return $sucess;        
+            return $sucess;
         }
 
         // input post submit
@@ -303,7 +303,7 @@ if (file_exists($file)) {
                 $file = $folder . $_FILES['files']['name'][$key];
                 if($error == 0) //if ($error == UPLOAD_ERR_OK)//
                     move_uploaded_file($_FILES["files"]["tmp_name"][$key], $file);
-                
+
                 // TODO implement a real verify
                 if(file_exists($file)) $sucess = true;
             }
