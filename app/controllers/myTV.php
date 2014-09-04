@@ -51,26 +51,15 @@ class MyTV_Controller {
                         );
 
                         // Subtitles (vtt)
-                        if(file_exists($path.$sep.$info['filename'].".vtt"))
+                        if(file_exists($path.$sep.$info['filename'].".srt")){
                             $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".vtt";
+                        }
 
                         // add video to the list
                         $videos[] = $show;
                     }
                 }
                 return $videos;
-
-            // Route API/myTV/vtt/$vtt
-            case 'vtt':
-                // requested subtitle
-                $vtt = $config->path;
-                while(isset($request->uri[++$k]))
-                    $vtt .= $sep.$request->uri[$k];
-
-                if(!file_exists($vtt)) return false;
-
-                Util::serve($vtt);
-                //return Util::download($vtt);
 
             // Route /myTV/show/$file
             case 'show':
