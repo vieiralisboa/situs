@@ -60,7 +60,7 @@ class MyTV_Controller {
                             $show['poster'] = "/myTV/poster/".$dir.$sep.$info['filename'].".jpg";
                         elseif (file_exists($path.$sep.$info['filename'].".png"))
                             $show['poster'] = "/myTV/poster/".$dir.$sep.$info['filename'].".jpg";
-                        else $show['poster'] = "/myTV/poster/noposter.jpg";
+                        else $show['poster'] = false;
 
                         // add video to the list
                         $videos[] = $show;
