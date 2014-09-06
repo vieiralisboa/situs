@@ -55,11 +55,30 @@ class MyTV_Controller {
                             $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".vtt";
                         }
 
+                        // Poster
+                        if(file_exists($path.$sep.$info['filename'].".jpg"))
+                            $show['poster'] = "/myTV/poster/".$dir.$sep.$info['filename'].".jpg";
+                        elseif (file_exists($path.$sep.$info['filename'].".png"))
+                            $show['poster'] = "/myTV/poster/".$dir.$sep.$info['filename'].".jpg";
+                        else $show['poster'] = "/myTV/poster/noposter.jpg";
+
                         // add video to the list
                         $videos[] = $show;
                     }
                 }
                 return $videos;
+
+            // Video poster
+            case 'poster':
+                $file = $config->path;
+                while(isset($request->uri[++$k]))
+                    $file .= $sep.$request->uri[$k];
+
+                //return $file;
+
+                if(!file_exists($file)) Util::quit(404);
+                Util::serve($file);
+                return;
 
             // Route /myTV/show/$file
             case 'show':
