@@ -9,25 +9,18 @@ class VideoPlayer_Controller {
     public function get($request) {
 
         $config = Router::$controller_config;
-        $sep = "/";//"\\";
-        $k = 1;
 
         // Routes
         switch($request->uri[1]){
 
             case 'popup':
-                $file = Router::$controller_config->popup;
+                $file = $config->popup;
                 if(!file_exists($file)) Util::quit(404);
                 return Util::serve($file);
-
-            // Route /myTV/config
-            case 'config':
-                return $config;
 
             // Video poster
             case 'poster':
                 $file = get_filename($config->path, $request->uri);
-
                 if(!file_exists($file)) Util::quit(404);
                 Util::serve($file);
                 return;
@@ -47,7 +40,9 @@ class VideoPlayer_Controller {
                 exit;
 
             default:
-                return false;
+                header('Location: http://xn--stio-vpa.pt/#VideoPlayer');
+                exit;
+                #return false;
         }
     }
 }
