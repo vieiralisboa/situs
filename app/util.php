@@ -191,6 +191,11 @@ class Util {
                 header('Content-Type: text/plain; charset=utf-8');
                 break;
 
+            case "jpg":
+            case "jpeg":
+                header('Content-Type: image/jpeg');
+                break;
+
             default:
                 self::quit(404);
         }
@@ -242,6 +247,11 @@ class Util {
 
             case "vtt":
                 header('Content-Type: text/vtt; charset=utf-8');
+                break;
+
+            case "jpg":
+            case "jpeg":
+                header('Content-Type: image/jpeg');
                 break;
 
             default:
