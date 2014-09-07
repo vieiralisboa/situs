@@ -28,19 +28,16 @@ class VideoPlayer_Controller {
             // Route /VideoPlayer/video/$file
             case 'video':
                 $file = get_filename($config->path, $request->uri);
-
-                // requires curl
-                #if(file_exists($file)) mp4Upload($file);
-
+                #if(file_exists($file)) mp4Upload($file);// requires curl
                 // requested video // only stream partial video (range)
                 if(!file_exists($file) || empty($_SERVER['HTTP_RANGE']))
                     return false;
-
                 rangeDownload($file);// stream the video
                 exit;
 
             default:
-                header('Location: http://xn--stio-vpa.pt/#VideoPlayer');
+                //TODO Router::location("http://xn--stio-vpa.pt/#VideoPlayer");
+                header('Location: http://xn--stio-vpa.pt/#!VideoPlayer');
                 exit;
                 #return false;
         }
