@@ -73,8 +73,9 @@ class Activity
         self::$logs = (object) array();
         if(!self::$filename)
         {
-            self::$root = "/shares/www";//dirname(dirname(__FILE__));
-            self::$filename = "/logs/activity_".date("Ym").".json";
+            $config = json_decode(file_get_contents(dirname(__FILE__)."/activity.json"));
+            self::$root = $config->folder;//dirname(dirname(__FILE__));
+            self::$filename = $config->name."_".date("Ym").".json";
         }
         return self::$set = 1;
     }
