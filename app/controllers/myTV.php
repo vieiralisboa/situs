@@ -34,9 +34,8 @@ class MyTV_Controller {
                 $_list = array();
                 while($_file = readdir($_dir)){
                     if ($_file != '.' and $_file != '..'){
-                        // add the filename, to be sure not to
-                        // overwrite a array key
-                        $_ctime = filectime($path .$sep. $_file) . ',' . $_file;
+                        // add the filename, to be sure not to overwrite a array key
+                        $_ctime = filectime($path.$sep.$_file) . ',' . $_file;
                         $_list[$_ctime] = $_file;
                     }
                 }
@@ -54,7 +53,6 @@ class MyTV_Controller {
                         $show = array(
                             'name' => $name,// $info['basename'],
                             'mp4' => 'video'.$sep.$dir.$sep.$info['filename']
-                            //'mp4' => "http://guest:guest@situs.no-ip.org:8080/myTV/show/" . $dir."/".$info['filename']
                         );
 
                         // Subtitles (vtt)
