@@ -1,6 +1,4 @@
 {
-	"_activity": {
-		"filename": "../storage/activity.json"
-	},
-	"activity": false
+	"activity": false,
+	"logs": "/var/www/logs/"
 }
