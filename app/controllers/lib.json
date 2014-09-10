@@ -8,7 +8,11 @@
 		"topzindex" : "topzindex/1.2/jquery.topzindex.js",
 		"ace" : "ace-builds/src-noconflict/ace.js",
 		"raphael" : "raphael/2.1.0/raphael-min.js",
-		"frontgate" : "frontgate/js/frontgate.js"
+		"frontgate" : "frontgate/js/frontgate.js",
+		"jquery-ui": "jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
+		"panel" : "panel/panel.js",
+		"bar" : "bar/js/bar.js",
+		"ze" :"ze/ze.js"
 	},
 	"help": {
 		"lib" : "lists available libs",
