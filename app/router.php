@@ -23,7 +23,7 @@ class Router extends Util {
      * adds a route callback to the routes array
      */
     public static function route($uri, $callback){
-        if(empty($uri) || empty($callback)) return; 
+        if(empty($uri) || empty($callback)) return;
         if(!isset(self::$routes)) self::$routes = (object) array();
         self::$routes->$uri = $callback;
     }
@@ -34,12 +34,12 @@ class Router extends Util {
      */
     protected function request() {
         if(isset($this->request)) return $this->request;
-        
+
         $this->request = (object) array();
         $this->request->method = strtolower($_SERVER['REQUEST_METHOD']);
         $this->request->input = json_decode(file_get_contents("php://input"));
         $this->request->uri = $this->ctype_array($this->break_uri($_SERVER['REQUEST_URI']));
-        
+
         return $this->request;
     }
 
@@ -50,12 +50,12 @@ class Router extends Util {
     public static function create_controller($api){
         $base = dirname(dirname(__FILE__));
         $controller = "$base/app/controllers/$api.php";
-        
+
         // controller already exists
         if(file_exists($controller)) return false;
 
         $schema = "$base/app/schemas/$api.php";
-        
+
         // schema exists
         if(file_exists($schema)) {
             return self::make_controller($controller, $api);
@@ -64,7 +64,7 @@ class Router extends Util {
         else {
             if(self::create_schema($schema, $api)){
                 return self::make_controller($controller, $api);
-            }    
+            }
         }
     }
 
@@ -73,17 +73,17 @@ class Router extends Util {
      * Will overwrite any existing controller!
      */
     public static function make_controller($controller, $api){
-        
+
         $base = dirname(dirname(__FILE__));
         $template = "$base/app/templates/controller.template";
-        
+
         $names = array('Name'=>ucfirst($api),'name'=>$api);
         $data = file_get_contents($template);
-        
+
         foreach($names as $name => $value){
             $data = str_replace("{".$name."}", $value, $data);
         }
-        
+
         file_put_contents($controller, $data);
 
         if(file_exists($controller)) return true;
@@ -104,8 +104,8 @@ class Router extends Util {
         $json = "$base/app/schemas/$api.json";
 
         // json schema exists
-        if(file_exists($json)) return self::make_schema($json);  
-        
+        if(file_exists($json)) return self::make_schema($json);
+
         // no json schema found
         return false;
     }
@@ -123,12 +123,12 @@ class Router extends Util {
 
         $columns = array();
         foreach($schema->columns as $column){
-            
+
             $string = "$column->name $column->type";
-            
-            if(isset($column->constraints)) 
+
+            if(isset($column->constraints))
                 $string .= " ".implode(" ", $column->constraints);
-            
+
             if(isset($column->default)){
                 $default = $column->default;
                 $string .= " DEFAULT $default";
@@ -141,9 +141,9 @@ class Router extends Util {
 
         $names = array(
             'Table'=>ucfirst($api),
-            'table'=>$api, 
+            'table'=>$api,
             'schema'=>implode(",\n", $columns),
-            'Controller' => ucfirst(strtolower($schema->PDO)), 
+            'Controller' => ucfirst(strtolower($schema->PDO)),
         );
         $data = file_get_contents($template);
 
@@ -191,7 +191,7 @@ class Router extends Util {
             $args = array();
             $args[] = $request;
 
-            if(method_exists($Controller, $request->method)) { 
+            if(method_exists($Controller, $request->method)) {
 
                 Auth::basic($api);
 
@@ -227,8 +227,8 @@ class Router extends Util {
 
     /**
      * Run
-     * Auto starts a new Router 
-     */   
+     * Auto starts a new Router
+     */
     public static function run($config = null) {
 
         /*/TODO get config from json file
@@ -245,8 +245,8 @@ class Router extends Util {
      * Read config (json) file
      * @param string $config config file name
      */
-    protected function config($config = "config.json"){
-        $file = dirname(__FILE__)."/".$config;
+    protected function config($config = false){
+        $file = dirname(__FILE__)."/config.json";
 
         #$this->stop(getcwd());// "/public/"
 
@@ -270,11 +270,12 @@ class Router extends Util {
      * Redirects to other url
      */
     public static function redirect($url){
-        header("Location: $url"); 
+        header("Location: $url");
         exit;
     }
 
     function __construct($config){
+        ini_set('date.timezone', 'Europe/Lisbon');
         header('X-Powered-By: PHP/'.phpversion().' Situs');
 
         // ignore OPTIONS method
@@ -285,16 +286,22 @@ class Router extends Util {
             exit;
         }
 
-        $this->config();
+        // Config $this->config();
+        $this->config($config);
 
-        if($this->config->activity) {
-            Activity::log();
+        // Activity
+        if(isset($this->config->activity)
+                && is_object($this->config->activity)){
+            if(isset($this->config->activity->disabled)
+                    && !$this->config->activity->disabled){
+                Activity::log($this->config->activity);
+            }
         }
 
         // use server's rewrite module or uncomment
         // or neither for a "404 Not Found" status at "/"
         #if($_SERVER['REQUEST_URI'] == "/") $this->redirect("/index.html");
-        
+
         $request = $this->request();
 
         //DEVELOPMENT ONLY
@@ -303,25 +310,25 @@ class Router extends Util {
         $this->start($request);
     }
 
-    function __destruct(){       
+    function __destruct(){
         #header('X-Powered-By: PHP/'.phpversion().' Situs');
 
         #if($this->response === null)
         #{
         #    $this->response = '';
         #}
-        
+
         #$this->json = $this->response !== '' ? $this->json : false;
 
         if( self::$json ){
             header('Cache-Control: no-cache, must-revalidate');
             header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             header('Content-type: application/json; charset=utf-8');
-            
+
             echo json_encode($this->response);
         }
         else echo $this->response;
-        
+
         self::$json = true;
     }
 }

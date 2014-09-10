@@ -1,4 +1,8 @@
 {
-	"activity": false,
-	"logs": "/var/www/logs/"
+	"activity": {
+		"disabled": false,
+		"folder": "c:/httpd/logs/",
+		"filename": "activity",
+		"date": "Ym"
+	}
 }

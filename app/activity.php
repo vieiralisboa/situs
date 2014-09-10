@@ -1,7 +1,6 @@
 <?php
 
-class Activity
-{
+class Activity {
     private static $logs;
     private static $root;
     private static $filename;
@@ -12,42 +11,35 @@ class Activity
     private static $json;
 
     // gets or sets filename
-    public static function filename($filename = false)
-    {
+    public static function filename($filename = false){
         if($filename === false)
             return self::$root . self::$filename;
         self::$filename = $filename;
         return self::$filename;
     }
 
-    public static function json()
-    {
-        if(!self::$fetched) self::_fetch();
+    public static function json($config){
+        if(!self::$fetched) self::_fetch($config);
         return self::$json;
     }
 
-    public static function logs()
-    {
-        if(!self::$fetched) self::_fetch();
+    public static function logs($config){
+        if(!self::$fetched) self::_fetch($config);
         return self::$logs;
     }
 
     // logs activity
-    public static function log()
-    {
-        self::_save();// save
+    public static function log($config){
+        self::_save($config);// save
         return self::$log;
     }
 
     // fetches logs
-    private function _fetch()
-    {
-        if(!self::$fetched)
-        {
-            self::_set();
+    private static function _fetch($config){
+        if(!self::$fetched){
+            self::_set($config);
             $filename = self::filename();
-            if(file_exists($filename))
-            {
+            if(file_exists($filename)){
                 self::$json = file_get_contents($filename);
                 self::$logs = json_decode(self::$json);
             }
@@ -56,11 +48,9 @@ class Activity
         }
     }
 
-    private function _save()
-    {
-        if(!self::$saved)
-        {
-            if(!self::$fetched) self::_fetch();
+    private static function _save($config){
+        if(!self::$saved){
+            if(!self::$fetched) self::_fetch($config);
             self::_log();
             file_put_contents(self::filename(), json_encode(self::$logs));
             self::$saved = 1;
@@ -68,21 +58,22 @@ class Activity
     }
 
     // sets attributes
-    private function _set(){
-        if(self::$set) return 0;
+    private static function _set($config){
+        if(self::$set || !is_object($config)) return 0;
         self::$logs = (object) array();
-        if(!self::$filename)
-        {
-            $config = json_decode(file_get_contents(dirname(__FILE__)."/activity.json"));
-            self::$root = $config->folder;//dirname(dirname(__FILE__));
-            self::$filename = $config->name."_".date("Ym").".json";
+        if(!self::$filename){
+            $_filename = isset($config->filename) ? $config->filename : "situs_activity";
+            $_date = isset($config->date) ? $config->date : "Ym";
+            $_folder = isset($config->folder) ? $config->folder : dirname(dirname(__FILE__))."/";
+
+            self::$root = $config->folder;
+            self::$filename = $_filename."_".date($config->date).".json";
         }
         return self::$set = 1;
     }
 
-    // sets log
-    private function _log()
-    {
+    // sets|returns log entry
+    private static function _log(){
         $agent = $_SERVER['HTTP_USER_AGENT'];
         $address = $_SERVER['REMOTE_ADDR'];
         $request = $_SERVER['REQUEST_URI'];
