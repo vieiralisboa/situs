@@ -342,40 +342,35 @@ if (file_exists($file)) {
         }
 
         if(!$algorithm){
-            $index = 2;
-            $algorithm = self::$algos[$index];//"sha256";
+            $index = 1;//"sha1";
+            $algorithm = self::$algos[$index];
         }
 
-        $cost = 3;
+        $cost = 2;
         if(isset($options['cost'])){
-            $cost = $options['cost'];//1-9
+            if($cost<10 && $cost>0) {
+                $cost = $options['cost'];
+            }
         }
 
-        if($cost>9 || $cost<1) $cost = 3;
-
-        $password = hash($algorithm, $string);//40
-
-        // salt
-        $spice = hash("sha1", $salt);
-        $sauce = hash("crc32", $spice);
-        for($i=0; $i<2; $i++){
-            $sauce .= hash("crc32", $spice);//22
-            $spice = hash("sha1", $sauce);
-        }
-
-        // hash
-        $hash = $sauce.$password;
-        for($i=0; $i<$cost*$cost; $i++){
-            $hash = hash($algorithm, $hash);
-        }
-
-        #string password_hash( string $password , integer $algo [, array $options ] )
+        $spice = self::zehash_sauce($salt, $salt, 1, "crc32")[0];
+        $sauce = self::zehash_sauce($string, $spice, $cost*$cost, $algorithm)[1];
         return array(
             "string" => $string,
             "algorithm" =>$algorithm,
             "salt" => $salt,
-            "hash" => $index."-".$cost."-".$sauce."-".$hash//8+32+64=112
+            "hash" => $index."-".$cost."-".$spice."-".$sauce
         );
+    }
+
+    public static function zehash_sauce($string, $salt, $cost=2, $algo="sha1"){
+        $spice = hash($algo, $salt);
+        $sauce = hash($algo, $string.$spice);
+        for($i=0; $i<$cost; $i++){
+            $spice .= hash($algo, $sauce);
+            $sauce = hash($algo, $sauce.$spice);
+        }
+        return [$spice, $sauce];
     }
 
     /**
@@ -385,23 +380,17 @@ if (file_exists($file)) {
     public static function zehash_verify($string, $hash){
         $frags = explode("-", $hash);
         $algo = self::$algos[$frags[0]];
-        $count = (int) $frags[1];
-        $count *= $count;
+        $cost = (int) $frags[1];
 
-        $passwords = [$frags[3]];
-        $password = hash($algo, $string);
-        $passwords[1] = $frags[2].$password;
-        for($i=0; $i<$count; $i++){
-            $passwords[1] = hash($algo, $passwords[1]);
-        }
-
+        $spice = $frags[2];
+        $sauce = self::zehash_sauce($string, $spice, $cost*$cost, $algo);
         return [
-            "string" => $string,//40
+            "string" => $string,
             "hash" => $hash,
             "algorithm" => $algo,
-            "count" => $count,
-            "spice" => $frags[2],
-            "verifies" => ($passwords[0] == $passwords[1])
+            "cost" => $cost,
+            "spice" => $spice,
+            "verifies" => ($sauce[1] == $frags[3])
         ];
     }
 }
