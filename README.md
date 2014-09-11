@@ -1,3 +1,3 @@
 # [SITUS](https://xn--stio-vpa.pt)
 
-Situs Framework
+Situs PHP Framework
