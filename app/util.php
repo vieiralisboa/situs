@@ -66,6 +66,8 @@ class Util {
         510 => 'Not Extended'
     );
 
+    public static $algos = ["md5", "sha1", "sha256", "sha512", "ripemd128"];
+
     /**
      * ctype Array Values
      * Converts ctype strings in array to numeric values
@@ -321,5 +323,85 @@ if (file_exists($file)) {
         }
 
         return $sucess;
+    }
+
+    /**
+     * ZeHash
+     * string hash
+     */
+    public static function zehash($string, $salt, $options=[]){
+        $algorithm = null;
+
+        if(isset($options['algo'])){
+            foreach(self::$algos as $index => $algo){
+                if($algo == $options['algo']) {
+                    $algorithm = self::$algos[$index];
+                    break;
+                }
+            }
+        }
+
+        if(!$algorithm){
+            $index = 2;
+            $algorithm = self::$algos[$index];//"sha256";
+        }
+
+        $cost = 3;
+        if(isset($options['cost'])){
+            $cost = $options['cost'];//1-9
+        }
+
+        if($cost>9 || $cost<1) $cost = 3;
+
+        $password = hash($algorithm, $string);//40
+
+        // salt
+        $spice = hash("sha1", $salt);
+        $sauce = hash("crc32", $spice);
+        for($i=0; $i<2; $i++){
+            $sauce .= hash("crc32", $spice);//22
+            $spice = hash("sha1", $sauce);
+        }
+
+        // hash
+        $hash = $sauce.$password;
+        for($i=0; $i<$cost*$cost; $i++){
+            $hash = hash($algorithm, $hash);
+        }
+
+        #string password_hash( string $password , integer $algo [, array $options ] )
+        return array(
+            "string" => $string,
+            "algorithm" =>$algorithm,
+            "salt" => $salt,
+            "hash" => $index."-".$cost."-".$sauce."-".$hash//8+32+64=112
+        );
+    }
+
+    /**
+     * ZeHash Verify
+     * verify string hash
+     */
+    public static function zehash_verify($string, $hash){
+        $frags = explode("-", $hash);
+        $algo = self::$algos[$frags[0]];
+        $count = (int) $frags[1];
+        $count *= $count;
+
+        $passwords = [$frags[3]];
+        $password = hash($algo, $string);
+        $passwords[1] = $frags[2].$password;
+        for($i=0; $i<$count; $i++){
+            $passwords[1] = hash($algo, $passwords[1]);
+        }
+
+        return [
+            "string" => $string,//40
+            "hash" => $hash,
+            "algorithm" => $algo,
+            "count" => $count,
+            "spice" => $frags[2],
+            "verifies" => ($passwords[0] == $passwords[1])
+        ];
     }
 }
