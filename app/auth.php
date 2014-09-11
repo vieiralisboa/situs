@@ -59,10 +59,13 @@ class Auth extends Util{
 
 		// get user password from the database
 		//"SELECT pw FROM $realm WHERE user='{$_SERVER['PHP_AUTH_USER']}'";
+
 		$pw = self::db(strtolower($_SERVER['PHP_AUTH_USER']), $realm);
 
+		$auth = Util::zehash_verify($_SERVER['PHP_AUTH_PW'], $pw);
+
 		// password verification
-		if ($_SERVER['PHP_AUTH_PW'] != $pw) {
+		if ($auth['verifies'] != true) {
 			self::unauthorize($realm);
 		}
 	}
