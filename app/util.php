@@ -329,8 +329,9 @@ if (file_exists($file)) {
      * ZeHash
      * string hash
      */
-    public static function zehash($string, $salt, $options=[]){
+    public static function zehash($string, $options=[]){
         $algorithm = null;
+        $cost = 2;
 
         if(isset($options['algo'])){
             foreach(self::$algos as $index => $algo){
@@ -346,19 +347,19 @@ if (file_exists($file)) {
             $algorithm = self::$algos[$index];
         }
 
-        $cost = 2;
         if(isset($options['cost'])){
             if($cost<10 && $cost>0) {
                 $cost = $options['cost'];
             }
         }
 
-        $spice = self::zehash_sauce($salt, $salt, 1, "crc32")[0];
+        $spice = self::zehash_sauce(uniqid(), uniqid(), 1, "crc32")[0];
         $sauce = self::zehash_sauce($string, $spice, $cost*$cost, $algorithm)[1];
+
         return array(
             "string" => $string,
-            "algorithm" =>$algorithm,
-            "salt" => $salt,
+            #"algorithm" =>$algorithm,
+            #"salt" => $salt,
             "hash" => $index."-".$cost."-".$spice."-".$sauce
         );
     }
@@ -366,10 +367,12 @@ if (file_exists($file)) {
     public static function zehash_sauce($string, $salt, $cost=2, $algo="sha1"){
         $spice = hash($algo, $salt);
         $sauce = hash($algo, $string.$spice);
+
         for($i=0; $i<$cost; $i++){
             $spice .= hash($algo, $sauce);
             $sauce = hash($algo, $sauce.$spice);
         }
+
         return [$spice, $sauce];
     }
 
@@ -384,12 +387,13 @@ if (file_exists($file)) {
 
         $spice = $frags[2];
         $sauce = self::zehash_sauce($string, $spice, $cost*$cost, $algo);
+
         return [
             "string" => $string,
             "hash" => $hash,
-            "algorithm" => $algo,
-            "cost" => $cost,
-            "spice" => $spice,
+            #"algorithm" => $algo,
+            #"cost" => $cost,
+            #"spice" => $spice,
             "verifies" => ($sauce[1] == $frags[3])
         ];
     }
