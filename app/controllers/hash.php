@@ -13,6 +13,9 @@ class Hash_Controller {
                 "routes" => [
                     "/hash/:string",
                     "/hash/:string/:algo",
+                    #"/hash/:string/salt/:salt",
+                    #"/hash/:string/salt/:salt/:algo",
+                    #"/hash/:string/salt/:salt/:algo/:cost",
                     "/hash/:string/:algo/:cost"],
                 "algos"=>hash_algos()
 
