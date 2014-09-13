@@ -56,8 +56,8 @@ class MyTV_Controller {
                         );
 
                         // Subtitles (vtt)
-                        if(file_exists($path.$sep.$info['filename'].".srt")){
-                            $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".vtt";
+                        if(file_exists($path.$sep.$info['filename'].".PT.srt")){
+                            $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".PT.vtt";
                         }
 
                         // Poster
