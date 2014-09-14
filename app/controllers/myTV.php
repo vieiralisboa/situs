@@ -47,9 +47,12 @@ class MyTV_Controller {
                     if(preg_match('/\.mp4$/', $video)) {
                         $name = $info['filename'];
                         $name = preg_replace("/\.hdtv.*/i", "", $name);
+                        $name = preg_replace("/\.proper.*/i", "", $name);
+                        $name = preg_replace("/\.rerip.*/i", "", $name);
                         $name = preg_replace("/\.webrip.*/i", "", $name);
                         $name = preg_replace("/\.web\-dl.*/i", "", $name);
                         $name = str_replace('.', " ", $name);
+
                         $show = array(
                             'name' => $name,// $info['basename'],
                             'mp4' => 'video'.$sep.$dir.$sep.$info['filename']
@@ -65,7 +68,19 @@ class MyTV_Controller {
                             $show['poster'] = "poster/".$dir.$sep.$info['filename'].".jpg";
                         elseif (file_exists($path.$sep.$info['filename'].".png"))
                             $show['poster'] = "poster/".$dir.$sep.$info['filename'].".jpg";
-                        else $show['poster'] = false;
+                        else {
+                            $pattern = "/ s\d{1,2}e\d{1,2}/i";
+                            if(preg_match($pattern, $name, $matches)){
+                                $name = preg_replace("/ s\d{1,2}e\d{1,2}/i", "", $name);
+                                $name = str_replace(' ', "_", $name);
+                                $file = "tv-shows/".$name.$sep.$name.".jpg";
+                                if(file_exists($config->path.$sep.$file)){
+                                    $show['poster'] = "poster/".$file;
+                                }
+                                else $show['poster'] = false;
+                            }
+                            else $show['poster'] = false;
+                        }
 
                         // add video to the list
                         $videos[] = $show;
