@@ -68,28 +68,25 @@ class MyTV_Controller {
                         // Poster
                         if($root == "tv-shows" || $root == "NEW"){
                             $name = $info['filename'];
-                            $name = preg_replace("/\.hdtv.*/i", "", $name);
-                            $name = preg_replace("/\.proper.*/i", "", $name);
-                            $name = preg_replace("/\.rerip.*/i", "", $name);
-                            $name = preg_replace("/\.webrip.*/i", "", $name);
-                            $name = preg_replace("/\.web\-dl.*/i", "", $name);
-                            $name = str_replace('.', " ", $name);
+                            $pattern = "/^(.*)[\.| |_](s\d{1,2}e\d{1,2})/i";
+                            $result = preg_match($pattern, $name, $matches);
 
-                            $show['name'] = $name;
+                            if($result){
+                                $series = str_replace('.', " ", $matches[1]);
+                                $folder = str_replace(' ', "_", strtolower($series));
 
-                            $pattern = "/ s\d{1,2}e\d{1,2}/i";
-
-                            if(preg_match($pattern, $name)){
-                                $name = preg_replace("/ s\d{1,2}e\d{1,2}/i", "", $name);
-                                $name = str_replace(' ', "_", $name);
-                                $file = "tv-shows/".$name.$sep.$name.".jpg";
+                                $name = "$series {$matches[2]}";
+                                $file = "tv-shows/$folder$sep$folder.jpg";
 
                                 if(file_exists($config->path.$sep.$file)){
-                                    $show['poster'] = "poster/".$file;
+                                    $show['poster'] = "poster/$file";
                                 }
                                 else $show['poster'] = false;
                             }
                             else $show['poster'] = false;
+
+                            $show['name'] = $name;
+
                         }
                         else {
                             if(file_exists($path.$sep.$info['filename'].".jpg"))
