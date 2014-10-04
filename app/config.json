@@ -1,4 +1,5 @@
 {
+	"ssl": false,
 	"activity": {
 		"disabled": false,
 		"folder": "c:/httpd/logs/",

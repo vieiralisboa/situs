@@ -289,7 +289,14 @@ class Router extends Util {
         // Config $this->config();
         $this->config($config);
 
-        // Activity
+        // ssl
+        if(isset($this->config->ssl) && $this->config->ssl){
+            if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on"){
+                header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]);
+            }
+        }
+
+        // activity
         if(isset($this->config->activity)
                 && is_object($this->config->activity)){
             if(isset($this->config->activity->disabled)
