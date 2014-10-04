@@ -526,4 +526,31 @@ if (file_exists($file)) {
             "verifies" => ($sauce == $frags[3])
         ];
     }
+
+    /**
+     * List R
+     * Lists files in directory recursively
+     */
+    public static function ListR($dir, $prefix = '') {
+        $dir = rtrim($dir, '\\/');
+        $result = array();
+
+        $h = opendir($dir);
+
+        while (($f = readdir($h)) !== false) {
+            if ($f !== '.' and $f !== '..') {
+                if (is_dir("$dir/$f")) {
+                    $result = array_merge($result, self::ListR("$dir/$f", "$prefix$f/"));
+                    #$result[$f] = ListIn("$dir/$f", $prefix);
+                }
+                else {
+                    $result[] = $prefix.$f;
+                }
+            }
+        }
+
+        closedir($h);
+
+      return $result;
+    }
 }
