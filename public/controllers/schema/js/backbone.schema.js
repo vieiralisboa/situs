@@ -3,7 +3,9 @@
 // requires Situs controller, Backbone 1.1.0
 
 (function(app){
-    var API = Frontgate.location(app.schema.location),
+
+    app.API = Frontgate.location(app.location);
+    app.API.auth(app.schema.auth);
 
     // column model constructor
     Column = Backbone.Model.extend({
@@ -94,7 +96,7 @@
     // schema
     Schema = Backbone.Model.extend({
         defaults: app.schema.defaults,
-        urlRoot: API.url(),
+        urlRoot: app.API.url(),
 
         initialize: function(attrs){
             attrs = attrs || {};
@@ -137,7 +139,7 @@
     // creates a schema (for the Situs controller)*
     Schema.create = function(schema, callback){
         (new Schema(schema)).save(null, {
-            beforeSend: API.xhrAuth(),
+            beforeSend: app.API.xhrAuth(),
             success: callback,
             error: function(){
                 console.error(arguments);
@@ -149,7 +151,7 @@
     window.Schema = Schema;
 
     // use credentials for Situs Schema controller
-    API.auth(app.schema.auth);
+    //API.auth(app.schema.auth);
 
     Schema.VERSION = app.version.join(".");
 
@@ -161,6 +163,11 @@
     "name": "Schema",
     "version": [0,2,0],
     "Router": {},
+    "location": {
+        "hostname": "situs.pt",
+        "protocol": "https",
+        "pathname": "/schema"
+    },
     "schema": {
         "name": "schema",
         "auth": {
@@ -192,11 +199,6 @@
                 "type": "TEXT",
                 "default": "CURRENT_TIMESTAMP"
             }
-        ],
-        "location": {
-            "hostname": "situs.pt",
-            "protocol": "https",
-            "pathname": "/schema"
-        }
+        ]
     }
 });
