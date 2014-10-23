@@ -5,7 +5,7 @@
 
     // Tasks controller's location
     app.API = Frontgate.location(app.location);
-    app.API.auth(app.schema.auth || Frontgate.location());
+    app.API.auth(app.schema.auth);
 
     // create the Tasks controler on Situs server ( tasks schema )
     Schema.create(app.schema, function(model, response, options){
