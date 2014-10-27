@@ -15,15 +15,22 @@ class Sqlite {
     /**
      * establishes a database connection
      */
-    protected function connect() {
+    protected function connect($db = null) {
         if(isset($this->db)) return $this->db;
-        $base = dirname(__FILE__);
-        if(file_exists("$base/sqlite.json")){
-            $config = json_decode(file_get_contents("$base/sqlite.json"));
-            if(!empty($config->base)) $base = $config->base;
+
+        if($db && file_exists($db)){
+            $database = "sqlite:$db";
+        }
+        else {
+            $base = dirname(__FILE__);
+            if(file_exists("$base/sqlite.json")){
+                $config = json_decode(file_get_contents("$base/sqlite.json"));
+                if(!empty($config->base)) $base = $config->base;
+            }
+
+            $database = "sqlite:$base/situs.sqlite";
         }
 
-        $database = "sqlite:$base/situs.sqlite";
         $this->db = new PDO($database);
         return $this->db;
     }
