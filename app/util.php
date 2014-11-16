@@ -209,6 +209,10 @@ class Util {
                 header('Content-Type: video/mp4');
                 break;
 
+            case "epub":
+                header('Content-Type: application/epub+zip');
+                break;
+
             case "pdf":
                 header('Content-Type: application/pdf');
                 break;
