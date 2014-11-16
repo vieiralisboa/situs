@@ -62,6 +62,7 @@ class Activity {
         if(self::$set || !is_object($config)) return 0;
         self::$logs = (object) array();
         if(!self::$filename){
+            #$_ip = str_replace([":","."], "-", $_SERVER['REMOTE_ADDR']);
             $_filename = isset($config->filename) ? $config->filename : "situs_activity";
             $_date = isset($config->date) ? $config->date : "Ym";
             $_folder = isset($config->folder) ? $config->folder : dirname(dirname(__FILE__))."/";
