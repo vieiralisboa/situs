@@ -1,4 +1,5 @@
 {
-	"path": "//MYBOOKLIVE/Public/Shared Videos",
-	"popup": "C:/httpd/docs/bar/templates/popup.html"
+	"path": "/mnt/Public/Shared Videos",
+	"transmission-dir-parent": "/var/www",
+	"popup": "/var/www/libs/bar/templates/popup.html"
 }

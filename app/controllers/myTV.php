@@ -9,7 +9,7 @@ class MyTV_Controller {
         if($request->uri[1] == 'auth') return "Authorized";
 
         $config = Router::$controller_config;
-        $sep = "/";//"\\";
+        $sep = "/";
         $k = 1;
 
         // Routes
@@ -29,12 +29,15 @@ class MyTV_Controller {
                     $dir .=  $sep.$request->uri[$k];
                 $path .= $sep.$dir;
 
+                if($root == "transmission") {
+                    $path = "/var/www/transmission";
+                }
+
                 $videos = $_list = array();
 
-                if(file_exists($path)) {
-                    $_dir = opendir($path);
-                    while($_file = readdir($_dir)){
-                        if ($_file != '.' and $_file != '..'){
+                if(file_exists($path) && is_dir($path)) {
+                    foreach(Util::listR($path) as $_file){
+                        if(preg_match('/\.mp4$/', $_file)){
                             if($root != "tv-shows") {
                                 // add the filename, to be sure not to overwrite a array key
                                 $_ctime = filectime($path.$sep.$_file) . ',' . $_file;
@@ -46,64 +49,74 @@ class MyTV_Controller {
                             }
                         }
                     }
-                    closedir($_dir);
+
                     if($root != "tv-shows") krsort($_list);
                     else sort($_list);
                 }
 
                 foreach($_list as $video){
                     $info = pathinfo($video);
+                    $show = array();
+                    #$show['info'] = $info;
+                    #$show['root'] = $root;
+                    $show['mp4'] = 'video'.$sep.$dir.$sep.$video;
+                    $show['name'] = name($info, $root);
+                    $show['poster'] = poster($info, $root, $config, $dir);
 
-                    if(preg_match('/\.mp4$/', $video)) {
-                        $show = array();
-
-                        $show['mp4'] = 'video'.$sep.$dir.$sep.$info['filename'];
-                        $show['name'] = str_replace('.', " ", $info['filename']);
-
-                        // Subtitles (vtt)
-                        if(file_exists($path.$sep.$info['filename'].".PT.srt")){
-                            $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".PT.vtt";
-                        }
-
-                        // Poster
-                        if($root == "tv-shows" || $root == "NEW"){
-                            $name = $info['filename'];
-                            $pattern = "/^(.*)[\.| |_](s\d{1,2}e\d{1,2})/i";
-                            $result = preg_match($pattern, $name, $matches);
-
-                            if($result){
-                                $series = str_replace('.', " ", $matches[1]);
-                                $folder = str_replace(' ', "_", strtolower($series));
-
-                                $name = "$series {$matches[2]}";
-                                $file = "tv-shows/$folder$sep$folder.jpg";
-
-                                if(file_exists($config->path.$sep.$file)){
-                                    $show['poster'] = "poster/$file";
-                                }
-                                else $show['poster'] = false;
-                            }
-                            else $show['poster'] = false;
-
-                            $show['name'] = $name;
-
-                        }
-                        else {
-                            if(file_exists($path.$sep.$info['filename'].".jpg"))
-                                $show['poster'] = "poster/".$dir.$sep.$info['filename'].".jpg";
-                            #elseif (file_exists($path.$sep.$info['filename'].".png"))
-                            #    $show['poster'] = "poster/".$dir.$sep.$info['filename'].".png";
-                            else $show['poster'] = false;
-                        }
-
-                        // add video to the list
-                        $videos[] = $show;
+                    // vtt Subtitles
+                    if(file_exists($path.$sep.$info['filename'].".PT.srt")){
+                        $show['vtt'] = "/VideoPlayer/vtt/?sub=".$dir.$sep.$info['filename'].".PT.vtt";
                     }
+
+                    // add video to the list
+                    $videos[] = $show;
                 }
+
                 return $videos;
 
             default:
                 return false;
         }
     }
+}
+
+function name($info, $root){
+    $name = $info['filename'];
+    if($root == "tv-shows" || $root == "NEW"){
+        $pattern = "/^(.*)[\.| |_](s\d{1,2}e\d{1,2})/i";
+        $result = preg_match($pattern, $name, $matches);
+        if($result){
+            $series = str_replace('.', " ", $matches[1]);
+            $name = "$series {$matches[2]}";
+        }
+        return $name;
+    }
+
+    return str_replace('.', " ", $name);
+}
+
+function poster($info, $root, $config, $dir){
+    $sep = "/";
+    if($root == "tv-shows" || $root == "NEW"){
+        $name = $info['filename'];
+        $pattern = "/^(.*)[\.| |_](s\d{1,2}e\d{1,2})/i";
+        $result = preg_match($pattern, $name, $matches);
+
+        if($result){
+            $series = str_replace('.', " ", $matches[1]);
+            $folder = str_replace(' ', "_", strtolower($series));
+            $file = "tv-shows/$folder$sep$folder.jpg";
+
+            if(file_exists($config->path.$sep.$file)){
+                return "poster/$file";
+            }
+        }
+    }
+    else {
+        $path = $config->path.$sep.$dir;
+        if(file_exists($path.$sep.$info['filename'].".jpg"))
+            return "poster/".$dir.$sep.$info['filename'].".jpg";
+    }
+
+    return false;
 }
