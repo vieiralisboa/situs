@@ -16,7 +16,7 @@ class Tasks_Controller {
     /**
      * GET
      */
-    public function get(){     
+    public function get(){
         
         Router::route('/tasks', function(){ 
             // gets all records from the database
@@ -45,7 +45,7 @@ class Tasks_Controller {
             return $todo->save();
         });
 
-        Router::route('/tasks/delete/:id', function($request) {    
+        Router::route('/tasks/delete/:id', function($request) {
             // delets a record by its id in the database
             return Database::delete($request->data['id']);
         });
