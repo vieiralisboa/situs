@@ -6,9 +6,9 @@ class Resource
     public static $rendimento_query;
     public static $composto_query;
 
-    public static function db()
+    public static function db($config)
     {
-        return new Resource();
+        return new Resource($config);
     }
 
     public function query($query)
@@ -112,21 +112,34 @@ class Resource
         return $result;
     }
 
-    function __construct(){
-        $this->db = new PDO('mysql:host=situs.pt;dbname=FICHAS;charset=utf8', Auth::user(), Auth::pw(),
+    function __construct($config)
+    {
+        $user = isset($config->user) ? $config->user : Auth::user();
+        $pw = isset($config->pw) ? $config->pw : Auth::pw();
+
+        $pdo = "mysql:host={host};dbname={dbname};charset={charset}";
+
+        if(empty($config->host) || empty($config->dbname)) Util::quit(500);
+        $pdo = str_replace("{host}", $config->host, $pdo);
+        $pdo = str_replace("{dbname}", $config->dbname, $pdo);
+
+        if(empty($config->charset)) $config->charset = "utf8";
+        $pdo = str_replace("{charset}", $config->charset, $pdo);
+
+        $this->db = new PDO($pdo, $user, $pw,
             array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
     }
 }
 
 Resource::$rendimento_query = <<<SQL1
-SELECT RESOURCE.id, RESOURCE.name, AMOUNT.quantity, RESOURCE.price, RESOURCE.type_code
+SELECT RESOURCE.id, RESOURCE.name, AMOUNT.quantity, RESOURCE.unit_code, RESOURCE.price, RESOURCE.type_code
 FROM AMOUNT, RESOURCE
 WHERE AMOUNT.composite_id = {id}
 AND RESOURCE.id = AMOUNT.resource_id;
 SQL1;
 
 Resource::$composto_query = <<<SQL2
-SELECT RESOURCE.id, AMOUNT.quantity, RESOURCE.price, RESOURCE.type_code
+SELECT RESOURCE.id, AMOUNT.quantity, RESOURCE.unit_code, RESOURCE.price, RESOURCE.type_code
 FROM AMOUNT, RESOURCE
 WHERE AMOUNT.composite_id = {id}
 AND RESOURCE.id = AMOUNT.resource_id

@@ -6,13 +6,15 @@ class Recursos_Controller
 {
     public function get($request)
     {
+        $config = Router::$controller_config;
+
         // special cases
         switch(strtolower($request->uri[1])) {
             // SQL query
             case "query":
                 if(isset($request->uri[2])) {
                     try {
-                       return Resource::db()->query(urldecode($request->uri[2]));
+                       return Resource::db($config)->query(urldecode($request->uri[2]));
                     } catch(PDOException $ex) {
                         return $ex->getMessage();
                     }
@@ -31,8 +33,10 @@ class Recursos_Controller
                 '/recursos/:table'];
         });
 
-        Router::route('/recursos/recurso/:id', function($request) { 
-            $db = Resource::db();
+        Router::route('/recursos/recurso/:id', function($request) {
+            $config = Router::$controller_config;
+
+            $db = Resource::db($config);
             try {
                $recurso = $db->recurso($request->data['id']);
             }
@@ -55,23 +59,27 @@ class Recursos_Controller
         });
 
         Router::route('/recursos/recursivo/:id', function($request) {
-            $db = Resource::db();
+            $config = Router::$controller_config;
+            $db = Resource::db($config);
             return$db->recursivo($db->rendimento($request->data['id']));
         });
 
         Router::route('/recursos/rendimento/:id', function($request) {
-            return Resource::db()->rendimento($request->data['id']);
+            $config = Router::$controller_config;
+            return Resource::db($config)->rendimento($request->data['id']);
         });
 
         Router::route('/recursos/:table/:id', function($request) {
             $table = strtoupper($request->data['table']);
             $id = $request->data['id'];
-            return Resource::db()->query("SELECT * FROM $table WHERE id = $id;")[0];
+            $config = Router::$controller_config;
+            return Resource::db($config)->query("SELECT * FROM $table WHERE id = $id;")[0];
         });
 
         Router::route('/recursos/:table', function($request) {
+            $config = Router::$controller_config;
             try {
-               return Resource::db()->table(strtoupper($request->data['table']));
+               return Resource::db($config)->table(strtoupper($request->data['table']));
             }
             catch(PDOException $ex) {
                 return $ex->getMessage();
