@@ -13,8 +13,14 @@ class Resource
 
     public function query($query)
     {
-       $stmt = $this->db->query($query);
-       return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->db->query($query);
+        }
+        catch(PDOException $ex) {
+            return $ex->getMessage();
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function table($table)
