@@ -8,8 +8,8 @@
 			"panel/panel.js",
 			"bar/js/bar.js"
 		]},
-	"temp": "C:/temp/",
-	"docs": "C:/httpd/docs/",
+	"temp": "/tmp/",
+	"docs": "/var/www/libs/",
 	"_docs": "http://docs.medorc.org/",
 	"__docs": false
 }

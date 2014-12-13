@@ -1,7 +1,7 @@
 {
-	"java" : "java.exe",
-	"compiler" : "C:/httpd/docs/closure-compiler/compiler-latest/compiler.jar",
-	"uploads": "C:/temp",
-	"jshrink": "C:/httpd/docs/JShrink/src/JShrink/Minifier.php",
+	"java" : "java",
+	"compiler" : "/var/www/libs/closure-compiler/compiler-latest/compiler.jar",
+	"uploads": "/tmp",
+	"jshrink": "/var/www/libs/JShrink/src/JShrink/Minifier.php",
 	"minifier": false
 }

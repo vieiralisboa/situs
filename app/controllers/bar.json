@@ -1,4 +1,4 @@
 {
-	"temp": "c:/temp/",
-	"bar": "c:/httpd/sites/ze/public/bar/"
+	"temp": "/tmp/",
+	"bar": "/var/www/sites/ze/public/bar/"
 }

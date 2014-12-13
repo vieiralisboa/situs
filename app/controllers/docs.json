@@ -1,4 +1,3 @@
 {
-	"htdocs": "C:/httpd/",
-	"_htdocs": "/mnt/extSdCard/www/htdocs/"
+	"htdocs": "/var/www/"
 }

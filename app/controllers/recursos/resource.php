@@ -2,15 +2,17 @@
 
 class Resource
 {
-    protected $db;
+    public $db;
     public static $rendimento_query;
     public static $composto_query;
 
+    //
     public static function db($config)
     {
         return new Resource($config);
     }
 
+    //
     public function query($query)
     {
         try {
@@ -23,16 +25,25 @@ class Resource
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //
     public function table($table)
     {
        $stmt = $this->db->query("SELECT * FROM $table");
        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //
+    public function tables($db)
+    {
+       $stmt = $this->db->query("SHOW TABLES FROM $db");
+       return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    //
     public function recurso($id)
     {
         try {
-            $stmt = $this->db->query("SELECT * FROM RESOURCE WHERE id = $id");
+            $stmt = $this->db->query("SELECT * FROM RECURSO WHERE RECURSO_ID = $id");
         }
         catch(PDOException $ex) {
             return $ex->getMessage();
@@ -48,8 +59,8 @@ class Resource
         $recursos = $this->query(str_replace("{id}", $id, self::$composto_query));
 
         foreach ($recursos as $key => $recurso) {
-            if($recurso['type_code'] == "RCO") $price += $this->composto($recurso['id']);
-            else $price += $recurso['price']*$recurso['quantity'];
+            if($recurso['TIPO_CODIGO'] == "COMP") $price += $this->composto($recurso['RECURSO_ID']);
+            else $price += $recurso['RECURSO_PRECO'] * $recurso['QUANTIDADE'];
         }
 
         return round($price,2);
@@ -59,8 +70,8 @@ class Resource
     public function recursivo($rendimento)
     {
         foreach ($rendimento['recursos'] as $key => $recurso) {
-            if($recurso['type_code'] == "RCO") {
-                $rendimento['recursos'][$key] = $this->recursivo($this->rendimento($recurso['id']));
+            if($recurso['TIPO_CODIGO'] == "COMP") {
+                $rendimento['recursos'][$key] = $this->recursivo($this->rendimento($recurso['RECURSO_ID']));
             }
         }
 
@@ -80,41 +91,41 @@ class Resource
         $result = array();
         $total = 0;
         $result['recurso'] = $recurso[0];
-        $result['recurso']['id'] = intval($result['recurso']['id']);
+        //$result['recurso']['RECURSO_ID'] = intval($result['recurso']['RECURSO_ID']);
 
         // composto
-        if($recurso[0]['type_code'] == "RCO") {
+        if($recurso[0]['TIPO_CODIGO'] == "COMP") {
             try {
-                $recursos = $this->query(str_replace("{id}", $recurso[0]['id'], self::$rendimento_query));
+                $recursos = $this->query(str_replace("{id}", $recurso[0]['RECURSO_ID'], self::$rendimento_query));
             }
             catch(PDOException $ex) {
                 return $ex->getMessage();
             }
 
             foreach ($recursos as $key => $value) {
-                $id = intval($value['id']);
+                $id = intval($value['RECURSO_ID']);
 
-                if($value['type_code'] == "RCO") $price = $this->composto($id);
-                else $price = floatval($value['price']);
+                if($value['TIPO_CODIGO'] == "COMP") $price = $this->composto($id);
+                else $price = floatval($value['RECURSO_PRECO']);
 
-                $quantity = floatval($value['quantity']);
+                $quantity = floatval($value['QUANTIDADE']);
                 $parcial = round($price*$quantity, 2);
                 $total += $parcial;
 
-                $recursos[$key]['id'] = $id;
-                $recursos[$key]['price'] = $price;
-                $recursos[$key]['quantity'] = $quantity;
-                $recursos[$key]['parcial'] = $parcial;
+                $recursos[$key]['RECURSO_ID'] = $id;
+                $recursos[$key]['RECURSO_PRECO'] = $price;
+                $recursos[$key]['QUANTIDADE'] = $quantity;
+                $recursos[$key]['PRECO_PARCIAL'] = $parcial;
             }
 
-            $result['recurso']['price'] = $total;
+            $result['recurso']['RECURSO_PRECO'] = $total;
             $result['recursos'] = $recursos;
 
             return $result;
         }
 
-        $result['recurso']['supplier_id'] = intval($result['recurso']['supplier_id']);
-        $result['recurso']['price'] = floatval($result['recurso']['price']);
+        //$result['recurso']['supplier_id'] = intval($result['recurso']['supplier_id']);
+        $result['recurso']['RECURSO_PRECO'] = floatval($result['recurso']['RECURSO_PRECO']);
         return $result;
     }
 
@@ -138,17 +149,17 @@ class Resource
 }
 
 Resource::$rendimento_query = <<<SQL1
-SELECT RESOURCE.id, RESOURCE.name, AMOUNT.quantity, RESOURCE.unit_code, RESOURCE.price, RESOURCE.type_code
-FROM AMOUNT, RESOURCE
-WHERE AMOUNT.composite_id = {id}
-AND RESOURCE.id = AMOUNT.resource_id;
+SELECT RECURSO.RECURSO_ID, RECURSO.NOME, RENDIMENTO.QUANTIDADE, RECURSO.UNIDADE_CODIGO, RECURSO.RECURSO_PRECO, RECURSO.TIPO_CODIGO
+FROM RENDIMENTO, RECURSO
+WHERE RENDIMENTO.REC_RECURSO_ID = {id}
+AND RECURSO.RECURSO_ID = RENDIMENTO.RECURSO_ID;
 SQL1;
 
 Resource::$composto_query = <<<SQL2
-SELECT RESOURCE.id, AMOUNT.quantity, RESOURCE.unit_code, RESOURCE.price, RESOURCE.type_code
-FROM AMOUNT, RESOURCE
-WHERE AMOUNT.composite_id = {id}
-AND RESOURCE.id = AMOUNT.resource_id
+SELECT RECURSO.RECURSO_ID, RENDIMENTO.QUANTIDADE, RECURSO.UNIDADE_CODIGO, RECURSO.RECURSO_PRECO, RECURSO.TIPO_CODIGO
+FROM RENDIMENTO, RECURSO
+WHERE RENDIMENTO.REC_RECURSO_ID = {id}
+AND RECURSO.RECURSO_ID = RENDIMENTO.RECURSO_ID;
 SQL2;
 
 // ----- CONNECT -----

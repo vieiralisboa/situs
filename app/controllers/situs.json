@@ -1,14 +1,10 @@
 {
-	"htdocs": "C:\\htdocs\\",
-	"libs": "C:\\htdocs\\libs\\",
-	"temp": "C:\\htdocs\\libs\\TEMP\\",
-	"frontgate": "C:\\htdocs\\sites\\frontgate\\public\\js\\",
-	"bar": "sites/ze/js/bar/",
-	"bars": null,
-
-	"_frontgate": "http://hosts.medorc.org/frontgate/js/",
-	"_libs": "http://docs.medorc.org/",
-	"_bar": "http://docs.medorc.org/jquery.bar/",
+	"htdocs": "/var/www/",
+	"libs": "http://docs.medorc.org/",
+	"temp": "/tmp/",
+	"frontgate": "/var/www/sites/xn--stio-vpa.pt/public/js/",
+	"bar": "/var/www/sites/ze/js/bar/",
+	"bars": "/var/www/sites/ze/js/bars/",
 
 	"!": "use urls with time penalty"
 }

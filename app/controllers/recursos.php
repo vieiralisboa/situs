@@ -1,11 +1,14 @@
 <?php
 
+
 require_once "recursos/resource.php";
 
 class Recursos_Controller
 {
+
     public function get($request)
     {
+
         $config = Router::$controller_config;
 
         // special cases
@@ -15,7 +18,8 @@ class Recursos_Controller
                 if(isset($request->uri[2])) {
                     try {
                        return Resource::db($config)->query(urldecode($request->uri[2]));
-                    } catch(PDOException $ex) {
+                    }
+                    catch(PDOException $ex) {
                         return $ex->getMessage();
                     }
                 }
@@ -29,8 +33,49 @@ class Recursos_Controller
                 '/recursos/recurso/:id',
                 '/recursos/recursivo/:id',
                 '/recursos/rendimento/:id',
-                '/recursos/:table'];
+                #'/recurso/:id/:name/:unit/:type/:supplier/:description',
+                #"/transaction/:data",
+                #"/:tabela/delete/:id",
+                #"/:tabela/update/:data",
+                #"/:tabela/insert/:data",
+                '/recursos/:tabela',
+                '/recursos/tabelas'];
         });
+
+
+        Router::route('/recursos/tabelas', function($request) {
+            $config = Router::$controller_config;
+            try {
+               return Resource::db($config)->tables("FICHAS");
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+        });
+
+        if(true) Router::route('/recursos/recurso/:name/:unit/:type', function($request) {
+            $db = Resource::db(Router::$controller_config);
+
+            $data = array(
+                ":name" => $request->data['name'],
+                ":unit" => $request->data['unit'],
+                ":type" => $request->data['type']//,
+                //":supplier" => $request->data['supplier'],
+                //":description" => $request->data['description']
+            );
+
+return $data;
+
+            // query
+            $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
+            $values = "(:name, :unit, :type)";
+            $sql = "INSERT INTO RECURSO $fields VALUES $values";
+
+            $q = $db->db->prepare($sql);
+            return $q->execute($data);
+            //$q->execute(array(':author'=>$author, ':title'=>$title));
+        });
+
 
         Router::route('/recursos/recurso/:id', function($request) {
             $config = Router::$controller_config;
@@ -46,13 +91,14 @@ class Recursos_Controller
             if(!count($recurso)) return null;
             $recurso = $recurso[0];
 
-            if($recurso['type_code'] == "RCO") {
-                $recurso['price'] = $db->composto($recurso['id']);
+            if($recurso['TIPO_CODIGO'] == "COMP") {
+                $recurso['RECURSO_PRECO'] = $db->composto($recurso['RECURSO_ID']);
             }
 
-            $recurso['supplier_id'] = intval($recurso['supplier_id']);
-            $recurso['id'] = intval($recurso['id']);
-            $recurso['price'] = floatval($recurso['price']);
+            //TODO verificar se é realmente necessário intval(), floatval()
+            //$recurso['supplier_id'] = intval($recurso['supplier_id']);
+            $recurso['RECURSO_ID'] = intval($recurso['RECURSO_ID']);
+            $recurso['RECURSO_PRECO'] = floatval($recurso['RECURSO_PRECO']);
 
             return $recurso;
         });
@@ -60,7 +106,8 @@ class Recursos_Controller
         Router::route('/recursos/recursivo/:id', function($request) {
             $config = Router::$controller_config;
             $db = Resource::db($config);
-            return $db->recursivo($db->rendimento($request->data['id']));
+
+            return $db->recursivo( $db->rendimento($request->data['id']) );
         });
 
         Router::route('/recursos/rendimento/:id', function($request) {
@@ -78,6 +125,6 @@ class Recursos_Controller
             }
         });
 
-        return null;
+        return false;
     }
 }

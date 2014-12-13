@@ -1,9 +1,9 @@
 {
-	"ssl": false,
+	"ssl": true,
 	"activity": {
-		"disabled": false,
-		"folder": "c:/httpd/logs/",
+		"disabled": true,
+		"folder": "/var/www/logs/",
 		"filename": "activity",
-		"date": "Ym"
+		"date": "Ymd"
 	}
 }
