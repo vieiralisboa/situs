@@ -25,6 +25,33 @@ class Recursos_Controller
                 }
                 return null;
 
+
+            case "execute":
+
+
+            case "recurso":
+
+            if(count($request->uri)<5) break;
+
+            $db = Resource::db(Router::$controller_config);
+
+            $data = array(
+                ":name" => urldecode($request->uri[2]),
+                ":unit" => urldecode($request->uri[3]),
+                ":type" => urldecode($request->uri[4])//,
+                //":supplier" => $request->data['supplier'],
+                //":description" => $request->data['description']
+            );
+//return $data;
+
+            // query
+            $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
+            $values = "(:name, :unit, :type)";
+            $sql = "INSERT INTO RECURSO $fields VALUES $values";
+
+            $q = $db->db->prepare($sql);
+            return $q->execute($data);
+
             default:;
         }
 
@@ -42,6 +69,46 @@ class Recursos_Controller
                 '/recursos/tabelas'];
         });
 
+        Router::route('/recursos/init', function($request){
+            $config = Router::$controller_config;
+            try {
+               $db = Resource::db($config)->query("SELECT USER() AS USER, DATABASE() AS DB")[0];
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+
+            $Tables = array();
+            try {
+                $tables = Resource::db($config)->tables("FICHAS");
+                foreach($tables as $table)
+                    foreach($table as $name => $value)
+                        $Tables[] = $value;
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            $db[$name] = $Tables;
+
+            $db['Tables'] = array();
+            try {
+               $unidade = Resource::db($config)->table("UNIDADE");
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            $db['Tables']['UNIDADE'] = $unidade;
+
+            try {
+               $tipo = Resource::db($config)->table("TIPO");
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            $db['Tables']['TIPO'] = $tipo;
+
+            return $db;
+        });
 
         Router::route('/recursos/tabelas', function($request) {
             $config = Router::$controller_config;
@@ -52,6 +119,14 @@ class Recursos_Controller
                 return $ex->getMessage();
             }
         });
+
+        Router::route('/recursos/delete/:id', function($request) {
+            $db = Resource::db(Router::$controller_config);
+            $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id_to_delete";
+            $query = $db->db->prepare( $sql );
+            return $query->execute(array(":id_to_delete" => $request->data['id']));
+        });
+
 
         if(true) Router::route('/recursos/recurso/:name/:unit/:type', function($request) {
             $db = Resource::db(Router::$controller_config);
@@ -64,7 +139,7 @@ class Recursos_Controller
                 //":description" => $request->data['description']
             );
 
-return $data;
+//return $data;
 
             // query
             $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
