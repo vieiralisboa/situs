@@ -1,6 +1,5 @@
 <?php
 
-
 require_once "recursos/resource.php";
 
 class Recursos_Controller
@@ -25,33 +24,52 @@ class Recursos_Controller
                 }
                 return null;
 
-
             case "execute":
-
-
             case "recurso":
+                if(count($request->uri) < 5) break;
+                switch(count($request->uri)) {
+                    case 5:
+                        $db = Resource::db(Router::$controller_config);
+                        $data = array(
+                            ":name" => urldecode($request->uri[2]),
+                            ":unit" => urldecode($request->uri[3]),
+                            ":type" => urldecode($request->uri[4])//,
+                            //":supplier" => $request->data['supplier'],
+                            //":description" => $request->data['description']
+                        );
+                        //return $data;
+                        // query
+                        $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
+                        $values = "(:name, :unit, :type)";
+                        $sql = "INSERT INTO RECURSO $fields VALUES $values";
+                        $q = $db->db->prepare($sql);
+                        return $q->execute($data);
 
-            if(count($request->uri)<5) break;
+                    case 6:
+                        $values = array(
+                            urldecode($request->uri[3]),// name
+                            urldecode($request->uri[4]),// unit
+                            urldecode($request->uri[5]),// type
+                            intval($request->uri[2])// id
+                        );
 
-            $db = Resource::db(Router::$controller_config);
+                        $db = Resource::db(Router::$controller_config);
+                        $sql = "UPDATE RECURSO SET NOME=?, UNIDADE_CODIGO=?, TIPO_CODIGO=? WHERE RECURSO_ID=?";
+                        //return $sql;
 
-            $data = array(
-                ":name" => urldecode($request->uri[2]),
-                ":unit" => urldecode($request->uri[3]),
-                ":type" => urldecode($request->uri[4])//,
-                //":supplier" => $request->data['supplier'],
-                //":description" => $request->data['description']
-            );
-//return $data;
+                        $q = $db->db->prepare($sql);
 
-            // query
-            $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
-            $values = "(:name, :unit, :type)";
-            $sql = "INSERT INTO RECURSO $fields VALUES $values";
+                        try
+                        {
+                            $result = $q->execute($values);
+                        }
+                        catch(PDOException $ex) {
+                            return $ex->getMessage();
+                        }
 
-            $q = $db->db->prepare($sql);
-            return $q->execute($data);
-
+                        return $result;
+                    default:;
+                }
             default:;
         }
 
@@ -69,7 +87,37 @@ class Recursos_Controller
                 '/recursos/tabelas'];
         });
 
-        Router::route('/recursos/init', function($request){
+        Router::route('/recursos/precos/:id', function($request) {
+            $config = Router::$controller_config;
+            $id = $request->data['id'];
+            $fields = "PRECO.RECURSO_ID, PRECO.FORNECEDOR_ID, FORNECEDOR_NOME as fornecedor, DATE_FORMAT(PRECO.DATA, '%Y-%m-%d') as DATA, VALOR";
+            $tables = "PRECO, FORNECEDOR";
+            $restrictions = "PRECO.FORNECEDOR_ID = FORNECEDOR.FORNECEDOR_ID AND RECURSO_ID = $id";
+            $query = "SELECT $fields FROM $tables WHERE $restrictions";
+            try {
+                $precos = Resource::db($config)->query($query);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            try {
+                $query = "SELECT FORNECEDOR_ID FROM FORNECIMENTO WHERE RECURSO_ID = $id";
+                $fornecimento = Resource::db($config)->query($query);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+
+            $fornecedor_id = count($fornecimento > 0) ? $fornecimento[0]['FORNECEDOR_ID'] : 0;
+            foreach($precos as $i => $preco) {
+                if($preco['FORNECEDOR_ID'] == $fornecedor_id) $precos[$i]['fornece'] = true;
+                else $precos[$i]['fornece'] = false;
+            }
+
+            return $precos;
+        });
+
+        Router::route('/recursos/init', function($request) {
             $config = Router::$controller_config;
             try {
                $db = Resource::db($config)->query("SELECT USER() AS USER, DATABASE() AS DB")[0];
@@ -122,35 +170,97 @@ class Recursos_Controller
 
         Router::route('/recursos/delete/:id', function($request) {
             $db = Resource::db(Router::$controller_config);
-            $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id_to_delete";
+            $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
             $query = $db->db->prepare( $sql );
-            return $query->execute(array(":id_to_delete" => $request->data['id']));
+
+            try {
+               $response = $query->execute(array(":id" => $request->data['id']));
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            return array($response, $request);
+            return $response;
         });
 
+        Router::route('/recursos/fornecimento/delete/:rid', function($request) {
+            $db = Resource::db(Router::$controller_config);
+            $sql = "DELETE FROM FORNECIMENTO WHERE RECURSO_ID = :rid";
+            $query = $db->db->prepare($sql);
+            $data = array(":rid" => intval($request->data['rid']));
+            try {
+               $response = $query->execute($data);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            return array($response, $request);
+        });
 
-        if(true) Router::route('/recursos/recurso/:name/:unit/:type', function($request) {
+        Router::route('/recursos/fornecimento/:fid/:rid', function($request) {
             $db = Resource::db(Router::$controller_config);
 
             $data = array(
-                ":name" => $request->data['name'],
-                ":unit" => $request->data['unit'],
-                ":type" => $request->data['type']//,
-                //":supplier" => $request->data['supplier'],
-                //":description" => $request->data['description']
+                ":fid" => intval($request->data['fid']),
+                ":rid" => intval($request->data['rid'])
             );
 
-//return $data;
-
             // query
-            $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
-            $values = "(:name, :unit, :type)";
-            $sql = "INSERT INTO RECURSO $fields VALUES $values";
+            $fields = "(FORNECEDOR_ID, RECURSO_ID)";
+            $values = "(:fid, :rid)";
+            $sql = "INSERT INTO FORNECIMENTO $fields VALUES $values";
 
             $q = $db->db->prepare($sql);
-            return $q->execute($data);
-            //$q->execute(array(':author'=>$author, ':title'=>$title));
+            
+            try {
+               $response = $q->execute($data);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            return $response;
         });
 
+        Router::route('/recursos/preco/delete/:fid/:rid', function($request) {
+            $db = Resource::db(Router::$controller_config);
+            $sql = "DELETE FROM PRECO WHERE RECURSO_ID = :rid AND FORNECEDOR_ID = :fid";
+            $data = array(":rid" => intval($request->data['rid']), ":fid" => intval($request->data['fid']));
+            $query = $db->db->prepare($sql);
+            try {
+               $response = $query->execute($data);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            return array($response, $request);
+        });
+
+        Router::route('/recursos/preco/:rid/:fid/:val/:data', function($request) {
+            $db = Resource::db(Router::$controller_config);
+
+            $data = array(
+                ":rid" => intval($request->data['rid']),
+                ":fid" => intval($request->data['fid']),
+                ":val" => floatval($request->data['val']),
+                ":date" => $request->data['data']
+            );
+
+            //*/ query
+            $fields = "(FORNECEDOR_ID, RECURSO_ID, VALOR, DATA)";
+            $values = "(:fid, :rid, :val, :date)";
+            $sql = "INSERT INTO PRECO $fields VALUES $values";
+
+            $q = $db->db->prepare($sql);
+            
+            try {
+               $response = $q->execute($data);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+            return $response;
+            //*/
+        });
 
         Router::route('/recursos/recurso/:id', function($request) {
             $config = Router::$controller_config;
