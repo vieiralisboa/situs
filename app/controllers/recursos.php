@@ -117,7 +117,7 @@ class Recursos_Controller
                 }
                 return $result;
 
-            default: return false;
+            default: ;
         }
 
         Router::route('/recursos', function($request) { 
@@ -214,23 +214,6 @@ class Recursos_Controller
                 return $ex->getMessage();
             }
         });
-
-        /*/
-        Router::route('/recursos/delete/:id', function($request) {
-            $db = Resource::db(Router::$controller_config);
-            $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
-            $query = $db->db->prepare( $sql );
-
-            try {
-               $response = $query->execute(array(":id" => $request->data['id']));
-            }
-            catch(PDOException $ex) {
-                return $ex->getMessage();
-            }
-            return array($response, $request);
-            return $response;
-        });
-        //*/
 
         Router::route('/recursos/fornecimento/delete/:rid', function($request) {
             $db = Resource::db(Router::$controller_config);
