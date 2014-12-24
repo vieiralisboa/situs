@@ -25,6 +25,7 @@ class Recursos_Controller
                 return null;
 
             case "fornecedor":
+                if(count($request->uri) < 4) break;
                 switch(count($request->uri)) {
                     // fornecedor/:nome/:morada
 
