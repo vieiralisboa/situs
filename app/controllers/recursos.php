@@ -27,36 +27,40 @@ class Recursos_Controller
             case "fornecedor":
                 if(count($request->uri) < 4) break;
                 switch(count($request->uri)) {
-                    // fornecedor/:nome/:morada
 
                     case 4:
-                        $db = Resource::db(Router::$controller_config);
-                        $data = array(
-                            ":nome" => urldecode($request->uri[2]),
-                            ":morada" => urldecode($request->uri[3])
-                        );
-                        // query
-                        $fields = "(FORNECEDOR_NOME, FORNECEDOR_MORADA)";
-                        $values = "(:nome, :morada)";
-                        $sql = "INSERT INTO FORNECEDOR $fields VALUES $values";
-                        $q = $db->db->prepare($sql);
+                        // DELETE recursos/fornecedor/delete/:id
+                        if($request->uri[2] == "delete") {
+                            $data = array(":id" => $request->uri[3]);
+                            $sql = "DELETE FROM FORNECEDOR WHERE FORNECEDOR_ID = :id";
+                        }
+                        // INSERT recursos/fornecedor/:nome/:morada
+                        else {
+                            $data = array(
+                                ":nome" => urldecode($request->uri[2]),
+                                ":morada" => urldecode($request->uri[3])
+                            );
+                            // query
+                            $fields = "(FORNECEDOR_NOME, FORNECEDOR_MORADA)";
+                            $values = "(:nome, :morada)";
+                            $sql = "INSERT INTO FORNECEDOR $fields VALUES $values";
+                        }
                         break;
 
-                    // fornecedor/:id/:nome/:morada
+                    // UPDATE fornecedor/:id/:nome/:morada
                     case 5:
                         $data = array(
                             urldecode($request->uri[3]),// :name
                             urldecode($request->uri[4]),// :morada
                             intval($request->uri[2])// :id
                         );
-                        $db = Resource::db(Router::$controller_config);
                         $sql = "UPDATE FORNECEDOR SET FORNECEDOR_NOME=?, FORNECEDOR_MORADA=? WHERE FORNECEDOR_ID=?";
-                        $q = $db->db->prepare($sql);
                         break;
 
                     default: return false;
                 }
-
+                $db = Resource::db(Router::$controller_config);
+                $q = $db->db->prepare($sql);
                 try
                 {
                     $result = $q->execute($data);
@@ -67,51 +71,53 @@ class Recursos_Controller
                 return $result;
 
             case "recurso":
-                if(count($request->uri) < 5) break;
+                if(count($request->uri) < 4) break;
                 switch(count($request->uri)) {
+
+                    // DELETE recursos/recurso/delete/:id
+                    case 4:
+                        $data = array(":id" => $request->uri[3]);
+                        $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
+                        break;
+
+                    // recursos/recurso/:name/:unit/:type
                     case 5:
-                        $db = Resource::db(Router::$controller_config);
                         $data = array(
                             ":name" => urldecode($request->uri[2]),
                             ":unit" => urldecode($request->uri[3]),
-                            ":type" => urldecode($request->uri[4])//,
-                            //":supplier" => $request->data['supplier'],
-                            //":description" => $request->data['description']
+                            ":type" => urldecode($request->uri[4])
                         );
-                        //return $data;
-                        // query
                         $fields = "(NOME, UNIDADE_CODIGO, TIPO_CODIGO)";
                         $values = "(:name, :unit, :type)";
                         $sql = "INSERT INTO RECURSO $fields VALUES $values";
-                        $q = $db->db->prepare($sql);
-                        return $q->execute($data);
+                        break;
 
+                    // recursos/recurso/:id/:name/:unit/:type
                     case 6:
-                        $values = array(
+                        $data = array(
                             urldecode($request->uri[3]),// name
                             urldecode($request->uri[4]),// unit
                             urldecode($request->uri[5]),// type
                             intval($request->uri[2])// id
                         );
-
-                        $db = Resource::db(Router::$controller_config);
                         $sql = "UPDATE RECURSO SET NOME=?, UNIDADE_CODIGO=?, TIPO_CODIGO=? WHERE RECURSO_ID=?";
-                        //return $sql;
+                        break;
 
-                        $q = $db->db->prepare($sql);
-
-                        try
-                        {
-                            $result = $q->execute($values);
-                        }
-                        catch(PDOException $ex) {
-                            return $ex->getMessage();
-                        }
-
-                        return $result;
-                    default:;
+                    default: return false;
                 }
-            default:;
+
+                $db = Resource::db(Router::$controller_config);
+                $q = $db->db->prepare($sql);
+                try
+                {
+                    $result = $q->execute($data);
+                }
+                catch(PDOException $ex) {
+                    return $ex->getMessage();
+                }
+                return $result;
+
+            default: return false;
         }
 
         Router::route('/recursos', function($request) { 
@@ -199,8 +205,6 @@ class Recursos_Controller
             return $db;
         });
 
-
-
         Router::route('/recursos/tabelas', function($request) {
             $config = Router::$controller_config;
             try {
@@ -211,6 +215,7 @@ class Recursos_Controller
             }
         });
 
+        /*/
         Router::route('/recursos/delete/:id', function($request) {
             $db = Resource::db(Router::$controller_config);
             $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
@@ -225,6 +230,7 @@ class Recursos_Controller
             return array($response, $request);
             return $response;
         });
+        //*/
 
         Router::route('/recursos/fornecimento/delete/:rid', function($request) {
             $db = Resource::db(Router::$controller_config);
