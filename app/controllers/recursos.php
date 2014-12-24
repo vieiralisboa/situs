@@ -24,7 +24,47 @@ class Recursos_Controller
                 }
                 return null;
 
-            case "execute":
+            case "fornecedor":
+                switch(count($request->uri)) {
+                    // fornecedor/:nome/:morada
+
+                    case 4:
+                        $db = Resource::db(Router::$controller_config);
+                        $data = array(
+                            ":nome" => urldecode($request->uri[2]),
+                            ":morada" => urldecode($request->uri[3])
+                        );
+                        // query
+                        $fields = "(FORNECEDOR_NOME, FORNECEDOR_MORADA)";
+                        $values = "(:nome, :morada)";
+                        $sql = "INSERT INTO FORNECEDOR $fields VALUES $values";
+                        $q = $db->db->prepare($sql);
+                        break;
+
+                    // fornecedor/:id/:nome/:morada
+                    case 5:
+                        $data = array(
+                            urldecode($request->uri[3]),// :name
+                            urldecode($request->uri[4]),// :morada
+                            intval($request->uri[2])// :id
+                        );
+                        $db = Resource::db(Router::$controller_config);
+                        $sql = "UPDATE FORNECEDOR SET FORNECEDOR_NOME=?, FORNECEDOR_MORADA=? WHERE FORNECEDOR_ID=?";
+                        $q = $db->db->prepare($sql);
+                        break;
+
+                    default: return false;
+                }
+
+                try
+                {
+                    $result = $q->execute($data);
+                }
+                catch(PDOException $ex) {
+                    return $ex->getMessage();
+                }
+                return $result;
+
             case "recurso":
                 if(count($request->uri) < 5) break;
                 switch(count($request->uri)) {
@@ -157,6 +197,8 @@ class Recursos_Controller
 
             return $db;
         });
+
+
 
         Router::route('/recursos/tabelas', function($request) {
             $config = Router::$controller_config;
