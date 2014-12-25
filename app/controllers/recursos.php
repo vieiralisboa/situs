@@ -141,24 +141,12 @@ class Recursos_Controller
             $tables = "PRECO, FORNECEDOR";
             $restrictions = "PRECO.FORNECEDOR_ID = FORNECEDOR.FORNECEDOR_ID AND RECURSO_ID = $id";
             $query = "SELECT $fields FROM $tables WHERE $restrictions";
+
             try {
                 $precos = Resource::db($config)->query($query);
             }
             catch(PDOException $ex) {
                 return $ex->getMessage();
-            }
-            try {
-                $query = "SELECT FORNECEDOR_ID FROM FORNECIMENTO WHERE RECURSO_ID = $id";
-                $fornecimento = Resource::db($config)->query($query);
-            }
-            catch(PDOException $ex) {
-                return $ex->getMessage();
-            }
-
-            $fornecedor_id = count($fornecimento > 0) ? $fornecimento[0]['FORNECEDOR_ID'] : 0;
-            foreach($precos as $i => $preco) {
-                if($preco['FORNECEDOR_ID'] == $fornecedor_id) $precos[$i]['fornece'] = true;
-                else $precos[$i]['fornece'] = false;
             }
 
             return $precos;
@@ -207,6 +195,7 @@ class Recursos_Controller
 
         Router::route('/recursos/tabelas', function($request) {
             $config = Router::$controller_config;
+
             try {
                return Resource::db($config)->tables("FICHAS");
             }
