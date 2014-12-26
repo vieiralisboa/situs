@@ -7,16 +7,31 @@ class Recursos_Controller
 
     public function get($request)
     {
-
         $config = Router::$controller_config;
 
-        // special cases
+        //-------------------
+        //TEMP special cases
+        //-------------------
+
         switch(strtolower($request->uri[1])) {
-            // SQL query
+
             case "query":
                 if(isset($request->uri[2])) {
                     try {
                        return Resource::db($config)->query(urldecode($request->uri[2]));
+                    }
+                    catch(PDOException $ex) {
+                        return $ex->getMessage();
+                    }
+                }
+                return null;
+
+            case "execute":
+                $db = Resource::db(Router::$controller_config);
+                $sql = urldecode($request->uri[2]);
+                if(isset($request->uri[2])) {
+                    try {
+                       return $db->db->execute();
                     }
                     catch(PDOException $ex) {
                         return $ex->getMessage();
@@ -142,8 +157,54 @@ class Recursos_Controller
                 }
                 return $result;
 
+            case "unidade":
+                $db = Resource::db(Router::$controller_config);
+                // recursos/unidade
+                // recursos/unidade/:id
+                $count = count($request->uri);
+                if($count < 4) break;
+                switch($count) {
+                    //unidades/unidade/:id/:name
+                    case 4:
+                        $code = $request->uri[2];
+                        $res = $db->query("SELECT * FROM UNIDADE WHERE UNIDADE_CODIGO = '$code'");
+                        // INSERT
+                        if(!count($res)) {
+                            $fields = "(UNIDADE_CODIGO, UNIDADE_NOME)";
+                            $values = "(:code, :name)";
+                            $sql = "INSERT INTO UNIDADE $fields VALUES $values";
+                            $data = array();
+                            break,
+                        }
+                        // UPDATE
+                        $data = array(
+                            urldecode($request->uri[2]),// :code
+                            urldecode($request->uri[3]),// :name
+                            intval($request->uri[2])// :code
+                        );
+                        $sql = "UPDATE UNIDADE SET UNIDADE_CODIGO=?, UNIDADE_NOME=? WHERE UNIDADE_CODIGO=?";
+                        break;
+
+                    default: return null;
+                }
+
+                $q = $db->db->prepare($sql);
+
+                try
+                {
+                    $result = $q->execute($data);
+                }
+                catch(PDOException $ex) {
+                    return $ex->getMessage();
+                }
+                return $result;
+
             default: ;
         }
+
+        //--------
+        // Routes
+        //--------
 
         Router::route('/recursos', function($request) { 
             return ['/recursos/query/:query',
@@ -356,6 +417,6 @@ class Recursos_Controller
             }
         });
 
-        return false;
+        return null;
     }
 }
