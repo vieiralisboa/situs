@@ -27,11 +27,12 @@ class Recursos_Controller
                 return null;
 
             case "execute":
-                $db = Resource::db(Router::$controller_config);
-                $sql = urldecode($request->uri[2]);
                 if(isset($request->uri[2])) {
+                    $db = Resource::db(Router::$controller_config);
+                    $sql = urldecode($request->uri[2]);
+                    $q = $db->db->prepare($sql);
                     try {
-                       return $db->db->execute();
+                       return $q->execute();
                     }
                     catch(PDOException $ex) {
                         return $ex->getMessage();
@@ -174,7 +175,7 @@ class Recursos_Controller
                             $values = "(:code, :name)";
                             $sql = "INSERT INTO UNIDADE $fields VALUES $values";
                             $data = array();
-                            break,
+                            break;
                         }
                         // UPDATE
                         $data = array(
