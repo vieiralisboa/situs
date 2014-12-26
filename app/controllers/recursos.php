@@ -74,11 +74,14 @@ class Recursos_Controller
                 if(count($request->uri) < 4) break;
                 switch(count($request->uri)) {
 
-                    // DELETE recursos/recurso/delete/:id
                     case 4:
-                        $data = array(":id" => $request->uri[3]);
-                        $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
-                        break;
+                        // DELETE recursos/recurso/delete/:id
+                        if($request->uri[2] == "delete") {
+                            $data = array(":id" => $request->uri[3]);
+                            $sql = "DELETE FROM RECURSO WHERE RECURSO_ID = :id";
+                            break;
+                        }
+                        return false;
 
                     // recursos/recurso/:name/:unit/:type
                     case 5:
@@ -92,8 +95,18 @@ class Recursos_Controller
                         $sql = "INSERT INTO RECURSO $fields VALUES $values";
                         break;
 
-                    // recursos/recurso/:id/:name/:unit/:type
                     case 6:
+                        // recursos/recurso/price/:rid/:fid/:price
+                        if($request->uri[2] == "preco") {
+                            $data = array(
+                                urldecode($request->uri[4]),// fid
+                                floatval($request->uri[5]),// price
+                                intval($request->uri[3])// rid
+                            );
+                            $sql = "UPDATE RECURSO SET FORNECEDOR_ID=?, RECURSO_PRECO=? WHERE RECURSO_ID=?";
+                            break;
+                        }
+                        // recursos/recurso/:id/:name/:unit/:type
                         $data = array(
                             urldecode($request->uri[3]),// name
                             urldecode($request->uri[4]),// unit
@@ -101,6 +114,18 @@ class Recursos_Controller
                             intval($request->uri[2])// id
                         );
                         $sql = "UPDATE RECURSO SET NOME=?, UNIDADE_CODIGO=?, TIPO_CODIGO=? WHERE RECURSO_ID=?";
+                        break;
+
+                    case 8:
+                        $data = array(
+                            urldecode($request->uri[3]),// fid
+                            urldecode($request->uri[4]),// name
+                            urldecode($request->uri[5]),// unit
+                            urldecode($request->uri[6]),// type
+                            urldecode($request->uri[7]),// price
+                            intval($request->uri[2])// rid
+                        );
+                        $sql = "UPDATE RECURSO SET FORNECEDOR_ID=?, NOME=?, UNIDADE_CODIGO=?, TIPO_CODIGO=?, RECURSO_PRECO=? WHERE RECURSO_ID=?";
                         break;
 
                     default: return false;
