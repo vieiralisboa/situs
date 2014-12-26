@@ -166,6 +166,12 @@ class Recursos_Controller
                 switch($count) {
                     //unidades/unidade/:id/:name
                     case 4:
+                        // DELETE
+                        if($request->uri[2] == "delete") {
+                            $sql = "DELETE FROM UNIDADE WHERE CODIGO =?";
+                            $data = array(urldecode($request->uri[2]));
+                            break;
+                        }
                         $res = $db->query("SELECT * FROM UNIDADE WHERE UNIDADE_CODIGO = '{$request->uri[2]}'");
                         // INSERT
                         if(!count($res)) {
@@ -186,7 +192,6 @@ class Recursos_Controller
                         );
                         $sql = "UPDATE UNIDADE SET UNIDADE_CODIGO=?, UNIDADE_NOME=? WHERE UNIDADE_CODIGO=?";
                         break;
-
                     default: return null;
                 }
 
