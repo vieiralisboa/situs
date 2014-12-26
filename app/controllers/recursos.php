@@ -43,7 +43,6 @@ class Recursos_Controller
             case "fornecedor":
                 if(count($request->uri) < 4) break;
                 switch(count($request->uri)) {
-
                     case 4:
                         // DELETE recursos/fornecedor/delete/:id
                         if($request->uri[2] == "delete") {
@@ -167,14 +166,16 @@ class Recursos_Controller
                 switch($count) {
                     //unidades/unidade/:id/:name
                     case 4:
-                        $code = $request->uri[2];
-                        $res = $db->query("SELECT * FROM UNIDADE WHERE UNIDADE_CODIGO = '$code'");
+                        $res = $db->query("SELECT * FROM UNIDADE WHERE UNIDADE_CODIGO = '{$request->uri[2]}'");
                         // INSERT
                         if(!count($res)) {
+                            $data = array(
+                                ":code" => urldecode($request->uri[2]),
+                                ":name" => urldecode($request->uri[3])
+                            );
                             $fields = "(UNIDADE_CODIGO, UNIDADE_NOME)";
                             $values = "(:code, :name)";
                             $sql = "INSERT INTO UNIDADE $fields VALUES $values";
-                            $data = array();
                             break;
                         }
                         // UPDATE
