@@ -15,6 +15,17 @@ class Recursos_Controller
 
         switch(strtolower($request->uri[1])) {
 
+            case "contactos":
+                $config = Router::$controller_config;
+                $query = "SELECT * FROM FORNECEDOR_CONTACTO WHERE FORNECEDOR_ID = $id".$request->uri[2];
+                try {
+                    $contactos = Resource::db($config)->query($query);
+                }
+                catch(PDOException $ex) {
+                    return $ex->getMessage();
+                }
+                return $contactos;
+
             case "query":
                 if(isset($request->uri[2])) {
                     try {
@@ -27,6 +38,7 @@ class Recursos_Controller
                 return null;
 
             case "execute":
+
                 if(isset($request->uri[2])) {
                     $db = Resource::db(Router::$controller_config);
                     $sql = urldecode($request->uri[2]);
@@ -113,9 +125,14 @@ class Recursos_Controller
                     case 6:
                         // recursos/recurso/price/:rid/:fid/:price
                         if($request->uri[2] == "preco") {
+                            if($request->uri[4] == "null") {
+                                $sql = "UPDATE RECURSO SET FORNECEDOR_ID=NULL, RECURSO_PRECO=NULL WHERE RECURSO_ID=?";
+                                $data = array(intval($request->uri[3]));
+                                break;
+                            }
                             $data = array(
                                 urldecode($request->uri[4]),// fid
-                                floatval($request->uri[5]),// price
+                                round(floatval($request->uri[5]),2),// price
                                 intval($request->uri[3])// rid
                             );
                             $sql = "UPDATE RECURSO SET FORNECEDOR_ID=?, RECURSO_PRECO=? WHERE RECURSO_ID=?";
@@ -167,11 +184,13 @@ class Recursos_Controller
                     //unidades/unidade/:id/:name
                     case 4:
                         // DELETE
+                        // recursos/recurso/delete/:code
                         if($request->uri[2] == "delete") {
-                            $sql = "DELETE FROM UNIDADE WHERE CODIGO =?";
-                            $data = array(urldecode($request->uri[2]));
+                            $sql = "DELETE FROM UNIDADE WHERE UNIDADE_CODIGO = :code";
+                            $data = array(":code" => $request->uri[3]);
                             break;
                         }
+
                         $res = $db->query("SELECT * FROM UNIDADE WHERE UNIDADE_CODIGO = '{$request->uri[2]}'");
                         // INSERT
                         if(!count($res)) {
@@ -240,6 +259,10 @@ class Recursos_Controller
             }
             catch(PDOException $ex) {
                 return $ex->getMessage();
+            }
+
+            foreach($precos as $i => $preco) {
+                $precos[$i]['VALOR'] = round($preco['VALOR'], 2);
             }
 
             return $precos;
@@ -355,7 +378,7 @@ class Recursos_Controller
             $data = array(
                 ":rid" => intval($request->data['rid']),
                 ":fid" => intval($request->data['fid']),
-                ":val" => floatval($request->data['val']),
+                ":val" => round(floatval($request->data['val']), 2),
                 ":date" => $request->data['data']
             );
 
@@ -397,7 +420,7 @@ class Recursos_Controller
             //TODO verificar se é realmente necessário intval(), floatval()
             //$recurso['supplier_id'] = intval($recurso['supplier_id']);
             $recurso['RECURSO_ID'] = intval($recurso['RECURSO_ID']);
-            $recurso['RECURSO_PRECO'] = floatval($recurso['RECURSO_PRECO']);
+            $recurso['RECURSO_PRECO'] = round(floatval($recurso['RECURSO_PRECO']),2);
 
             return $recurso;
         });
@@ -417,11 +440,19 @@ class Recursos_Controller
         Router::route('/recursos/:table', function($request) {
             $config = Router::$controller_config;
             try {
-               return Resource::db($config)->table(strtoupper($request->data['table']));
+               $rows = Resource::db($config)->table(strtoupper($request->data['table']));
             }
             catch(PDOException $ex) {
                 return $ex->getMessage();
             }
+
+            foreach ($rows as $i => $row) {
+                # code...
+                if(isset($row['VALOR'])) $rows[$i]['VALOR'] = round($row['VALOR'], 2);
+                if(isset($row['RECURSO_PRECO'])) $rows[$i]['RECURSO_PRECO'] = round($row['RECURSO_PRECO'], 2);
+            }
+
+            return $rows;
         });
 
         return null;
