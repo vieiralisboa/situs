@@ -70,7 +70,7 @@ class Resource
     public function recursivo($rendimento)
     {
         foreach ($rendimento['recursos'] as $key => $recurso) {
-            if($recurso['TIPO_CODIGO'] == "COMP") {
+            if($recurso['TIPO_CODIGO'] == "COM") {
                 $rendimento['recursos'][$key] = $this->recursivo($this->rendimento($recurso['RECURSO_ID']));
             }
         }
@@ -91,10 +91,11 @@ class Resource
         $result = array();
         $total = 0;
         $result['recurso'] = $recurso[0];
+        //$result['rendimento'] = null;
         //$result['recurso']['RECURSO_ID'] = intval($result['recurso']['RECURSO_ID']);
 
         // composto
-        if($recurso[0]['TIPO_CODIGO'] == "COMP") {
+        if($recurso[0]['TIPO_CODIGO'] == "COM") {
             try {
                 $recursos = $this->query(str_replace("{id}", $recurso[0]['RECURSO_ID'], self::$rendimento_query));
             }
@@ -111,8 +112,10 @@ class Resource
                 $quantity = floatval($value['QUANTIDADE']);
                 $parcial = round($price*$quantity, 2);
                 $total += $parcial;
+                
 
                 $recursos[$key]['RECURSO_ID'] = $id;
+                $recursos[$key]['FORNECEDOR_ID'] = intval($value['FORNECEDOR_ID']);
                 $recursos[$key]['RECURSO_PRECO'] = $price;
                 $recursos[$key]['QUANTIDADE'] = $quantity;
                 $recursos[$key]['PRECO_PARCIAL'] = $parcial;
@@ -120,6 +123,7 @@ class Resource
 
             $result['recurso']['RECURSO_PRECO'] = $total;
             $result['recursos'] = $recursos;
+            //$result['rendimento'] = array();
 
             return $result;
         }
@@ -148,13 +152,15 @@ class Resource
     }
 }
 
+//
 Resource::$rendimento_query = <<<SQL1
-SELECT RECURSO.RECURSO_ID, RECURSO.NOME, RENDIMENTO.QUANTIDADE, RECURSO.UNIDADE_CODIGO, RECURSO.RECURSO_PRECO, RECURSO.TIPO_CODIGO
+SELECT RECURSO.FORNECEDOR_ID, RECURSO.RECURSO_ID, RECURSO.NOME, RENDIMENTO.QUANTIDADE, RECURSO.UNIDADE_CODIGO, RECURSO.RECURSO_PRECO, RECURSO.TIPO_CODIGO
 FROM RENDIMENTO, RECURSO
 WHERE RENDIMENTO.REC_RECURSO_ID = {id}
 AND RECURSO.RECURSO_ID = RENDIMENTO.RECURSO_ID;
 SQL1;
 
+//
 Resource::$composto_query = <<<SQL2
 SELECT RECURSO.RECURSO_ID, RENDIMENTO.QUANTIDADE, RECURSO.UNIDADE_CODIGO, RECURSO.RECURSO_PRECO, RECURSO.TIPO_CODIGO
 FROM RENDIMENTO, RECURSO

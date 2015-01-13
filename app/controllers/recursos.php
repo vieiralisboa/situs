@@ -433,8 +433,24 @@ class Recursos_Controller
         });
 
         Router::route('/recursos/rendimento/:id', function($request) {
-            $config = Router::$controller_config;
-            return Resource::db($config)->rendimento($request->data['id']);
+            $db = Resource::db(Router::$controller_config);
+            try {
+                $result = $db->rendimento($request->data['id']);
+            }
+            catch(PDOException $ex) {
+                return $ex->getMessage();
+            }
+
+            $sql = "UPDATE RECURSO SET RECURSO_PRECO = ".$result['recurso']['RECURSO_PRECO']." WHERE RECURSO_ID = ".$result['recurso']['RECURSO_ID'];
+            $q = $db->db->prepare($sql);
+            try {
+                $q->execute();
+            }
+            catch(PDOException $x) {
+                return $x->getMessage();
+            }
+
+            return $result;
         });
 
         Router::route('/recursos/:table', function($request) {
