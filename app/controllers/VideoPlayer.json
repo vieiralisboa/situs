@@ -1,4 +1,5 @@
 {
 	"path": "/mnt/Public/Shared Videos",
+	"transmission": "/mnt",
 	"popup": "/var/www/libs/bar/templates/popup.html"
 }

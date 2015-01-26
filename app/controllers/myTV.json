@@ -1,5 +1,6 @@
 {
 	"path": "/mnt/Public/Shared Videos",
 	"transmission-dir-parent": "/var/www",
+	"transmission": "/mnt/Transmission",
 	"popup": "/var/www/libs/bar/templates/popup.html"
 }

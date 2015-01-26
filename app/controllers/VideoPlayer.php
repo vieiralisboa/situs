@@ -28,10 +28,11 @@ class VideoPlayer_Controller {
             // Route /VideoPlayer/video/$file
             case 'video':
                 if($request->uri[2] == "transmission"){
-                    $config->path = "/var/www";
+                    $config->path = $config ->transmission;
+                    $request->uri[2] = "Transmission";
                 }
 
-                $file = get_filename($config->path, $request->uri);//return $file;
+                $file = get_filename($config->path, $request->uri);// return $file;
 
                 // requires curl
                 #if(file_exists($file)) return mp4Upload($file);
