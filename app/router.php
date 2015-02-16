@@ -193,30 +193,33 @@ class Router extends Util {
             $controller = "$folder/$api.php";
             if(!load($controller)) {
                 // create controller (if a schema exists) or quit
-                if(!self::create_controller($api)) {
-                    // retry from the controller's folder
-
-                    self::quit(404);
-                } 
+                if(!self::create_controller($api)) self::quit(404);
                 // retry loading the controller or quit
                 if(!load($controller)) self::quit(404);
             }
         }
 
+        //------------
+        // Controller
+        //------------
         // Controller class name
         $Controller = ucwords($api) . "_Controller";
-
         // Controller
         if(class_exists($Controller)) {
             $args = array();
             $args[] = $request;
-
             if(method_exists($Controller, $request->method)) {
-
+                //-------------------------------------
+                // Basic Auth to access the controller
+                //-------------------------------------
                 Auth::basic($api);
 
+                // ...
                 Database::$table = $api;
 
+                //--------
+                // Config 
+                //--------
                 // load controller config
                 $jsonfile = "$folder/$api.json";
                 if(file_exists($jsonfile)){
@@ -224,19 +227,26 @@ class Router extends Util {
                     self::$controller_config = json_decode($json);
                 }
 
+                // invoke the controller
                 $reflectionMethod = new ReflectionMethod($Controller, $request->method);
-
                 $this->response = $reflectionMethod->invokeArgs(new $Controller(), $args);
 
-                // Controllers has set Routes
-                if(count(self::$routes) > 0){
+                //--------
+                // Routes
+                //--------
+                // controller has routes
+                if(count(self::$routes) > 0) {
+                    // find a route match
                     foreach(self::$routes as $route => $callback) {
+                        // route match found
                         if($request->data = $this->preg_match_uri($route)) {
                             $this->response = $callback($request);
                             break;
                         }
                     }
+                    // route not found
                 }
+                // controler has no routes or route not found
                 #if(is_string($this->response)) $this->json = false;
                 return;
             }
