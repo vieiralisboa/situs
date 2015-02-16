@@ -165,28 +165,48 @@ class Router extends Util {
      * Start the (Router) Controller
      */
     public function start ($request) {
-        // Controller name
+        // controller name
         $api = $request->uri[0];// situs.pt/$api/:some
 
         // requires PHP version 5.3+
         if(floatval(phpversion()) < 5.3) self::quit(501);
 
-        // class filename
-        $base = dirname(dirname(__FILE__));
-        $controller = "$base/app/controllers/$api.php";
+        //-----------------
+        // controller path
+        //-----------------
+        // framework root
+        $root = dirname(dirname(__FILE__));
+        // controllers folder
+        $folder = "$root/app/controllers/$api";
+        // controller filename
+        $controller = "$folder/$api.php";
 
-        // load Controller script
+        //---------------------
+        // load the Controller
+        //---------------------
+        // controller loading fails
         if(!load($controller)) {
-            // create controller script if schema exists
-            if(!self::create_controller($api)) self::quit(404);
+            //--------------------
+            // legacy controllers
+            //--------------------
+            $folder = "$root/app/controllers";
+            $controller = "$folder/$api.php";
+            if(!load($controller)) {
+                // create controller (if a schema exists) or quit
+                if(!self::create_controller($api)) {
+                    // retry from the controller's folder
 
-            // retry loading the controller script
-            if(!load($controller)) self::quit(404);
+                    self::quit(404);
+                } 
+                // retry loading the controller or quit
+                if(!load($controller)) self::quit(404);
+            }
         }
 
         // Controller class name
         $Controller = ucwords($api) . "_Controller";
 
+        // Controller
         if(class_exists($Controller)) {
             $args = array();
             $args[] = $request;
@@ -198,7 +218,7 @@ class Router extends Util {
                 Database::$table = $api;
 
                 // load controller config
-                $jsonfile = "$base/app/controllers/$api.json";
+                $jsonfile = "$folder/$api.json";
                 if(file_exists($jsonfile)){
                     $json = file_get_contents($jsonfile);
                     self::$controller_config = json_decode($json);
