@@ -1,5 +1,5 @@
 {
-	"path":"/var/www/libs/",
+	"path":"/mnt/Green/www/libs/",
 	"libs": {
 		"_" : "underscore/1.4.2/underscore-min.js",
 		"underscore" : "underscore/1.4.2/underscore-min.js",
@@ -8,11 +8,13 @@
 		"topzindex" : "topzindex/1.2/jquery.topzindex.js",
 		"ace" : "ace-builds/src-noconflict/ace.js",
 		"raphael" : "raphael/2.1.2/raphael-min.js",
-		"frontgate" : "frontgate/js/frontgate.js",
 		"jquery-ui": "jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
-		"panel" : "panel/panel.js",
-		"bar" : "bar/js/bar.js",
-		"ze" :"ze/ze.js"
+		"frontgate" : "frontgate/js/frontgate.js",
+		"uploader" : "ze/js/uploader.js",
+		"log" : "ze/js/log.js",
+		"panel" : "ze/js/panel.js",
+		"bar" : "ze/js/bar.js",
+		"ze" :"ze/js/ze.js"
 	},
 	"help": {
 		"lib" : "lists available libs",
