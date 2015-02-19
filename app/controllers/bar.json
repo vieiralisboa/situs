@@ -1,4 +1,5 @@
 {
 	"temp": "/tmp/",
-	"bar": "/var/www/sites/ze/public/bar/"
+	"bars": "/mnt/Green/www/ze/private/bars",
+	"ze": "/mnt/Green/www/ze/public"
 }
