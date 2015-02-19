@@ -1,4 +1,5 @@
 {
+	"offline": false,
 	"ssl": true,
 	"activity": {
 		"disabled": true,
