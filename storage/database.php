@@ -30,7 +30,6 @@ class Database extends Sqlite {
      */
     public static function query($sql)
     {
-        
         // validate sql here
 
         $result = self::db()->connect()->query($sql);
@@ -91,18 +90,31 @@ class Database extends Sqlite {
     {
         $data = $this->validate_schema_fields();
 
+if(!count($data['fields']) || !count($data['values']))
+    Util::quit(417, "FAILED TO GET SCHEMA FIELDS");//json_encode($data));        
+
         $sql = "INSERT INTO {table}({fields}) VALUES({values});";
         $sql = str_replace("{table}", self::$table, $sql);
         $sql = str_replace("{fields}", implode(", ", $data['fields']), $sql);
         $sql = str_replace("{values}", implode(", ", $data['values']), $sql);
 
-        $database = $this->connect();
+        $db = $this->connect();
+   
+        try {
+            $result = $db->exec($sql);
+        }
+        catch(PDOException $Exception) {
+            Util::quit(417, $Exception->getMessage()." [".$Exception->getCode()."]");
+        }
         
-        if($database->exec($sql)){
-            $id = (int) $database->lastInsertId();
+        if($result) {
+            $id = (int) $db->lastInsertId();
+            if(!$id) Util::quit(417, "id = $id");      
             return $id;
-        } 
-            
+        }
+        
+        Util::quit(417, "result: '$result'"); 
+
         return null;
     }
 
@@ -150,11 +162,21 @@ class Database extends Sqlite {
         #$args = func_get_args();
         
         $table = self::$table;    
+
+        if($id === null) {
+            $id = $this->insert();
+        } 
+        else {
+            $this->update($id);
+        } 
         
-        if($id === null) $id = $this->insert();
-        else $this->update($id);
-             
-        return Database::find($id);
+        if($id === null) Util::quit(417, "INSERT INTO $table FAILED");
+
+        $result = Database::find($id);
+
+        // parse result here
+
+        return $result;
     }
     
 
@@ -176,11 +198,17 @@ class Database extends Sqlite {
 
         //* using schema.php
         // if the table desn't exist
-        if(! $sqlite->table_exists($table)) {
-            $private = dirname(__FILE__);
-            $schema_file = "$private/schemas/$table.php";
+        if(!$sqlite->table_exists($table)) {
+#Util::quit(417, "'$table' NO EXISTS");
 
-            load($schema_file);
+            $root = dirname(dirname(__FILE__));
+            $schema_file = "$root/private/schemas/$table.php";
+#Util::quit(417, "'$schema_file'");
+
+            if(!load($schema_file)) {
+#Util::quit(417, "'$schema_file' DOES NO EXIST");
+                return -1;
+            }
 
             $Schema = ucwords($table)."_Table";
             if (class_exists($Schema)){
@@ -190,6 +218,13 @@ class Database extends Sqlite {
                     $schema->{$action}();
                 }
             }
+
+            //TODO verify that table was created
+            return 1;// created table
+        }
+        else  {
+#Util::quit(417, "'$table' ALREADY EXISTS");
+            return 0;// did not create table (table already exists)
         }
         //*/
     }
@@ -246,12 +281,15 @@ class Database extends Sqlite {
     /**
      * Validates input data for/to its table (fields) schema
      */
-    private function validate_schema_fields($sql)
+    private function validate_schema_fields()
     {
         $input = $this->fields;
         $schema = $this->schema();
-        $fields = $values = array();
-        foreach($input as $field => $value){
+        $fields = $values = array();     
+
+#Util::quit(417, "validate_schema_fields: ".json_encode(array($input, $schema)));  
+
+        foreach($input as $field => $value) {
             $fields[] = $field;
             $values[] = $schema[$field][0] == "TEXT" ? "'$value'" : $value;
         };
@@ -263,12 +301,15 @@ class Database extends Sqlite {
     {
         if($input === null) return;
 
-        self::create_table(self::$table);
+        if(self::create_table(self::$table) == -1) 
+            Util::quit(417, "FAILED TO CREATE '".self::$table."' TABLE");
         
         $schema = $this->schema(self::$table);
-        
+    
         $this->input = $input;
         
+if(!count($schema)) Util::quit(417, "FAILED TO GET '".self::$table."' SCHEMA");
+
         $this->fields = (object) array();
         foreach($input as $field => $value){
             if(isset($schema[$field])){
