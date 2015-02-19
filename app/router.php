@@ -48,13 +48,13 @@ class Router extends Util {
      * is its schema exists
      */
     public static function create_controller($api){
-        $base = dirname(dirname(__FILE__));
-        $controller = "$base/app/controllers/$api.php";
+        $base = dirname(__FILE__);
+        $controller = "$base/controllers/$api.php";
 
         // controller already exists
         if(file_exists($controller)) return false;
 
-        $schema = "$base/app/schemas/$api.php";
+        $schema = "$base/schemas/$api.php";
 
         // schema exists
         if(file_exists($schema)) {
@@ -74,8 +74,8 @@ class Router extends Util {
      */
     public static function make_controller($controller, $api){
 
-        $base = dirname(dirname(__FILE__));
-        $template = "$base/app/templates/controller.template";
+        $base = dirname(__FILE__);
+        $template = "$base/templates/controller.template";
 
         $names = array('Name'=>ucfirst($api),'name'=>$api);
         $data = file_get_contents($template);
@@ -100,8 +100,8 @@ class Router extends Util {
         // schema exists?
         if(file_exists($schema)) return false;
 
-        $base = dirname(dirname(__FILE__));
-        $json = "$base/app/schemas/$api.json";
+        $base = dirname(__FILE__);
+        $json = "$base/schemas/$api.json";
 
         // json schema exists
         if(file_exists($json)) return self::make_schema($json);
@@ -175,9 +175,9 @@ class Router extends Util {
         // controller path
         //-----------------
         // framework root
-        $root = dirname(dirname(__FILE__));
+        $root = dirname(__FILE__);
         // controllers folder
-        $folder = "$root/app/controllers/$api";
+        $folder = "$root/controllers/$api";
         // controller filename
         $controller = "$folder/$api.php";
 
@@ -189,7 +189,7 @@ class Router extends Util {
             //--------------------
             // legacy controllers
             //--------------------
-            $folder = "$root/app/controllers";
+            $folder = "$root/controllers";
             $controller = "$folder/$api.php";
             if(!load($controller)) {
                 // create controller (if a schema exists) or quit
