@@ -80,7 +80,7 @@ class Router extends Util {
         $names = array('Name'=>ucfirst($api),'name'=>$api);
         $data = file_get_contents($template);
 
-        foreach($names as $name => $value){
+        foreach($names as $name => $value) {
             $data = str_replace("{".$name."}", $value, $data);
         }
 
@@ -319,7 +319,13 @@ class Router extends Util {
         // Config $this->config();
         $this->config($config);
 
-        // ssl
+        //
+        if($this->config->offline) {
+            $this->response = "offline";
+            exit;
+        }
+
+        // force ssl
         if(isset($this->config->ssl) && $this->config->ssl){
             if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on"){
                 header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]);
