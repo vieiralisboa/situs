@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Situs - A PHP Framework
  *
@@ -18,7 +19,8 @@ class Database extends Sqlite {
     /**
      * Static Database...
      */
-    public static function db () {
+    public static function db ()
+    {
          return new Database();
     }
 
@@ -26,12 +28,13 @@ class Database extends Sqlite {
     /**
      * executes a SQL query
      */
-    public static function query($sql) {
+    public static function query($sql)
+    {
         
-        //validate sql here
+        // validate sql here
 
         $result = self::db()->connect()->query($sql);
-        
+
         $rows = array();
         if(!empty($result)) {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -45,8 +48,12 @@ class Database extends Sqlite {
     /**
      * Fetches all records from the database
      */
-    public static function all() {
-        $result = self::db()->connect()->query("SELECT * FROM ".self::$table);
+    public static function all()
+    {
+
+        $db = self::db();
+
+        $result = $db->connect()->query("SELECT * FROM ".self::$table);
         
         $rows = array();
         if(!empty($result)) {
@@ -54,6 +61,7 @@ class Database extends Sqlite {
                 $rows[] = Util::ctype_array($row);
             }   
         }
+        
         return $rows;
     }
 
@@ -61,7 +69,8 @@ class Database extends Sqlite {
     /**
      * Fetches one record from the database
      */
-    public static function find($id){
+    public static function find($id)
+    {
         $table = self::$table;
         $sql = "SELECT * FROM $table WHERE id = ". $id;
         $result = self::db()->connect()->query($sql);
@@ -78,7 +87,8 @@ class Database extends Sqlite {
     /**
      * Inserts a record into the database
      */
-    private function insert(){
+    private function insert()
+    {
         $data = $this->validate_schema_fields();
 
         $sql = "INSERT INTO {table}({fields}) VALUES({values});";
@@ -100,7 +110,8 @@ class Database extends Sqlite {
     /**
      * Updates a record in the database
      */
-    private function update($id){
+    private function update($id)
+    {
         $this->fields->last_updated = date("Y-m-d H:m:s");
         
         $data = $this->validate_schema_fields();
@@ -122,7 +133,8 @@ class Database extends Sqlite {
      /**
      * Deletes a record from the database
      */
-    public static function delete($id){
+    public static function delete($id)
+    {
         $table = self::$table;
         $sql = "DELETE FROM $table WHERE id = $id;";
         return self::db()->connect()->exec($sql);
@@ -132,7 +144,8 @@ class Database extends Sqlite {
     /**
      * Saves a record to the database
      */
-    public function save ($id = null){
+    public function save ($id = null)
+    {
         #$numargs = func_num_args();
         #$args = func_get_args();
         
@@ -148,7 +161,8 @@ class Database extends Sqlite {
     /**
      * use table schema to create table in the database
      */
-    public static function create_table($table){
+    public static function create_table($table)
+    {
         $sqlite = new Sqlite;
 
         /* using schema.sql
@@ -163,8 +177,8 @@ class Database extends Sqlite {
         //* using schema.php
         // if the table desn't exist
         if(! $sqlite->table_exists($table)) {
-            $base = dirname(dirname(__FILE__));
-            $schema_file = "$base/app/schemas/$table.php";
+            $private = dirname(__FILE__);
+            $schema_file = "$private/schemas/$table.php";
 
             load($schema_file);
 
@@ -183,7 +197,8 @@ class Database extends Sqlite {
     /**
      * Delete table
      */
-    public static function drop_table($table){
+    public static function drop_table($table)
+    {
         $sqlite = new Sqlite;
         if($sqlite->table_exists($table)) return $sqlite->exec("DROP TABLE todos");
         return false;
@@ -192,7 +207,8 @@ class Database extends Sqlite {
     /**
      * Populates table
      */
-    public static function seed($records) {
+    public static function seed($records)
+    {
         $table = self::$table;
         self::create_table($table);
 
@@ -230,7 +246,8 @@ class Database extends Sqlite {
     /**
      * Validates input data for/to its table (fields) schema
      */
-    private function validate_schema_fields($sql){
+    private function validate_schema_fields($sql)
+    {
         $input = $this->fields;
         $schema = $this->schema();
         $fields = $values = array();
@@ -242,7 +259,8 @@ class Database extends Sqlite {
     }
 
    
-    function __construct($input = null){
+    function __construct($input = null)
+    {
         if($input === null) return;
 
         self::create_table(self::$table);
