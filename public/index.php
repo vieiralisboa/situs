@@ -25,7 +25,7 @@ Router::run();
 function __autoload($className) {
     $className = strtolower($className);
     $base = dirname(dirname(__FILE__));
-    $paths = array("/app/", "/storage/");
+    $paths = array("/private/", "/storage/");
     foreach($paths as $path){
     	if(load("$base$path$className.php")) break;
     }

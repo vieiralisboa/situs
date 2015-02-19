@@ -1,5 +1,5 @@
-app/uploads/*
+private/uploads/*
 storage/*.sqlite
 .idea
 logs/*
-app/controllers-disabled
+private/controllers-disabled
