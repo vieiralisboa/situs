@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Situs - A PHP Framework
  *
@@ -13,7 +14,7 @@
  */
 class Util {
 
-    public static $codes = [
+    public static $codes = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',
@@ -64,23 +65,26 @@ class Util {
         507 => 'Insufficient Storage',
         509 => 'Bandwidth Limit Exceeded',
         510 => 'Not Extended'
-    ];
+    );
 
     /**
      * ctype Array Values
      * Converts ctype strings in array to numeric values
      */
-    public static function ctype_array($array){
+    public static function ctype_array($array)
+    {
         foreach($array as $key => $value){
             $array[$key] = ctype_digit($value) ? (int) $value : $value;
         }
         return $array;
     }
 
+
     /**
      * Break uri Apart
      */
-    public static function break_uri($uri){
+    public static function break_uri($uri)
+    {
         $string = str_replace('\/', '/', $uri);
         $string = str_replace('//', '/',  $string);
         $array = explode('/', substr($string, 1));
@@ -91,7 +95,8 @@ class Util {
     /**
      * Regex Uri
      */
-    public static function regex_uri($uri) {
+    public static function regex_uri($uri)
+    {
         $uri_array = self::break_uri($uri);
 
         $regex = "/^";
@@ -104,6 +109,7 @@ class Util {
         return $regex;
     }
 
+
     /**
      * Preg Match Requested Uri
      * @example
@@ -112,7 +118,8 @@ class Util {
      * match_uri('/tasks'); // false
      * @return Array matches false for no match
      */
-    public function preg_match_uri($match) {
+    public function preg_match_uri($match)
+    {
         $regex = self::regex_uri($match);
 
         if(preg_match($regex, $_SERVER['REQUEST_URI'])){
@@ -123,18 +130,21 @@ class Util {
         else return false;
     }
 
-    public function uri($uri){
+    public function uri($uri)
+    {
         return self::preg_match_uri($uri);
     }
 
-    public function dummie(){
+    public function dummie()
+    {
         return 'dummie';
     }
 
     /**
      * Quit
      */
-    public static function quit($code){
+    public static function quit($code, $msg = "")
+    {
         // prevent the null trail (json empty string)
         Router::$json = false;
 
@@ -144,8 +154,9 @@ class Util {
 
         $response = file_get_contents(dirname(__FILE__)."/status.html");
 
-        foreach(array('code'=>$code, 'status'=>$status, 'server' => $_SERVER['HTTP_HOST']) as $name => $value)
+        foreach(array('code'=>$code, 'status'=>$status, 'server' => $_SERVER['HTTP_HOST'], 'msg' => $msg ) as $name => $value) {
             $response = str_replace( "<%= $name %>", $value, $response);
+        }
 
         die($response);
     }
@@ -154,7 +165,8 @@ class Util {
      * Serve static
      * Reads local files
      */
-    public static function serve($file){
+    public static function serve($file)
+    {
         // prevent the null trail (json empty string)
         Router::$json = false;
 
@@ -233,7 +245,8 @@ class Util {
      * Download
      * Uploads local files
      */
-    public static function download($file){
+    public static function download($file)
+    {
         // prevent the null trail (json empty string)
         Router::$json = false;
 
@@ -249,7 +262,7 @@ class Util {
         header("Content-Description: File Transfer");
         header("Content-Disposition: attachment; filename=$filename");
 
-        switch(pathinfo($filename, PATHINFO_EXTENSION)){
+        switch(pathinfo($filename, PATHINFO_EXTENSION)) {
             case "html":
             case "htm":
                 header('Content-Type: text/html; charset=utf-8');
@@ -282,22 +295,22 @@ class Util {
                 header('Content-Length: ' . filesize($file));
         }
 
-/*/
-$file = 'monkey.gif';
-if (file_exists($file)) {
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename='.basename($file));
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
-    header('Content-Length: ' . filesize($file));
-    ob_clean();
-    flush();
-    readfile($file);
-    exit;
-}
-//*/
+        /*/
+        $file = 'monkey.gif';
+        if (file_exists($file)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename='.basename($file));
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            ob_clean();
+            flush();
+            readfile($file);
+            exit;
+        }
+        //*/
         ob_clean();
         flush();
 
@@ -310,7 +323,8 @@ if (file_exists($file)) {
     /**
      * Download file range
      */
-    public static function rangeDownload($file) {
+    public static function rangeDownload($file)
+    {
         // prevent the null trail (json empty string)
         Router::$json = false;
 
@@ -422,7 +436,8 @@ if (file_exists($file)) {
      * Upload
      * Saves uploaded files
      */
-    public static function upload($file) {
+    public static function upload($file)
+    {
         $sucess = false;
 
         // Ajax file post
@@ -460,12 +475,14 @@ if (file_exists($file)) {
      * ZeHash
      * string hash
      */
-    public static function zehash($string, $options=[]){
+    public static function zehash($string, $options = array())
+    {
         $algorithm = null;
         $cost = 2;
+        $algos = hash_algos();
 
-        if(isset($options['algo'])){
-            foreach(hash_algos() as $index => $algo){
+        if(isset($options['algo'])) {
+            foreach($algos as $index => $algo) {
                 if($algo == $options['algo']) {
                     $algorithm = $algo;
                     break;
@@ -473,12 +490,12 @@ if (file_exists($file)) {
             }
         }
 
-        if(!$algorithm){
+        if(!$algorithm) {
             $index = 3;
-            $algorithm = hash_algos()[3];
+            $algorithm = $algos[3];
         }
 
-        if(isset($options['cost'])){
+        if(isset($options['cost'])) {
             if($cost<10 && $cost>0) {
                 $cost = $options['cost'];
             }
@@ -496,7 +513,9 @@ if (file_exists($file)) {
         );
     }
 
-    public static function zehash_sauce($string, $salt, $cost=2, $algo="sha1"){
+
+    public static function zehash_sauce($string, $salt, $cost=2, $algo="sha1")
+    {
         $spice = hash($algo, $salt);
         $sauce = hash($algo, $string.$spice);
 
@@ -508,34 +527,39 @@ if (file_exists($file)) {
         return $sauce;
     }
 
+
     /**
      * ZeHash Verify
      * verify string hash
      */
-    public static function zehash_verify($string, $hash){
-        if(empty($string) || empty($hash)) return ["verifies" => false];
+    public static function zehash_verify($string, $hash)
+    {
+        if(empty($string) || empty($hash)) return array("verifies" => false);
 
         $frags = explode("-", $hash);
-        $algo = hash_algos()[$frags[0]];
+        $algos = hash_algos();
+        $algo = $algos[$frags[0]];
         $cost = (int) $frags[1];
         $spice = $frags[2];
         $sauce = self::zehash_sauce($string, $spice, $cost*$cost, $algo);
 
-        return [
+        return array(
             "string" => $string,
             "hash" => $hash,
             #"algorithm" => $algo,
             #"cost" => $cost,
             #"spice" => $spice,
             "verifies" => ($sauce == $frags[3])
-        ];
+        );
     }
+
 
     /**
      * List R
      * Lists files in directory recursively
      */
-    public static function ListR($dir, $prefix = '') {
+    public static function ListR($dir, $prefix = '')
+    {
         $dir = rtrim($dir, '\\/');
         $result = array();
 
