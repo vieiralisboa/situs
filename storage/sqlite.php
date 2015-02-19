@@ -11,19 +11,22 @@
 /**
  * SQL controller for Sqlite PDO
  */
-class Sqlite {
+class Sqlite
+{
     /**
      * establishes a database connection
      */
-    protected function connect($db = null) {
+    protected function connect($db = null)
+    {
         if(isset($this->db)) return $this->db;
 
-        if($db && file_exists($db)){
+        if($db && file_exists($db)) {
             $database = "sqlite:$db";
         }
         else {
-            $base = dirname(__FILE__);
-            if(file_exists("$base/sqlite.json")){
+            $base = dirname(__FILE__);      
+
+            if(file_exists("$base/sqlite.json")) {
                 $config = json_decode(file_get_contents("$base/sqlite.json"));
                 if(!empty($config->base)) $base = $config->base;
             }
@@ -31,15 +34,25 @@ class Sqlite {
             $database = "sqlite:$base/situs.sqlite";
         }
 
-        $this->db = new PDO($database);
+        try {
+            $this->db = new PDO($database); // PDO Driver DSN. Throws A PDOException.
+        }
+        catch( PDOException $Exception ) {
+            // Note The Typecast To An Integer!
+            #throw new MyDatabaseException($Exception->getMessage() , (int) $Exception->getCode());
+            Util::quit(417, $Exception->getMessage());
+        }
+
+
+        #$this->db = new PDO($database);
         return $this->db;
     }
 
     /**
      * executes SQL queries
      */
-    protected function exec($sql) {
-
+    protected function exec($sql)
+    {
         //parse sql here
 
         return $this->connect()->exec($sql);
@@ -48,7 +61,8 @@ class Sqlite {
     /**
      * Checks if a table exists in database
      */
-    public function table_exists($table) {
+    public function table_exists($table)
+    {
         $sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = '$table'";
         $query = $this->connect()->query($sql);
         return $query->fetch() === false ? false : true;
@@ -57,7 +71,8 @@ class Sqlite {
     /**
      * Parses the Create Table Statement
      */
-    public function schema($table) {
+    public function schema($table)
+    {
         if(isset($this->schema)) return $this->schema;
 
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name = '$table';";
