@@ -1,5 +1,5 @@
 {
-	"path":"/mnt/Green/www/libs/",
+	"path":"/libs/",
 	"libs": {
 		"_" : "underscore/1.4.2/underscore-min.js",
 		"underscore" : "underscore/1.4.2/underscore-min.js",
@@ -24,5 +24,6 @@
 		"lib/dl/:lib" : "downloads script :lib",
 		"lib/dl/min/:lib" : "downloads minified :lib script",
 		"lib/config" : "displays config json file"
-	}
+	},
+	"WWW": null
 }

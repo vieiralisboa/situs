@@ -20,7 +20,7 @@ class Lib_Controller {
 
         Router::route('/lib/:lib', function($request) {
             $lib = $request->data['lib'];
-            $path = Router::$controller_config->path;
+            $path = WWW.Router::$controller_config->path;
             $file = $path.Router::$controller_config->libs->$lib;
 
             if(!file_exists($file)) Util::quit(404);
@@ -29,7 +29,7 @@ class Lib_Controller {
 
         Router::route('/lib/dl/:lib', function($request) {
             $lib = $request->data['lib'];
-            $path = Router::$controller_config->path;
+            $path = WWW.Router::$controller_config->path;
             $file = $path.Router::$controller_config->libs->$lib;
 
             if(!file_exists($file)) Util::quit(404);
