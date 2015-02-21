@@ -3,21 +3,33 @@
 /**
  * PHP
  */
-class PHP_Controller {
+class PHP_Controller
+{
 
     // GET
     public function get($request) {
 
         Router::route('/PHP', function() {
-            return array(
-        	'version' => phpversion(),
-        	//'credits' => phpcredits()
-        	);
+            return array('version' => phpversion());
+        });
+
+        Router::route('/PHP/credits', function() {
+            Router::$json = false;
+            phpcredits();
         });
 
         Router::route('/PHP/info', function() {
         	Router::$json = false;
             phpinfo();
         });
+
+        Router::route('/PHP/SERVER', function() {
+            return $_SERVER;
+        });
+
+        Router::route('/PHP/GLOBALS', function() {
+            return $GLOBALS;
+        });
+
     }
 }
