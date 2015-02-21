@@ -171,6 +171,9 @@ class Router extends Util {
         // requires PHP version 5.3+
         if(floatval(phpversion()) < 5.3) self::quit(501);
 
+        define("SITUS", dirname(dirname(__FILE__)));
+        define("WWW", dirname(SITUS));
+
         //-----------------
         // controller path
         //-----------------
@@ -225,6 +228,7 @@ class Router extends Util {
                 if(file_exists($jsonfile)){
                     $json = file_get_contents($jsonfile);
                     self::$controller_config = json_decode($json);
+                    if(empty(self::$controller_config->WWW)) self::$controller_config->WWW = WWW;
                 }
 
                 // invoke the controller
