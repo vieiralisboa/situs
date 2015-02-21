@@ -5,11 +5,11 @@
 			"underscore/1.4.2/underscore-min.js",
 			"jquery-ui/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js",
 			"topzindex/1.2/jquery.topzindex.js",
-			"panel/panel.js",
-			"bar/js/bar.js"
+			"ze/js/panel.js",
+			"ze/js/bar.js"
 		]},
 	"temp": "/tmp/",
-	"docs": "/var/www/libs/",
+	"docs": "/libs/",
 	"_docs": "http://docs.medorc.org/",
 	"__docs": false
 }

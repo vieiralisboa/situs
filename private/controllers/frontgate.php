@@ -3,21 +3,23 @@
 /**
  * Frontgate Controller
  */
-class Frontgate_Controller {
+class Frontgate_Controller
+{
 
     /**
      * GET
      */
-    public function get() {
+    public function get()
+    {
         Router::route('/frontgate', function() {
-            $path = Router::$controller_config->docs."frontgate/";
+            $path = WWW.Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."js/frontgate.js");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
 
         Router::route('/frontgate/css', function($request) {
-            $path = Router::$controller_config->docs."frontgate/";
+            $path = WWW.Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."css/frontgate.css");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -25,17 +27,20 @@ class Frontgate_Controller {
 
         // frontgate/and/:module
         Router::route('/frontgate/and/:module', function($request) {
-            $path = Router::$controller_config->docs."frontgate/";
+            $path = WWW.Router::$controller_config->docs."frontgate/";
             $file = $path."js/frontgate.js";
+            
             if(!file_exists($file)) Util::quit(404);
+            
             $body = "";
 
             switch($request->data['module']){
                 case "situs":
                     $situs = $path."js/frontgate.situs.js";
                     if(!file_exists($situs)) break;
+
                     $require = Router::$controller_config->require;
-                    $docs = Router::$controller_config->docs;
+                    $docs = WWW.Router::$controller_config->docs;
                     foreach ($require->situs as $script) {
                         $script = $docs.$script;
                         $body .= file_get_contents($script);
@@ -45,6 +50,7 @@ class Frontgate_Controller {
                 case "router":
                     $router = $path."js/frontgate.router.js";
                     if(!file_exists($router)) break;
+                  
                     $body = file_get_contents($router).$body;
                     break;
 
@@ -53,7 +59,7 @@ class Frontgate_Controller {
             }
 
             $frontgate = file_get_contents($file);
-            $temp = Router::$controller_config->temp;
+            $temp = WWW.Router::$controller_config->temp;
             $temp .= "frontgate.and.{$request->data['module']}.js";
             $protocol = $_SERVER['HTTPS']? "https" : "http";
 
@@ -74,7 +80,9 @@ $body
 SCRIPT;
 
             file_put_contents($temp, $SCRIPT);
+
             if(!file_exists($temp)) Util::quit(404);
+
             return Util::serve($temp);
         });
 
@@ -83,7 +91,7 @@ SCRIPT;
         });
 
         Router::route('/frontgate/:module', function($request) {
-            $path = Router::$controller_config->docs."frontgate/";
+            $path = WWW.Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."js/frontgate.{$request->data['module']}.js");
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
@@ -93,25 +101,29 @@ SCRIPT;
     /**
      * POST
      */
-    public function post() {
+    public function post()
+    {
         Util::quit(501);
     }
 
     /**
      * UPDATE
      */
-    public function put(){
+    public function put()
+    {
         Util::quit(501);
     }
 
     /**
      * DELETE
      */
-    public function delete($request){
+    public function delete($request)
+    {
         Util::quit(501);
     }
 
-    public function options(){
+    public function options()
+    {
         Util::quit(204);
     }
 }
