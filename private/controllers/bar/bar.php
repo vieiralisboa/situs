@@ -13,7 +13,7 @@ class Bar_Controller {
 
         Router::route('/bar', function() {
             // full path to file
-            $path = Router::$controller_config->ze;
+            $path = WWW.Router::$controller_config->ze;
             $file = utf8_decode("$path/js/bar.js");
 
             if(!file_exists($file)) Util::quit(404);
@@ -22,7 +22,7 @@ class Bar_Controller {
 
         Router::route('/bar/css', function($request) {
             // full path to file
-            $path = Router::$controller_config->ze;
+            $path = WWW.Router::$controller_config->ze;
             $file = utf8_decode("$path/css/bar.css");
 
             if(!file_exists($file)) Util::quit(404);
@@ -30,12 +30,8 @@ class Bar_Controller {
         });
 
         Router::route('/bar/:bar/template/:name', function($request) {
-
-            $path = Router::$controller_config->bars;
+            $path = WWW.Router::$controller_config->bars;
             $template = "{$request->data['bar']}/templates/{$request->data['name']}.html";
-
-            #$path = Router::$controller_config->bar."templates/";
-            #$template = "{$request->data['bar']}.{$request->data['name']}.html";    
 
             $file = utf8_decode("$path/$template");
             if(!file_exists($file)) Util::quit(404);
@@ -45,7 +41,7 @@ class Bar_Controller {
         Router::route('/bar/:bar/css', function($request) {
             // file name
             $filename = "bar.{$request->data['bar']}.css";
-            $path = Router::$controller_config->bars;
+            $path = WWW.Router::$controller_config->bars;
             $file = utf8_decode("$path/$filename");
 
             if(!file_exists($file)) Util::quit(404);
@@ -55,7 +51,7 @@ class Bar_Controller {
         Router::route('/bar/:bar/json', function($request) {
             // file name
             $filename = "bar.{$request->data['bar']}.json";
-            $path = Router::$controller_config->bars;
+            $path = WWW.Router::$controller_config->bars;
             $file = utf8_decode("$path/$filename");
 
             if(!file_exists($file)) Util::quit(404);
@@ -74,7 +70,7 @@ class Bar_Controller {
             $script = "jquery.bar/js/$filename";
 
             // full path to file
-            $path = Router::$controller_config->bars;
+            $path = WWW.Router::$controller_config->bars;
             $file = utf8_decode("$path/$filename");
 
             // attach the filename

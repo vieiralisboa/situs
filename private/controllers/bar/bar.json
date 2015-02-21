@@ -1,5 +1,5 @@
 {
 	"temp": "/tmp/",
-	"bars": "/mnt/Green/www/ze/private/bars",
-	"ze": "/mnt/Green/www/ze/public"
+	"bars": "/ze/private/bars",
+	"ze": "/ze/public"
 }
