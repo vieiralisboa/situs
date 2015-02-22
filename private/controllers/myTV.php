@@ -3,9 +3,11 @@
 /**
  * myTV controller
  */
-class MyTV_Controller {
+class MyTV_Controller
+{
 
-    public function get($request) {
+    public function get($request)
+    {
         if($request->uri[1] == 'auth') return "Authorized";
 
         $config = Router::$controller_config;
@@ -13,7 +15,7 @@ class MyTV_Controller {
         $k = 1;
 
         // Routes
-        switch($request->uri[1]){
+        switch($request->uri[1]) {
 
             // Route /myTV/config
             case 'config':
@@ -30,7 +32,6 @@ class MyTV_Controller {
                 $path .= $sep.$dir;
 
                 if($root == "transmission") {
-                    //$path = "/var/www/transmission";
                     $path = $config->transmission;
                 }
 
@@ -55,11 +56,15 @@ class MyTV_Controller {
                     else sort($_list);
                 }
 
-                foreach($_list as $video){
+                foreach($_list as $video) {
                     $info = pathinfo($video);
                     $show = array();
+                    
+                    $video = str_replace("#", "%23", htmlentities($video));
+
                     #$show['info'] = $info;
                     #$show['root'] = $root;
+
                     $show['mp4'] = 'video'.$sep.$dir.$sep.$video;
                     $show['name'] = name($info, $root);
                     $show['poster'] = poster($info, $root, $config, $dir);
@@ -81,7 +86,8 @@ class MyTV_Controller {
     }
 }
 
-function name($info, $root){
+function name($info, $root)
+{
     $name = $info['filename'];
     if($root == "tv-shows" || $root == "NEW"){
         $pattern = "/^(.*)[\.| |_](s\d{1,2}e\d{1,2})/i";
@@ -96,7 +102,8 @@ function name($info, $root){
     return str_replace('.', " ", $name);
 }
 
-function poster($info, $root, $config, $dir){
+function poster($info, $root, $config, $dir)
+{
     $sep = "/";
     if($root == "tv-shows" || $root == "NEW") {
         $name = $info['filename'];
