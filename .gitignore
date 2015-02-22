@@ -2,4 +2,4 @@ private/uploads/*
 storage/*.sqlite
 .idea
 logs/*
-private/controllers-disabled
+private/controllers/_disabled
