@@ -140,6 +140,14 @@ class Util {
         return 'dummie';
     }
 
+    public static function location($location)
+    {
+        Router::$json = false;
+        header("Location: $location");
+        exit;
+    }
+
+
     /**
      * Quit
      */
@@ -321,25 +329,56 @@ class Util {
     }
 
     /**
-     * Download file range
+     * Download mp4 file
      */
-    public static function rangeDownload($file)
-    {
-        // prevent the null trail (json empty string)
-        Router::$json = false;
+    public static function mp4Download($file, $start_byte = 0, $bytes = 0)
+    { 
+        $size = filesize($file);
 
+        if($size == false) return false;
+        
+        // last byte
+        $end_byte = $bytes > 0 ? $start_byte + $bytes -1 : $start_byte + $size - 1;
+        $length = $end_byte - $start_byte + 1;
+
+        // first byte out of range// last byte out of range
+        if($start_byte < 0
+        || $start_byte >= $size - 1
+        || $end_byte <= $start_byte 
+        || $end_byte >= $size) return -1;
 
         $fp = @fopen($file, 'rb');
+        fseek($fp, $start_byte);
 
-        $size   = filesize($file); // File size
-        $length = $size;           // Content length
-        $start  = 0;               // Start byte
-        $end    = $size - 1;       // End byte
-
-        // Now that we've gotten so far without errors we send the accept range header
-
-        // set mp4 mime-type header
         header("Content-Type: video/mp4");
+        header("Content-Range: bytes $start_byte-$end_byte/$size");
+        header("Content-Length: $length");
+
+        // buffered download
+        $buffer = 1024 * 8;
+
+        while(!feof($fp) && ($pos = ftell($fp)) <= $end_byte) {
+            // last chunk smaller than buffer (1 KB), make sure we don't read past the length
+            if ($pos + $buffer > $end_byte) $buffer = $end_byte - $pos + 1;
+            set_time_limit(0); // Reset time limit for big files
+            echo fread($fp, $buffer);
+            flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
+        }
+
+        fclose($fp);
+
+        Router::$json = false;
+    }
+
+    /**
+     * Download [MP4] file range 
+     */
+    function rangeDownload($file)
+    {
+        $filesize = $length = filesize($file);
+        if(!$filesize) return -1;
+        $start = 0;
+        $end = $filesize - 1;
 
         /* At the moment we only support single ranges.
          * Multiple ranges requires some more work to ensure it works correctly
@@ -357,24 +396,14 @@ class Util {
         // multipart/byteranges
         // http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
         if (isset($_SERVER['HTTP_RANGE'])) {
-            $c_start = $start;
-            $c_end   = $end;
 
             // Extract the range string
             list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 
-            // Make sure the client hasn't sent us a multibyte range
+            // multibyte range ...
             if (strpos($range, ',') !== false) {
-                // (?) Shoud this be issued here, or should the first
-                // range be used? Or should the header be ignored and
-                // we output the whole content?
                 header('HTTP/1.1 416 Requested Range Not Satisfiable');
                 header("Content-Range: bytes $start-$end/$size");
-                // (?) Echo some info to the client?
-
-                // DEBUG
-                //file_put_contents("myTV_416_headers.json", json_encode(getallheaders()));
-
                 exit;
             }
 
@@ -382,55 +411,29 @@ class Util {
             // If not, we forward the file pointer
             // And make sure to get the end byte if spesified
             if ($range[0] == '-') {
-
                 // The n-number of the last bytes is requested
-                $c_start = $size - substr($range, 1);
+                $n = substr($range, 1);
+                if($n > 0) $start = $end - $n;
             }
             else {
-                $range  = explode('-', $range);
-                $c_start = $range[0];
-                $c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
+                $range = explode('-', $range);
+                $start = $range[0];
+                if(isset($range[1]) && is_numeric($range[1])) $end = $range[1];
             }
 
             /* Check the range and make sure it's treated according to the specs.
              * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
              */
-
-            // End bytes can not be larger than $end.
-            $c_end = ($c_end > $end) ? $end : $c_end;
-
-            // Validate the requested range and return an error if it's not correct.
-            if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
-                header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header("Content-Range: bytes $start-$end/$size");
-                // (?) Echo some info to the client?
-                exit;
-            }
-            $start  = $c_start;
-            $end    = $c_end;
-            $length = $end - $start + 1; // Calculate new content length
-            fseek($fp, $start);
             header('HTTP/1.1 206 Partial Content');
         }
 
-        // Notify the client the byte range we'll be outputting
-        header("Content-Range: bytes $start-$end/$size");
-        header("Content-Length: $length");
-
-        // Start buffered download
-        $buffer = 1024 * 8;
-        while(!feof($fp) && ($p = ftell($fp)) <= $end) {
-            if ($p + $buffer > $end) {
-                // In case we're only outputtin a chunk, make sure we don't read past the length
-                $buffer = $end - $p + 1;
-            }
-            set_time_limit(0); // Reset time limit for big files
-            echo fread($fp, $buffer);
-            flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
+        if(self::mp4Download($file, $start, $end - $start + 1) < 0) {
+            header('HTTP/1.1 416 Requested Range Not Satisfiable');
+            header("Content-Range: bytes $start-$end/$filesize");
+            exit;
         }
-
-        fclose($fp);
     }
+
 
     /**
      * Upload
