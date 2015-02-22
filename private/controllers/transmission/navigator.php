@@ -47,7 +47,9 @@ function browse($root, $request)
 
         switch(strtolower($info['extension'])) {
             case "mp4":
-                $files .= "\n<li><img src=\"/img/005_47.png\"> <a class=\"file\" href=\"/{$request->uri[0]}/play".$url."/".$file."\">";
+                $href = $request->uri[0]."/play".$url."/".$file;
+                $href = str_replace("#", "%23", $href);
+                $files .= "\n<li><img src=\"/img/005_47.png\"> <a class=\"file\" href=\"/$href\">";
                 $files .= $info['basename']."</a> <span>$filesize</span></li>";
                 break;
             case "mp3":
@@ -55,12 +57,16 @@ function browse($root, $request)
             case "jpeg":
             case "epub":
             case "pdf":
-                $a = "<a class=\"file\" href=\"/{$request->uri[0]}/serve".$url."/".$file."\">".$info['basename']."</a>";
+                $href = $request->uri[0]."/serve".$url."/".$file;
+                $href = str_replace("#", "%23", $href);
+                $a = "<a class=\"file\" href=\"/$href\">".$info['basename']."</a>";
                 $files .= "\n<li title=\"$folder/$file\"><img src=\"/img/005_47.png\"> $a <span>$filesize</span></li>";
                 break;
             default:
                 if(is_dir($folder."/".$file)){
-                    $folders .= "\n<li><img src=\"/img/005_43.png\"> <a class=\"folder\" href=\"".getPathname($request, -1)."/".$info['basename']."\">";
+                    $href = getPathname($request, -1)."/".$info['basename'];
+                    $href = str_replace("#", "%23", $href);
+                    $folders .= "\n<li><img src=\"/img/005_43.png\"> <a class=\"folder\" href=\"$href\">";
                     $folders .= $info['basename']."</a></li>";
                 }
         }
