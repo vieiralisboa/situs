@@ -1,6 +1,6 @@
 <?php
 
-require_once "recursos/resource.php";
+require_once "resource.php";
 
 class Recursos_Controller
 {
