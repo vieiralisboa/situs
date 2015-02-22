@@ -1,5 +1,5 @@
 {
-	"path": "/mnt/Public/Shared Videos",
-	"transmission": "/mnt",
-	"popup": "/var/www/libs/bar/templates/popup.html"
+	"videos": "/media/96A8AA7CA8AA5B0F/Public/Videos",
+	"transmission": "/media/96A8AA7CA8AA5B0F/Transmission",
+	"popup": "/media/0633db3b-cc7b-4a19-aec2-3012cbbc14fb/Green/www/ze/private/bars/VideoPlayer/popup.html"
 }
