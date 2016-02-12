@@ -1,4 +1,5 @@
 [
+    "tv",
     "hash",
     "VideoPlayer",
     "HTML5",
@@ -9,5 +10,6 @@
     "myip",
     "bar",
     "frontgate",
-    "fichas"
+    "fichas",
+    "eurolotto"
 ]

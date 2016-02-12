@@ -81,7 +81,14 @@ class Auth extends Util
         // no username or password
         if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
             self::unauthorize($realm);
-        }
+        }      
+
+        //-------------------------------------------------------------------------------------------------------------------
+        // Workaround for missing Authorization header under CGI/FastCGI Apache:
+        //             SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
+        //
+        // Now PHP should automatically declare $_SERVER[PHP_AUTH_*] variables if the client sends the Authorization header.
+        //-------------------------------------------------------------------------------------------------------------------
 
         // get user password from the database
         //"SELECT pw FROM $realm WHERE user='{$_SERVER['PHP_AUTH_USER']}'";
@@ -89,6 +96,7 @@ class Auth extends Util
         $pw = self::db(strtolower($_SERVER['PHP_AUTH_USER']), $realm);
 
         $auth = Util::zehash_verify($_SERVER['PHP_AUTH_PW'], $pw);
+
 
         // password verification
         if ($auth['verifies'] != true) {
