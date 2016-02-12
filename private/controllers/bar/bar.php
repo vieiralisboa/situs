@@ -74,7 +74,8 @@ class Bar_Controller {
             $file = utf8_decode("$path/$filename");
 
             // attach the filename
-            $temp_file = Router::$controller_config->temp . $filename;
+            #$temp_file = Router::$controller_config->temp . $filename;
+            $temp_file = TEMP_FOLDER.$filename;
             if(file_exists($file)) {
                 $body = file_get_contents($file);
                 $json = file_get_contents($file."on");
@@ -103,7 +104,7 @@ $body
     json: '$json'
 });
 SCRIPT;
-
+//die($temp_file);
             file_put_contents($temp_file, $SCRIPT);
             if(file_exists($temp_file)) Util::serve($temp_file);//Util::download($temp_file);
             else Util::quit(404);
