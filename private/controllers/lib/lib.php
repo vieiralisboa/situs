@@ -7,14 +7,20 @@ class Lib_Controller {
     public function get($request) {
 
         Router::route('/lib', function($request) {
-            return Router::$controller_config->libs;
+            $self = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['SERVER_NAME']."/lib/";
+            $libs = Router::$controller_config->libs;
+            foreach($libs as $name => $lib) {
+                $libs->$name = $self.$name; 
+            }
+            $libs->config = $self."config";
+            return $libs;
         });
 
         Router::route('/lib/config', function($request) {
             return Router::$controller_config;
         });
 
-        Router::route('/lib/help', function($request) {
+        Router::route('/lib/$config = help', function($request) {
             return Router::$controller_config->help;
         });
 
