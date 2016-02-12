@@ -109,7 +109,6 @@ class Util {
         return $regex;
     }
 
-
     /**
      * Preg Match Requested Uri
      * @example
@@ -142,31 +141,77 @@ class Util {
 
     public static function location($location)
     {
-        Router::$json = false;
+        self::pre();
         header("Location: $location");
         exit;
     }
-
 
     /**
      * Quit
      */
     public static function quit($code, $msg = "")
     {
-        // prevent the null trail (json empty string)
-        Router::$json = false;
-
         $status = self::$codes[$code];
-
         header($_SERVER["SERVER_PROTOCOL"]." $code $status");
-
         $response = file_get_contents(dirname(__FILE__)."/status.html");
 
         foreach(array('code'=>$code, 'status'=>$status, 'server' => $_SERVER['HTTP_HOST'], 'msg' => $msg ) as $name => $value) {
             $response = str_replace( "<%= $name %>", $value, $response);
         }
 
-        die($response);
+        self::html($response);
+    }
+
+    public static function pre()
+    {
+        // prevent the null trail (json empty string)
+        if(class_exists("Router")) Router::$json = false;        
+    }
+
+    public static function html($text)
+    {
+        header('Content-Type: text/html; charset=utf-8');
+        self::plain($text);
+    }    
+
+    public static function text($text)
+    {
+        header('Content-Type: text/plain; charset=utf-8');
+        self::plain($text);
+    }
+
+    public static function plain($text)
+    {
+        self::pre();
+        die($text);
+    }
+
+    public static function vtt($vtt)
+    {
+        header('Content-Type: text/vtt; charset=utf-8');
+        self::plain($vtt);
+    }
+
+    public static function srt2vtt($srt)
+    {
+        if(!file_exists($srt)) return;
+
+        $info = pathinfo($srt);
+        $filename = $info['dirname']."/".$info['filename'].".vtt";
+
+        if($info['extension'] != "srt") return;
+
+        $vtt = array();
+        $vtt[0] = "WEBVTT\n";
+        $vtt[1] = "\n";
+        foreach(file($srt) as $i => $line){
+            $pattern ='/\d{2}:\d{2}:\d{2},\d{1,3} \-\-\> \d{2}:\d{2}:\d{2},\d{1,3}/';
+            if(preg_match($pattern, $line, $matches))
+                $line = str_replace(",", ".", $line);
+            $vtt[$i+2] = utf8_encode($line);
+        }
+
+        return implode("", $vtt);
     }
 
     /**
@@ -175,8 +220,7 @@ class Util {
      */
     public static function serve($file)
     {
-        // prevent the null trail (json empty string)
-        Router::$json = false;
+        self::pre();
 
         if(!file_exists($file) || is_dir($file)) {
             self::quit(404);
@@ -255,8 +299,7 @@ class Util {
      */
     public static function download($file)
     {
-        // prevent the null trail (json empty string)
-        Router::$json = false;
+        self::pre();
 
         //!preg_match('/\.js$/', $file)
         if(!file_exists($file) || is_dir($file)) {
@@ -367,7 +410,8 @@ class Util {
 
         fclose($fp);
 
-        Router::$json = false;
+        self::pre();
+        #Router::$json = false;
     }
 
     /**
@@ -516,7 +560,6 @@ class Util {
         );
     }
 
-
     public static function zehash_sauce($string, $salt, $cost=2, $algo="sha1")
     {
         $spice = hash($algo, $salt);
@@ -529,7 +572,6 @@ class Util {
 
         return $sauce;
     }
-
 
     /**
      * ZeHash Verify
@@ -555,7 +597,6 @@ class Util {
             "verifies" => ($sauce == $frags[3])
         );
     }
-
 
     /**
      * List R

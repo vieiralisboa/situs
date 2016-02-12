@@ -28,6 +28,20 @@ class Router extends Util {
         self::$routes->$uri = $callback;
     }
 
+    public static function html($html)
+    {
+        self::$json = false;
+        header('Content-Type: text/html; charset=utf-8');
+        die($html);
+    }
+
+    public static function text($text)
+    {
+        self::$json = false;
+        header('Content-Type: text/plain; charset=utf-8');
+        die($text);
+    }
+
     /**
      * Request
      * parses the request headers
@@ -174,9 +188,15 @@ class Router extends Util {
         define("SITUS", dirname(dirname(__FILE__)));
         define("WWW", dirname(SITUS));
 
-        //-----------------
-        // controller path
-        //-----------------
+        $temp_folder = WWW."/temp/";
+        if (!file_exists($temp_folder)) {
+            mkdir($temp_folder, 0777, true);
+        }
+        define("TEMP_FOLDER", WWW."/temp/");
+
+        //------------
+        // controller
+        //------------
         // framework root
         $root = dirname(__FILE__);
         // controllers folder
@@ -187,24 +207,24 @@ class Router extends Util {
         //---------------------
         // load the Controller
         //---------------------
-        // controller loading fails
+        // if controller loading fails...
         if(!load($controller)) {
-            //--------------------
-            // legacy controllers
-            //--------------------
+            //--------------------------------
+            // try loading legacy controllers
+            //--------------------------------
             $folder = "$root/controllers";
             $controller = "$folder/$api.php";
             if(!load($controller)) {
-                // create controller (if a schema exists) or quit
+                // create (table) controller (if a schema exists) or quit
                 if(!self::create_controller($api)) self::quit(404);
                 // retry loading the controller or quit
                 if(!load($controller)) self::quit(404);
             }
         }
 
-        //------------
-        // Controller
-        //------------
+        //--------------------
+        // run the Controller
+        //--------------------
         // Controller class name
         $Controller = ucwords($api) . "_Controller";
         // Controller
@@ -264,6 +284,10 @@ class Router extends Util {
      * Auto starts a new Router
      */
     public static function run($config = null) {
+        // using a aquery
+        if(!empty($_SERVER['QUERY_STRING'])) {
+            $_SERVER['REQUEST_URI'] = "/".strtolower($_SERVER['QUERY_STRING']); 
+        }
 
         /*/TODO get config from json file
         if($config === null){
@@ -320,16 +344,20 @@ class Router extends Util {
             exit;
         }
 
+        //---------------------------------------------
+        // Please review the config file 'config.json'
+        //---------------------------------------------
+
         // Config $this->config();
         $this->config($config);
 
-        //
+        // offline?
         if($this->config->offline) {
             $this->response = "offline";
             exit;
         }
 
-        // force ssl
+        // force ssl?
         if(isset($this->config->ssl) && $this->config->ssl){
             if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on"){
                 header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]);
@@ -337,24 +365,40 @@ class Router extends Util {
             }
         }
 
-        // activity
-        if(isset($this->config->activity)
-                && is_object($this->config->activity)){
-            if(isset($this->config->activity->disabled)
-                    && !$this->config->activity->disabled){
+        // log activity?
+        // TODO log activity to a database
+        if(isset($this->config->activity) && is_object($this->config->activity)){
+            if(isset($this->config->activity->disabled) && !$this->config->activity->disabled){
                 Activity::log($this->config->activity);
             }
         }
 
-        // use server's rewrite module or uncomment
+        // use .htaccess file or uncomment the 1st line in the if block
         // or neither for a "404 Not Found" status at "/"
-        #if($_SERVER['REQUEST_URI'] == "/") $this->redirect("/index.html");
+        if($_SERVER['REQUEST_URI'] == "/" || $_SERVER['REQUEST_URI'] == ""){
+            #$this->redirect("/index.html");
 
+            $dir = scandir(dirname(__FILE__)."/controllers");
+            $controllers = (object) array();
+
+            foreach ($dir as $key => $value) {
+                if($value != "." && $value != ".."){
+                    $controller = preg_replace('/\\.[^.\\s]{3,4}$/', '', $value);
+                    $controllers->$controller =$_SERVER['REQUEST_SCHEME']."://". $_SERVER['HTTP_HOST']."/". $controller;
+                }
+            }
+
+            $this->stop($controllers);
+        } 
+
+        //--------------
+        // http request
+        //--------------
+        // process the request
         $request = $this->request();
-
         //DEVELOPMENT ONLY
         #$this->stop($request);
-
+        // satisfy the request
         $this->start($request);
     }
 
