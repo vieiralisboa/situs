@@ -38,7 +38,6 @@ class Recursos_Controller
                 return null;
 
             case "execute":
-
                 if(isset($request->uri[2])) {
                     $db = Resource::db(Router::$controller_config);
                     $sql = urldecode($request->uri[2]);
@@ -429,11 +428,13 @@ class Recursos_Controller
             $config = Router::$controller_config;
             $db = Resource::db($config);
 
-            return $db->recursivo( $db->rendimento($request->data['id']) );
+            return $db->recursivo($db->rendimento($request->data['id']));
         });
 
         Router::route('/recursos/rendimento/:id', function($request) {
+            //return $request;
             $db = Resource::db(Router::$controller_config);
+            
             try {
                 $result = $db->rendimento($request->data['id']);
             }

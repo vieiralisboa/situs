@@ -59,7 +59,7 @@ class Resource
         $recursos = $this->query(str_replace("{id}", $id, self::$composto_query));
 
         foreach ($recursos as $key => $recurso) {
-            if($recurso['TIPO_CODIGO'] == "COMP") $price += $this->composto($recurso['RECURSO_ID']);
+            if($recurso['TIPO_CODIGO'] == "RCO") $price += $this->composto($recurso['RECURSO_ID']);
             else $price += $recurso['RECURSO_PRECO'] * $recurso['QUANTIDADE'];
         }
 
@@ -70,7 +70,7 @@ class Resource
     public function recursivo($rendimento)
     {
         foreach ($rendimento['recursos'] as $key => $recurso) {
-            if($recurso['TIPO_CODIGO'] == "COM") {
+            if($recurso['TIPO_CODIGO'] == "RCO") {
                 $rendimento['recursos'][$key] = $this->recursivo($this->rendimento($recurso['RECURSO_ID']));
             }
         }
@@ -95,7 +95,7 @@ class Resource
         //$result['recurso']['RECURSO_ID'] = intval($result['recurso']['RECURSO_ID']);
 
         // composto
-        if($recurso[0]['TIPO_CODIGO'] == "COM") {
+        if($recurso[0]['TIPO_CODIGO'] == "RCO") {
             try {
                 $recursos = $this->query(str_replace("{id}", $recurso[0]['RECURSO_ID'], self::$rendimento_query));
             }
@@ -106,7 +106,7 @@ class Resource
             foreach ($recursos as $key => $value) {
                 $id = intval($value['RECURSO_ID']);
 
-                if($value['TIPO_CODIGO'] == "COMP") $price = $this->composto($id);
+                if($value['TIPO_CODIGO'] == "RCO") $price = $this->composto($id);
                 else $price = floatval($value['RECURSO_PRECO']);
 
                 $quantity = floatval($value['QUANTIDADE']);
