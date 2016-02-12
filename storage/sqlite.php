@@ -28,7 +28,13 @@ class Sqlite
 
             if(file_exists("$base/sqlite.json")) {
                 $config = json_decode(file_get_contents("$base/sqlite.json"));
-                if(!empty($config->base)) $base = $config->base;
+                
+                // custom database (base) dir [from json conf]
+                if(!empty($config->base)) {
+                    // valid dir?
+                    if(is_dir($config->base))
+                        $base = $config->base;
+                }
             }
 
             $database = "sqlite:$base/situs.sqlite";
@@ -40,7 +46,7 @@ class Sqlite
         catch( PDOException $Exception ) {
             // Note The Typecast To An Integer!
             #throw new MyDatabaseException($Exception->getMessage() , (int) $Exception->getCode());
-            Util::quit(417, $Exception->getMessage());
+            Util::quit(417, $Exception->getMessage()." [$database]");
         }
 
 
@@ -78,7 +84,17 @@ class Sqlite
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name = '$table';";
         $query = $this->connect()->query($sql);
         $create = $query->fetch();
+
+#return preg_match("/\(\.+\)/", $create[0]);
+
+
+#return $create[0];
+
+
         $create = explode("\n", $create[0]);
+#return $create;
+
+
         $this->schema = array();
         for($i=1; $i < count($create); $i++){
             $trimmed = str_replace(array(",",")"), "", trim($create[$i]));

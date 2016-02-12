@@ -21,6 +21,7 @@ class Database extends Sqlite {
      */
     public static function db ()
     {
+         #die("#Database::db");
          return new Database();
     }
 
@@ -30,7 +31,7 @@ class Database extends Sqlite {
      */
     public static function query($sql)
     {
-        // validate sql here
+        //TODO validate sql here
 
         $result = self::db()->connect()->query($sql);
 
@@ -49,8 +50,10 @@ class Database extends Sqlite {
      */
     public static function all()
     {
-
         $db = self::db();
+
+#var_dump($db);
+#die("#Database::all");
 
         $result = $db->connect()->query("SELECT * FROM ".self::$table);
         
@@ -90,8 +93,8 @@ class Database extends Sqlite {
     {
         $data = $this->validate_schema_fields();
 
-if(!count($data['fields']) || !count($data['values']))
-    Util::quit(417, "FAILED TO GET SCHEMA FIELDS");//json_encode($data));        
+        if(!count($data['fields']) || !count($data['values']))
+            Util::quit(417, "FAILED TO GET SCHEMA FIELDS");//json_encode($data));        
 
         $sql = "INSERT INTO {table}({fields}) VALUES({values});";
         $sql = str_replace("{table}", self::$table, $sql);
@@ -156,7 +159,7 @@ if(!count($data['fields']) || !count($data['values']))
     /**
      * Saves a record to the database
      */
-    public function save ($id = null)
+    public function save($id = null)
     {
         #$numargs = func_num_args();
         #$args = func_get_args();
@@ -198,15 +201,15 @@ if(!count($data['fields']) || !count($data['values']))
 
         //* using schema.php
         // if the table desn't exist
-        if(!$sqlite->table_exists($table)) {
-#Util::quit(417, "'$table' NO EXISTS");
+        if(!$sqlite->table_exists($table)) {    
+            #Util::quit(417, "'$table' NO EXISTS");
 
             $root = dirname(dirname(__FILE__));
             $schema_file = "$root/private/schemas/$table.php";
-#Util::quit(417, "'$schema_file'");
+            #Util::quit(417, "'$schema_file'");
 
             if(!load($schema_file)) {
-#Util::quit(417, "'$schema_file' DOES NO EXIST");
+                #Util::quit(417, "'$schema_file' DOES NO EXIST");
                 return -1;
             }
 
@@ -223,7 +226,7 @@ if(!count($data['fields']) || !count($data['values']))
             return 1;// created table
         }
         else  {
-#Util::quit(417, "'$table' ALREADY EXISTS");
+            #Util::quit(417, "'$table' ALREADY EXISTS");
             return 0;// did not create table (table already exists)
         }
         //*/
@@ -244,22 +247,28 @@ if(!count($data['fields']) || !count($data['values']))
      */
     public static function seed($records)
     {
+#return $records;
+
         $table = self::$table;
         self::create_table($table);
 
         $sqlite = new Sqlite;
         $schema = $sqlite->schema($table);
  
-        $fields = $types= array();
+#return $schema;
+
+        $fields = $types = array();
         foreach($schema as $field => $type) {
             $fields[] = $field;
             $types[$field] = $schema[$field][0];
         }
 
         // Prepare INSERT statement to SQLite3 file db
-        $sql = "INSERT INTO $table({fields}) VALUES (:{values});";
+        $sql = "INSERT INTO $table ({fields}) VALUES (:{values});";
         $sql = str_replace("{fields}", implode(", ", $fields), $sql);
         $sql = str_replace("{values}", implode(", :", $fields), $sql);
+
+#die($sql);
 
         $stmt = self::db()->connect()->prepare($sql);
         
@@ -287,7 +296,7 @@ if(!count($data['fields']) || !count($data['values']))
         $schema = $this->schema();
         $fields = $values = array();     
 
-#Util::quit(417, "validate_schema_fields: ".json_encode(array($input, $schema)));  
+        #Util::quit(417, "validate_schema_fields: ".json_encode(array($input, $schema)));  
 
         foreach($input as $field => $value) {
             $fields[] = $field;
@@ -296,10 +305,11 @@ if(!count($data['fields']) || !count($data['values']))
         return array('fields'=>$fields, 'values'=>$values);
     }
 
-   
     function __construct($input = null)
     {
+        
         if($input === null) return;
+die("#Database__construct");
 
         if(self::create_table(self::$table) == -1) 
             Util::quit(417, "FAILED TO CREATE '".self::$table."' TABLE");
@@ -308,9 +318,10 @@ if(!count($data['fields']) || !count($data['values']))
     
         $this->input = $input;
         
-if(!count($schema)) Util::quit(417, "FAILED TO GET '".self::$table."' SCHEMA");
+        if(!count($schema)) Util::quit(417, "FAILED TO GET '".self::$table."' SCHEMA");
 
         $this->fields = (object) array();
+
         foreach($input as $field => $value){
             if(isset($schema[$field])){
                 $this->fields->$field = $value;
