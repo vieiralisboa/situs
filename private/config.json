@@ -1,6 +1,6 @@
 {
 	"offline": false,
-	"ssl": true,
+	"ssl": false,
 	"activity": {
 		"disabled": true,
 		"folder": "/var/www/logs/",
