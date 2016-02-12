@@ -14,6 +14,7 @@
 //--------------------------
 error_reporting(0);
 
+// please review the config file (config.json)
 Router::run();
 
 /**

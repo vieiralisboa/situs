@@ -4,7 +4,10 @@
 ## be placed in your Apache config whenever possible.
 ## http://httpd.apache.org/docs/2.2/howto/htaccess.html
 
-DirectoryIndex index.html index.php
+## uncomment to use index.html on root folder
+#DirectoryIndex index.html index.php
+
+SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
 
 ### Headers
 <IfModule mod_headers.c>
