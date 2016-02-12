@@ -14,6 +14,7 @@ class Frontgate_Controller
         Router::route('/frontgate', function() {
             $path = WWW.Router::$controller_config->docs."frontgate/";
             $file = utf8_decode($path."js/frontgate.js");
+            
             if(!file_exists($file)) Util::quit(404);
             return Util::serve($file);
         });
@@ -59,7 +60,7 @@ class Frontgate_Controller
             }
 
             $frontgate = file_get_contents($file);
-            $temp = WWW.Router::$controller_config->temp;
+            $temp = TEMP_FOLDER;
             $temp .= "frontgate.and.{$request->data['module']}.js";
             $protocol = $_SERVER['HTTPS']? "https" : "http";
 
