@@ -1,0 +1,12 @@
+{
+	"seed": null,
+	"links": [
+		"/eurolotto/gen",
+		"/eurolotto/gen2",
+		"/eurolotto/distrib",
+		"/eurolotto/draws",
+		"/eurolotto/last/:n",
+		"/eurolotto/inlast/:n",
+		"/eurolotto/:id"
+	]
+}
