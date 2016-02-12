@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<style>
+/* style */	
+</style>
+<ol style="display: block; text-align: left; font-family: Consolas, monospace; font-size: 80%; white-space: nowrap;">
+	<h3><!-- crums --></h3><!-- back -->
+	<li style="padding: 10px; display: block; border: none;">
+		<ol style="display: table; padding: 0; margin: 0; border: none;">
+			<!-- folders -->
+			<!-- files -->
+		</ol>
+	</li>
+</ol>
+<script type="text/javascript">
+function toggleFullScreen() {
+  if (!document.fullscreenElement &&    // alternative standard method
+      !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+    e = e || window.event;
+    switch(e.keyCode){
+    	case 37:// left arrow
+            move.left();
+            break;
+    	case 38:// up arrow
+            move.up();
+            break;
+    	case 39:// right arrow
+            move.right();
+            break;
+    	case 40:// down arrow
+            move.down();
+            break;
+    	
+        case 13:// enter
+            move.enter();
+            break;
+
+        // FULLSCREEN
+        case 70:// F
+        case 102:// f
+            toggleFullScreen();
+            break;
+
+        case 27://escape
+        var oldURL = document.referrer;
+        //alert(oldURL);
+        location = oldURL;
+        break;
+
+    	default:
+    	console.log(e.keyCode);
+    }
+}
+
+    var move = {
+        firstTile: function(){
+            this.tiles().removeClass("selected").first().addClass("selected");
+        },
+        location: function() {
+            var selectedTile = this.selectedTile();
+            if(!selectedTile) return;
+            return selectedTile.find("a").attr("href");
+        },
+        tiles: function(){
+            return $("li.tile");
+        },
+        selectedTile: function() {
+            var selectedTile = $("li.tile.selected");
+            if(selectedTile.length == 1) return selectedTile;
+            return false;
+        },
+        right: function(){
+            //console.log("right");
+            var selectedTile = this.selectedTile();//$("li.tile.selected");
+            if(selectedTile.length > 0) {
+                var nextTile = selectedTile.next();
+                if(nextTile.length > 0) {
+                    selectedTile.removeClass("selected");
+                    nextTile.addClass("selected");
+                } 
+            }
+            else this.firstTile();
+        },
+        left: function(){
+            //console.log("left");
+            var selectedTile = this.selectedTile();//$("li.tile.selected");
+            if(selectedTile.length > 0) {
+                var prevTile = selectedTile.prev();
+                if(prevTile.length > 0) {
+                    selectedTile.removeClass("selected");
+                    prevTile.addClass("selected");
+                } 
+            }
+            else this.firstTile();
+        },
+        up: function(){
+            //console.log("up");
+            var selectedTile = this.selectedTile();
+            if(selectedTile.length == 1) {
+                var prevTile = selectedTile.prev();
+                var pos = prevTile.position();
+                while(typeof pos != "undefined"){
+                    if(pos.left == selectedTile.position().left){
+                        selectedTile.removeClass("selected");
+                        prevTile.addClass("selected");
+                        break;
+                    } 
+                    prevTile = prevTile.prev();
+                    pos = prevTile.position();
+                }
+            }
+            else this.firstTile();
+        },
+        down: function(){
+            var selectedTile = this.selectedTile();
+            if(selectedTile.length == 1) {
+                var nextTile = selectedTile.next();
+                var pos = nextTile.position();
+                while(typeof pos != "undefined"){
+                    if(pos.left == selectedTile.position().left){
+                        selectedTile.removeClass("selected");
+                        nextTile.addClass("selected");
+                        break;
+                    } 
+                    nextTile = nextTile.next();
+                    pos = nextTile.position();
+                }
+            }
+            else this.firstTile();
+        },
+        enter: function(){
+            //console.log("enter");
+            var selectedTile = this.selectedTile();//$("li.tile.selected");
+            if(selectedTile.length == 1) {
+                //alert(selectedTile.attr("title"));
+                //var href = selectedTile.find("a").attr("href");
+                location = selectedTile.find("a").attr("href");
+                //alert(href);
+            }
+        }
+    };
+</script>
+</body>
+</html>

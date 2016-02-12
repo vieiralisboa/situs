@@ -1,0 +1,321 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<style>
+body {
+    height: 100%;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    color: rgb(40,40,40);
+}
+video {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    width: 100%;
+    vertical-align: middle;
+}
+#container {
+    margin:0;
+    padding: 0;
+    text-align: center; 
+    background-color: black;
+    width: 100%; 
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.67);
+    position: absolute; 
+}
+#vid {
+    margin: 10px;
+    padding: 0;
+    display: inline-block;
+    box-shadow: 0 0 15px 3px rgba(0,0,0,.5);
+}
+::cue {
+    text-shadow: 1px 1px 5px black;
+    background-color: rgba(0,0,0,0.25);
+    color: rgba(255,255,255,0.95);
+    font-size: 125%;
+}
+
+::cue(.orange) {
+    color: orange;
+    font-size: 75%;
+}
+
+div.log{
+    top: 30px;
+    position: absolute;
+    z-index: 1;
+    text-align: center;
+    width: 100%;
+    background-color: none;/*rgba(0, 255, 255, .25);*/
+}
+
+div.log > span {
+    display: none;
+    color: orange; 
+    font-family: consolas, monospace;
+    font-weight: bold;
+    font-size: 150%;
+    background-color: rgba(0,0,0,.25);
+    border-radius: 5px;
+    padding: 10px 15px;
+    text-shadow: 1px 1px 3px black;
+}
+</style>
+<div id="osd" class="log"><span></span></div>
+<div id="container">
+    <div id="vid">
+        <video id="video" autoplay controls onclick="clickedOnVideo();">
+          <!-- source -->
+          <track id="osd-track">
+          <!-- tracks -->
+        Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+<script>
+
+    function gotoReferrer(){
+        var oldURL = document.referrer;
+        //alert(oldURL);
+        location = oldURL;
+    }
+
+    var osdcue = new VTTCue(0, 300, "OSD");
+    osdcue.line = 0; 
+    console.log(osdcue);
+
+    var track = $("#osd-track")[0];
+    track.kind = "captions";
+    track.label = "English";
+    track.srclang = "en";
+//    track.src = "captions/osd-en.vtt";
+
+
+var tracks = video.textTracks;
+var tracksLen = tracks.length;
+var lastVolume = 1;
+
+    function addOSDCue(text, t){
+        if(typeof t == "undefined") t = 3;
+        
+        tracks[0].mode = "showing";
+        //var cue = new VTTCue(start, end, text);
+        //console.log(cue);
+        //track.addCue(cue); 
+        //track.addCue(new VTTCue(18.7, 21.5, "This blade has a dark past.")); 
+        //track.addCue(new VTTCue(22.8, 26.8, "It has shed much innocent blood."));
+        osdcue.endTime =  video.currentTime;
+
+        if(text != "") osdcue.text = "<i.orange>" + text + "</i>";
+        osdcue.startTime =  video.currentTime;
+        osdcue.endTime =  video.currentTime + t;
+
+        //tracks[0].addCue(osdcue);
+        
+        //tracks[0].mode = "showing";
+    }
+
+/*
+video.addEventListener("loadedmetadata", function() { 
+   track = document.createElement("track"); 
+   track.kind = "captions";
+   track.label = "English";
+   track.srclang = "en"; 
+   track.src = "captions/sintel-en.vtt"; 
+   track.addEventListener("load", function() { 
+      this.mode = "showing"; 
+      video.textTracks[0].mode = "showing"; // thanks Firefox 
+   }); 
+   this.appendChild(track); 
+});
+*/
+
+function osd(msg){
+    $("#osd > span").text(msg).fadeIn();
+    setTimeout(function(){
+        $("#osd > span").fadeOut();
+    }, 3000);
+}
+
+function clickedOnVideo(){
+    console.log("clickedOnVideo"); 
+}
+
+function toggleFullScreen() {
+    // Mozilla
+    //document.mozFullscreen;
+    // Webkit
+    if(document.webkitIsFullScreen){
+        // Mozilla
+        //video.mozCancelFullScreen();
+        // Webkit
+        //video.webkitCancelFullScreen();
+        document.webkitExitFullscreen();
+    }
+    else {
+        // Mozilla
+        //video.mozRequestFullScreen();
+        // Webkit for video elements only
+        video.webkitEnterFullScreen();
+    }
+}
+
+video.addEventListener("click", function(){
+    //console.log("click event");
+    //toggleFullScreen();
+});
+
+video.addEventListener("dblclick", function(){
+    toggleFullScreen();
+    //console.log("dblclickedOnVideo");     
+});
+
+video.onended = gotoReferrer;
+
+// when the video starts...
+//video.onloadstart
+var videoName = "Name";
+video.onloadedmetadata = function() {
+    //video.click();
+    
+    this.volume = 0.5;
+
+    console.log("video.onloadstart");
+    var buri = video.baseURI.split("/");
+    //console.log(buri, buri.length);
+    videoName = decodeURI(buri[buri.length-1]);
+
+    //addOSDCue(videoName, 3);
+
+        tracks[0].mode = "showing";
+        //var cue = new VTTCue(start, end, text);
+        //console.log(cue);
+        //track.addCue(cue); 
+        //track.addCue(new VTTCue(18.7, 21.5, "This blade has a dark past.")); 
+        //track.addCue(new VTTCue(22.8, 26.8, "It has shed much innocent blood."));
+
+        osdcue.text = "<i.orange>" + videoName + "</i>";
+        osdcue.startTime =  0;
+        osdcue.endTime =  video.currentTime + 3;
+        tracks[0].addCue(osdcue);
+};
+
+//document.onkeypress
+document.onkeydown = function(e) {
+    var showing = 0;    
+    switch(e.keyCode) {
+        case 38:// up arrow
+        case 43:// +
+            if(video.muted) video.muted = !video.muted;
+            //console.log("+");
+            if(video.volume < 0.9) video.volume += .1;
+            else video.volume = 1;
+            addOSDCue("Volume: " + Math.round(video.volume*100) + "%");
+            break;
+        case 40:// down arrow
+        case 45:
+            if(video.muted) video.muted = !video.muted;
+            //console.log("-");
+            if(video.volume > 0.1)  video.volume -= .1;
+            else video.volume = 0;
+            addOSDCue("Volume: " + Math.round(video.volume*100) + "%");
+            break;
+        // MUTE
+        case 77:// M
+        case 109:// m
+            video.muted = !video.muted;
+            if(video.muted) addOSDCue("Muted");
+            else addOSDCue("Volume: " + Math.round(video.volume*100) + "%");
+            break;
+        // PAUSE
+        case 13:// P
+        case 80:
+        case 112:// p
+        case 32:// <space>
+            if(video.paused) {
+                addOSDCue("Playing");
+                video.play();
+            } 
+            else {
+                addOSDCue("Paused");
+                video.pause();
+            } 
+            break;
+
+        // subtitle tracks
+        case 16:
+        case 76:
+        case 108:
+            if(tracksLen < 1) break;
+            
+            console.log("tracksLen", tracksLen);
+
+            for(var i = 0; i < tracksLen; i++) {
+                // remmember active (showing) track
+                if(tracks[i].mode == "showing" && i != 0) showing = i;
+                
+                // disable all but the OSD track
+                if(i != 0) tracks[i].mode = "disabled"; 
+            }
+
+            // "showing" is not the last track
+            if(++showing < tracksLen) {
+                //console.log("CC:", tracks[showing].label);
+                tracks[showing].mode = "showing";
+                //osd(tracks[showing].label);
+            
+                //console.log(tracks[0]);
+                //osdcue.startTime = video.currentTime;
+                if(showing == 0) addOSDCue("OSD on");
+                else {      
+                    addOSDCue(tracks[showing].label);
+                } 
+            }
+            else {
+                //osd("CC off");       
+                //console.log("cc off");
+                if(tracksLen > 1) addOSDCue("subtitles off");
+                else  addOSDCue("no subtitles");
+            }
+            break;
+
+        case 73:// I (info)
+        case 105: // i (info)
+            var duration = Math.round(video.duration);
+            var remain_secs = duration%3600;
+
+            var videoLen = {};
+            videoLen.h = (duration-remain_secs)/3600;
+            videoLen.s = remain_secs%60;
+            videoLen.m = (remain_secs-videoLen.s)/60;
+            
+            addOSDCue(videoName+"\n{ duration: "+ ("0" + videoLen.h).substr(-2)+":"+("0" + videoLen.m).substr(-2)+":"+("0" + videoLen.s).substr(-2)+", width: "+video.videoWidth+", height: "+video.videoHeight+" }");
+        break;
+
+        // FULLSCREEN
+        case 70:// F
+        case 102:// f
+            toggleFullScreen();
+            break;
+
+        case 27://escape
+        gotoReferrer();
+        break;
+
+        default:
+            console.log("keyCode", e.keyCode);
+    }
+};
+</script>
+</body>
+</html>

@@ -1,3 +1,5 @@
 {
-	"dir": "/media/96A8AA7CA8AA5B0F/Transmission"
+	"dir": "C:/Users/acer-pc/Videos",
+	"ignore": ["posters", "images", "legendas", "situs", "ignore"],
+	"_dir": "/media/96A8AA7CA8AA5B0F/Transmission"
 }

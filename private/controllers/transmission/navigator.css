@@ -1,0 +1,127 @@
+/*
+body {
+    background-color: rgba(0,0,0,0.75);
+    color:silver;
+}
+*/
+
+h3 {
+    padding: 5px 8px;
+    font-family: Consolas, monospace;
+    font-weight: bold;
+    /*background-color: rgba(0,0,0,.05);*/
+    font-size: 125%;
+
+}
+
+a.file {
+    color: rgb(160,240,200);
+    text-decoration:~none;
+    width: 100%; height: 100%;
+}
+
+a, a.folder { 
+    color: rgb(200,160,240);
+    text-decoration:none;
+}
+
+a:hover {
+    text-decoration: none; 
+    text-shadow: 0 0 5px black
+}
+
+ol {
+    display: table;
+    padding: 0px;
+    margin: 0 0 0 10px;
+}
+    
+li {
+    background-color: rgba(133,133,133,.2);
+    float: left;
+    display:inline-block;
+    padding: 0px;
+    margin: 6px;
+    border-radius: 7px;
+    border: solid 1px rgba(255,255,255,0.1);
+}
+
+/*
+li {
+    background-color: rgba(133,133,133,.2);
+    float: left;
+    display:inline-block;
+    padding: 0px;
+    margin: 6px;
+    border-radius: 7px;
+    -webkit-transition: .25s;
+    transition: .25s;
+    border: solid 1px rgba(255,255,255,0.1);
+}
+*/   
+
+li.folder {
+    padding: 5px 10px;
+}
+
+li.tile {
+    /*opacity: 0.9;*/
+}
+
+/*   
+li.mp4 {  background-image: url(\"/public/serve/poster.jpg\"); background: transparent\9; }";//
+li.mp4 a {
+    line-height: 128px; 
+    height: 128px;
+    border: solid blue 1px;
+    width: 128px;
+    overflow: hidden;
+    background-color: blue;
+}
+*/
+
+div.video {
+    border-radius: 6px; 
+    margin: 2px;
+    overflow: hidden;
+    color: rgb(255,255,255);
+    font-size: 150%;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px black;
+    width: 172px;
+    height: 248px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: auto 256px;
+    /* background-image */
+}
+
+/*    
+img.poster { height: 128px; }
+*/
+
+li:hover {
+    background-color: rgba(133,133,133,.35);
+    border: solid 1px rgba(255,255,255, .1);
+    box-shadow: 0 0 10px black;
+}
+
+li.selected {
+    background-color: #D2691E;
+    box-shadow: 0 0 10px orange;
+    /*opacity: 1;*/
+}
+
+li * { vertical-align: middle; }
+li span {
+    cursor: default;
+    color: gray;
+}
+h3, h3 a {
+    color: rgb(90,90,90);
+}
+h3 a:hover {
+    color: rgb(140,140,140);
+}
+
+

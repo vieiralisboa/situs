@@ -1,16 +1,18 @@
 <?php
 
 /**
- * Transmission controller
+ * Transmission class
  */
 class Transmission_Controller
 {
-    public function get($request) {
-        #return "offline";
+    public static function get($request) {
         $config = Router::$controller_config;
-        $dir = "/shares";
-        if(isset($config->dir)) $dir = $config->dir;
-        return response($request, $dir);
+        foreach (array("dir","ignore") as $name)
+    		if(isset($config->$name)) $request->$name = $config->$name;
+
+        $request->url = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'].$request->pre."/";
+        
+        echo response($request);
     }
 }
 
